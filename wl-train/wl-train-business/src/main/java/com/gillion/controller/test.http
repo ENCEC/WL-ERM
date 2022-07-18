@@ -1,0 +1,24 @@
+###单个插入
+GET http://127.0.0.1:8080/ec-demo/insert1
+
+###单个更新
+GET http://127.0.0.1:8080/ec-demo/update1
+
+###单个删除
+GET http://127.0.0.1:8080/ec-demo/delete1
+
+### 批量插入
+GET http://127.0.0.1:8080/ec-demo/insert2
+
+### post请求
+POST http://127.0.0.1:8080/ec-demo/query1
+Content-Type: application/x-www-form-urlencoded
+
+cname=张三&mobile=123
+
+###
+DELETE http://localhost:8080/ec-demo/delete1/22
+
+
+### get请求
+GET http://127.0.0.1:8080/users/roles?username=wengms

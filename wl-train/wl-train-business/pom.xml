@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>wl-train-parent</artifactId>
+        <groupId>com.gillion.train</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../wl-train-parent/pom.xml</relativePath>
+    </parent>
+    <packaging>jar</packaging>
+    <artifactId>wl-train-business</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.train</groupId>
+            <artifactId>wl-train-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+
+        <!--daoservice-->
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-auth-ec-support</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>dao-service-embed-entity</artifactId>
+                    <groupId>com.gillion.ds</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-auth-core</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>dao-service-embed-entity</artifactId>
+                    <groupId>com.gillion.ds</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-core</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--<dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-gtx-core</artifactId>
+            <classifier>pg</classifier>
+        </dependency>-->
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-data-permission-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-client</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-embed-engine</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-embed-entity</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>persistence-api</artifactId>
+                    <groupId>javax.persistence</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-restful-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-excel</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-rule-number-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+
+
+        <!--ec start -->
+        <!--ec boot配置包-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-boot-autoconfigure</artifactId>
+            
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-distributed-lock</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--ec redis操作工具类-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-redis-client</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-cloud-debugger-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+
+        <!--ec 规则编号生成：客户端-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-rule-feign-number-client</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec 规则编号生成-缓存支持 -->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-rule-cache-number</artifactId>
+            <version>${ec.version}</version>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec 规则编号生成：基础包-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-rule-number-core</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec 规则编号生成：引擎端-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-rule-number-engine</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec 规则编号生成：管理台-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-rule-number-web</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+
+        <!--ec mq支持-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mq-boot-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--ec mq配置服务-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mq-config-server</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec mq配置获取客户端-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mq-config-client</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec mq管理台-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mq-dashboard</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+
+        <!--ec: 定时调度-数据库配置获取与状态维护-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-scheduler-jpa-data</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec: 定时调度-管理台-->
+
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-scheduler-web</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec: 定时调度-协议实现-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-scheduler-protocol-netty</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec: 定时调度-调度中心-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-scheduler-supervisor</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec: 定时调度-工作节点-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-scheduler-worker</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+
+        <!--ec: 返回结果封装-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-controller-result-support</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--ec: 核心包-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-core</artifactId>
+            
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>persistence-api</artifactId>
+                    <groupId>javax.persistence</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--ec: 功能权限实现-集成认证中心时，功能需要排除-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-web-filter-support</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec: 二级缓存支持-->
+
+        <dependency>
+            <groupId>com.gillion</groupId>
+            <artifactId>cache-manager</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion</groupId>
+            <artifactId>cache-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-spring-cache-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--ec redis缓存支持-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-cache-redis-support</artifactId>
+
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 地区控件支持-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-area-support</artifactId>
+            
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>persistence-api</artifactId>
+                    <groupId>javax.persistence</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--EC 批处理支持-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-batch-executor-support</artifactId>
+            
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>persistence-api</artifactId>
+                    <groupId>javax.persistence</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--EC 文件上传支持-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-upload-cloud-filesystem</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--远程文件服务配置获取-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-upload-cloud-remote-config</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 本地文件上传支持-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-upload-local-filesystem</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 后端校验实现-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-validator-support</artifactId>
+            
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--EC grid表格自定义布局维护-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-grid-support</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC mybatis维护-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mybatis-base-support</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--ec mybatis拦截器实现-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mybatis-interceptors</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--EC 主键生成相关：int自增策略实现-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-int-id-generator</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--EC 主键生成相关：雪花算法实现-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-snow-flake-id-generator</artifactId>
+            
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--EC 主键生成相关：uuid实现-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-uuid-id-generator</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 权限控制：数据权限实现-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-security-data-support</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 权限控制：功能权限控制-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-security-web-support</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--EC 静态资源版本管理-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-static-version-support</artifactId>
+            
+            <classifier>pg</classifier>
+        </dependency>
+
+
+        <!--EC 全局异常处理-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-exception-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.eds.client</groupId>
+            <artifactId>eds-client-extends-redis</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
+        <!--spring -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions><!-- 去掉默认配置 -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--spring-boot单元测试依赖包-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency> <!-- 引入log4j2依赖 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <!--<dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+        </dependency>-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>3.0.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+        </dependency>
+
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.2.5.RELEASE</version>
+                <!--使打包后的jar能直接运行-->
+                <configuration>
+                    <mainClass>com.gillion.Application</mainClass><!--这个要改成自己的入口类-->
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <!--跳过maven打包时的测试-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <artifactId>support-parent</artifactId>
+        <groupId>com.share</groupId>
+        <version>1.2020.001-RELEASE</version>
+        <relativePath/>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>share-auth-service</artifactId>
+    <version>1.2020.001-SNAPSHOT</version>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>logback-classic</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j-to-slf4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.49</version>
+        </dependency>
+        <!-- 编号生成 -->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-rule-feign-number-client</artifactId>
+            <classifier>pg</classifier>
+            <version>4.3.0.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- 编号生成 -->
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-rule-number-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!-- 规则引擎 enf-->
+
+        <!-- 服务间会话传递 -->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-cloud-session-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!-- 服务间会话传递 -->
+
+        <!-- guava start-->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+        </dependency>
+        <!-- guava end -->
+
+        <!--数据服务 start-->
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-data-permission-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-cache-support</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.gillion.ds</groupId>
+                    <artifactId>dao-service-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.gillion.ds</groupId>
+                    <artifactId>dao-service-embed-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion</groupId>
+            <artifactId>cache-manager</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-embed-entity</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-embed-engine</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-excel</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-client</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.squareup.okhttp3</groupId>
+                    <artifactId>okhttp</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bytesoft</groupId>
+            <artifactId>bytejta-supports</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-restful-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ds</groupId>
+            <artifactId>dao-service-auth-ec-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!-- es升级 -->
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-config-nacos</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-discovery-nacos</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-spring</artifactId>
+        </dependency>
+        <!-- es升级 -->
+        <!--数据服务 end-->
+
+
+        <!--GlPaas 相关JAR包 end-->
+
+        <!--EC 开始-->
+        <!--EC 基础-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-core</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-web-filter-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-spring-cache-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-cloud-debugger-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC Security-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-security-web-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-security-data-support</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--EC mybatis相关-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mybatis-base-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mybatis-interceptors</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 校验-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-validator-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--EC grid-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-grid-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 一级缓存-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-cache-redis-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 文件上传-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-upload-cloud-filesystem</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-upload-local-filesystem</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+
+        <!--EC excel导入导出-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-excel-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 主键生成相关-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-int-id-generator</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-snow-flake-id-generator</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-mybatis-generator-plugins</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-uuid-id-generator</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 地区-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-area-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!-- EC exception-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-exception-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!-- EC controller-result-->
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-controller-result-support</artifactId>
+            <classifier>pg</classifier>
+        </dependency>
+        <!--EC 结束-->
+        <!-- spring boot  start-->
+        <!-- spring-boot-starter-web-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>logback-classic</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j-to-slf4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- spring-boot-starter-test-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- spring-boot-starter-log4j2-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <!-- spring boot  end-->
+
+        <!-- spring start-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+        </dependency>
+        <!-- spring end-->
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- metrics-->
+        <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion</groupId>
+            <artifactId>gillion-esb-api</artifactId>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.ec</groupId>
+            <artifactId>ec-rule-number-core</artifactId>
+            <classifier>pg</classifier>
+            <version>4.3.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.eds.client</groupId>
+            <artifactId>eds-client-core</artifactId>
+            <version>4.0.1.RELEASE</version>
+            <classifier>pg</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.eds.client</groupId>
+            <artifactId>eds-client-extends-redis</artifactId>
+            <classifier>pg</classifier>
+            <version>4.0.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>share-auth-api</artifactId>
+            <version>1.2020.001-SNAPSHOT</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- spring-session start-->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+        </dependency>
+        <!-- spring-session end-->
+        <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>support-core</artifactId>
+            <version>1.2020.001-RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--Hutool Java工具包-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.7.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>share-message-api</artifactId>
+            <version>1.2020.001-RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>share-file-api</artifactId>
+            <version>1.2020.001-RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.eds.client</groupId>
+            <artifactId>eds-client-session</artifactId>
+            <version>4.0.1.RELEASE</version>
+            <classifier>pg</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.gillion</groupId>
+                    <artifactId>eds-client-esb-support</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.devops</groupId>
+            <artifactId>g-authentication-centre-session</artifactId>
+            <version>1.0.0.3.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gillion.eds.client</groupId>
+            <artifactId>eds-client-authentication-support</artifactId>
+            <version>4.0.1.RELEASE</version>
+            <classifier>pg</classifier>
+        </dependency>
+        <!-- 认证中心api -->
+        <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>share-auth-center-api</artifactId>
+            <version>1.2020.001-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>5.2.2.RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
+        <!--> thumbnailator <-->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.8</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <outputDirectory>target\classes</outputDirectory>
+        <testOutputDirectory>target\test-classes</testOutputDirectory>
+        <resources>
+            <resource>
+                <directory>src\main\java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.ftl</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.drl</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src\main\resources</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.bpmn</include>
+                    <include>**/*.png</include>
+                    <include>**/**/*.jpg</include>
+                    <include>**/*.html</include>
+                    <include>**/*.json</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.drl</include>
+                    <include>**/*.txt</include>
+                    <include>**/*.xls</include>
+                </includes>
+                <excludes>
+                    <exclude>deploy/**</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src\test\resources</directory>
+            </testResource>
+        </testResources>
+
+        <directory>target</directory>
+        <finalName>share-auth-service</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>spring-boot</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <packaging>jar</packaging>
+                <springBootScope>compile</springBootScope>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>${boot.maven.plugin.version}</version>
+                        <!--使打包后的jar能直接运⾏-->
+                        <configuration>
+                            <mainClass>com.share.auth.AuthApplication</mainClass><!--这个要改成自己的入口类-->
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>tomcat</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <packaging>war</packaging>
+                <springBootScope>provide</springBootScope>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>
