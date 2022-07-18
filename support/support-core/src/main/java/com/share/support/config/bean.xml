@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://3g.ahong.com/schema/mrp/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="">
+<!--fileName支持通配符-->
+
+<bean className="com.device.util.xlsbean.Bean" fileName="*" head="4" from="5">
+	<!-- bean属性名，xls中列名 顺序不要求 -->
+	<property name="name" value="用户名"></property><!--  nullable="false" -->
+	<property name="qq" value="QQ号"></property>
+</bean>
+
+</beans>
