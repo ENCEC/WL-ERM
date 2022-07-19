@@ -58,9 +58,9 @@ spring:
   slave-datasource:
     name: slaveDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_logink_portal?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: zhwl_lip_logink_portal
-    password: zhwl_lip_logink_portal
+    url: jdbc:mysql://172.16.0.23:3306/zhwl_lip_logink_portal?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
     type: com.alibaba.druid.pool.DruidDataSource
     maxActive: 30
     validationQuery: select 1 FROM DUAL
@@ -176,7 +176,7 @@ ec:
   area:
     enabled: false
   rule-number:
-    server-name: supply-chain-cec
+    server-name: supply-chain
     path: rule-number
   mybatis:
     interceptor:
@@ -396,8 +396,7 @@ feignClient:
 msg:
   systemCode: YYDM200013
   #  httpUrl: http://117.149.228.171:10003  #开发环境代理的ip
-#  httpUrl: http://dev.lip.share-auth-center.dps.gillion.com.cn  #开发环境代理的ip
-  httpUrl: http://dev.lip.wifi.gillion.com.cn:9540
+  httpUrl: http://dev.lip.share-auth-center.dps.gillion.com.cn  #开发环境代理的ip
   sms:
     template:
       review_success: share_auth_review_success
