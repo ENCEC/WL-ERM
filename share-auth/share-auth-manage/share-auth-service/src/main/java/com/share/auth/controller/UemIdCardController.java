@@ -2,11 +2,8 @@ package com.share.auth.controller;
 
 import com.share.auth.domain.*;
 import com.share.auth.service.UemIdCardService;
-import com.share.auth.service.UserCompanyManageService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.file.domain.*;
-import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,9 +31,6 @@ public class UemIdCardController {
 
     @Autowired
     private UemIdCardService uemIdCardService;
-
-    @Autowired
-    private UserCompanyManageService userCompanyManageService;
 
     @Autowired
     private DefaultUserService userService;
@@ -70,55 +64,6 @@ public class UemIdCardController {
     @ResponseBody
     public ResultHelper<Map<String, Object>> saveUemCompany(@RequestBody UemCompanyDto uemCompanyDto) {
         return uemIdCardService.saveUemCompany(uemCompanyDto);
-    }
-
-    /**
-     * 解除绑定
-     *
-     * @param uemUserCompanyDto 用户企业绑定表封装类
-     * @return Map<String, Object>
-     * @author xrp
-     */
-    @ApiOperation("解除绑定")
-    @ApiImplicitParam(name = "uemUserCompanyDto", value = "用户企业绑定表封装类", required = true, dataType = "UemUserCompanyDto", paramType = "unbindUemUser")
-    @PostMapping("/unbindUemUser")
-    @ResponseBody
-    public ResultHelper<Object> unbindUemUser(@RequestBody UemUserCompanyDto uemUserCompanyDto) {
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
-        if (Objects.isNull(userInfoModel) || userInfoModel.getUemUserId() == null) {
-            return CommonResult.getFaildResultData("data", "获取登录用户信息失败！");
-        }
-        return userCompanyManageService.unbindUser(userInfoModel.getUemUserId().toString(), uemUserCompanyDto.getUemCompanyId());
-    }
-
-    /**
-     * 申请绑定企业
-     *
-     * @param uemCompanyManageDto 管理员表封装类
-     * @return Map<String, Object>
-     * @author xrp
-     */
-    @ApiOperation("申请绑定企业")
-    @ApiImplicitParam(name = "uemCompanyManageDto", value = "管理员表封装类", required = true, dataType = "UemCompanyManageDto", paramType = "bindUemCompany")
-    @PostMapping("/bindUemCompany")
-    @ResponseBody
-    public ResultHelper<Object> bindUemCompany(@RequestBody UemCompanyManageDto uemCompanyManageDto) {
-        return uemIdCardService.bindUemCompany(uemCompanyManageDto);
-    }
-
-    /**
-     * 申请管理员
-     *
-     * @param uemCompanyManageDto 管理员表封装类
-     * @return Map<String, Object>
-     * @author xrp
-     */
-    @ApiOperation("申请管理员")
-    @ApiImplicitParam(name = "uemCompanyManageDto", value = "管理员表封装类", required = true, dataType = "UemCompanyManageDto", paramType = "applyAdmin")
-    @PostMapping("/applyAdmin")
-    @ResponseBody
-    public ResultHelper<Object> applyAdmin(@RequestBody UemCompanyManageDto uemCompanyManageDto) {
-        return uemIdCardService.applyAdmin(uemCompanyManageDto);
     }
 
     /**绑定原物流交换代码

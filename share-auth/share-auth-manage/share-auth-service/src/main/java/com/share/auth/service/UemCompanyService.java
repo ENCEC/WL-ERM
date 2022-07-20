@@ -25,18 +25,6 @@ import java.util.Map;
  *
  */
 public interface UemCompanyService {
-
-    /**
-     * 企业查询接口
-     * @Author:chenxf
-     * @Description: 企业查询接口
-     * @Date: 14:58 2020/11/3
-     * @param  opType: [opType]
-     * @return :java.util.Map<java.lang.String,java.lang.Object>
-     *
-     */
-    Map<String,Object> queryUemCompanyForCustomerType(String opType);
-
     /**
      * 企业管理树形表格数据查询接口
      * @Author:chenxf
@@ -144,23 +132,6 @@ public interface UemCompanyService {
      */
     OperateResultVO operateUemCompany(UemCompanyOperateVO uemCompanyOperateVO);
 
-    /**
-     * 根据规则查询企业
-     * @param companyTypeCode 企业类型代码
-     * @param isMatch 是否匹配，默认false
-     * @param itemCodes 企业类型选中代码
-     * @return 根据规则匹配的企业
-     */
-    List<UemCompanyVO> queryCompanyByRule(String companyTypeCode, Boolean isMatch, List<String> itemCodes);
-
-
-    /**
-     * 根据企业类型分页查询企业
-     * @param queryUemCompanyConditionVO 查询条件
-     * @return 分页
-     */
-    Page<UemCompanyVO> queryUemCompanyByCompanyType(QueryUemCompanyConditionVO queryUemCompanyConditionVO);
-
 
     /**
      * 根据企业id、企业类型获取下级企业id集合
@@ -176,20 +147,6 @@ public interface UemCompanyService {
      * @return UemUser
      */
     List<UemUserVO> queryAdministratorList(Long companyId);
-    /**
-     * 根据企业id获取上级省厅企业省份
-     * @param companyIds 企业id
-     * @return 企业id-上级省厅企业省份对应关系
-     */
-    Map<Long, String> querySuperiorProvinceCompanyProvince(List<Long> companyIds);
-
-
-    /**
-     * 根据企业id获取下级省厅企业省份、粮企企业省份
-     * @param companyId 企业id
-     * @return 企业id的下级省厅企业省份、粮企企业省份
-     */
-   List<String> querySubordinateProvinceCompanyProvince(Long companyId);
 
     /**
      * 获取企业可配置的权限

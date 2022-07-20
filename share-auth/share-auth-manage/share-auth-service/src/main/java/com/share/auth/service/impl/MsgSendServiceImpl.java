@@ -4,7 +4,6 @@ import com.share.auth.constants.CodeFinal;
 import com.share.auth.model.entity.SysPlatformUser;
 import com.share.auth.model.entity.UemUser;
 import com.share.auth.model.querymodels.QSysPlatformUser;
-import com.share.auth.model.querymodels.QUemCompanyManager;
 import com.share.auth.model.querymodels.QUemUser;
 import com.share.auth.service.MsgSendService;
 import com.share.message.api.MsgApiService;
@@ -165,51 +164,6 @@ public class MsgSendServiceImpl implements MsgSendService {
         if (StringUtils.isNotBlank(companyName)) {
             marcoMap.put("companyName", companyName);
             sendMsgToPlatformService(modifyAuditCompanyManagerMsgTemplate, marcoMap);
-        }
-    }
-
-    /**
-     * @Author:chenxf
-     * @Description: 短信通知企业管理员-有待审核绑定用户
-     * @Date: 14:41 2021/2/24
-     * @Param: [account, uemCompanyId]
-     * @Return:void
-     *
-     */
-    @Override
-    public void notifyAuditCompanyUser(String account, Long uemCompanyId) {
-        Map<String, Object> marcoMap = new HashMap<>(16);
-        if (StringUtils.isNotBlank(account)) {
-            marcoMap.put("account", account);
-            sendMsgToCompanyManage(modifyAuditCompanyUserMsgTemplate, marcoMap,uemCompanyId);
-        }
-    }
-
-    /**
-     * @Author:chenxf
-     * @Description: 发送短信给企业管理员
-     * @Date: 14:42 2021/2/24
-     * @Param: [modifyAuditCompanyManagerMsgTemplate, marcoMap, uemCompanyId]
-     * @Return:void
-     *
-     */
-    private void sendMsgToCompanyManage(String templateNo, Map<String, Object> marcoMap, Long uemCompanyId) {
-        String mobile = "";
-        List<UemUser> uemUserList = QUemUser.uemUser.select(QUemUser.mobile).where(
-                QUemUser.uemCompanyManager.chain(QUemCompanyManager.uemCompanyId).eq$(uemCompanyId)
-                .and(QUemUser.uemCompanyManager.chain(QUemCompanyManager.auditStatus).eq$(CodeFinal.AUDIT_STATUS_ONE))
-                .and(QUemUser.isValid.eq$(true))
-        ).execute();
-        if (CollectionUtils.isNotEmpty(uemUserList)){
-            List<String> mobileList = uemUserList.stream().map(UemUser::getMobile).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(mobileList)) {
-                //手机号码拼接字符串
-                mobile = StringUtils.join(mobileList, ",");
-            }
-            if (StringUtils.isNotBlank(mobile)) {
-                //发送短信
-                sendMobileMsg(templateNo, marcoMap, mobile);
-            }
         }
     }
 

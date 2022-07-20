@@ -12,9 +12,6 @@ import java.lang.String;
 import java.util.Date;
 
 import com.share.auth.center.model.entity.SysPlatformUser;
-import com.share.auth.center.model.entity.UemCustomerType;
-import com.share.auth.center.model.querymodels.QSysPlatformUser;
-import com.share.auth.center.model.querymodels.QUemCustomerType;
 
 /**
 * @author daoServiceGenerator
@@ -74,8 +71,6 @@ public class QUemCompany extends BaseModelExpression<UemCompany, Long> {
     public static final FieldExpression<Long> topCompany = uemCompany.fieldOf("topCompany", Long.class);
     public static final FieldExpression<Long> uemCompanyHistoryId = uemCompany.fieldOf("uemCompanyHistoryId", Long.class);
     public static final FieldExpression<Long> uemCompanyId = uemCompany.fieldOf("uemCompanyId", Long.class);
-
-    public static final BaseModelExpression<UemCustomerType, Long> uemCustomerType = new QUemCustomerType(uemCompany, "uemCustomerType");
     public static final BaseModelExpression<SysPlatformUser, Long> sysPlatformUser = new QSysPlatformUser(uemCompany, "sysPlatformUser");
 
     public QUemCompany() {

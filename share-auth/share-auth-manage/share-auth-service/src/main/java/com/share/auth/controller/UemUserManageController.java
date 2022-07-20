@@ -16,10 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
@@ -151,55 +147,6 @@ public class UemUserManageController {
     @GetMapping(value = "/resetUemUserPassword")
     public ResultHelper<String> resetUemUserPassword(Long uemUserId) {
         return uemUserManageService.resetUemUserPassword(uemUserId);
-    }
-
-
-    /**
-     * 校验平台客服指定管理员
-     * @param uemUserId 用户id
-     * @return 校验结果
-     */
-    @ApiOperation("校验平台客服指定管理员")
-    @ResponseBody
-    @GetMapping(value = "/validBindCompanyManager")
-    public ResultHelper<String> validBindCompanyManager(Long uemUserId) {
-        return uemUserManageService.validBindCompanyManager(uemUserId);
-    }
-
-    /**
-     * 平台客服指定管理员
-     * @param uemUserId 用户id
-     * @return 指定结果
-     */
-    @ApiOperation("平台客服指定管理员")
-    @ResponseBody
-    @GetMapping(value = "/bindCompanyManager")
-    public ResultHelper<String> bindCompanyManager(Long uemUserId) {
-        return uemUserManageService.bindCompanyManager(uemUserId);
-    }
-
-    /**
-     * 校验平台客服解绑管理员
-     * @param uemUserId 用户id
-     * @return 校验结果
-     */
-    @ApiOperation("平台客服解绑管理员")
-    @ResponseBody
-    @GetMapping(value = "/validUnbindCompanyManager")
-    public ResultHelper<String> validUnbindCompanyManager(Long uemUserId) {
-        return uemUserManageService.validUnbindCompanyManager(uemUserId);
-    }
-
-    /**
-     * 平台客服解绑管理员
-     * @param uemUserId 用户id
-     * @return 解绑结果
-     */
-    @ApiOperation("平台客服解绑管理员")
-    @ResponseBody
-    @GetMapping(value = "/unbindCompanyManager")
-    public ResultHelper<String> unbindCompanyManager(Long uemUserId) {
-        return uemUserManageService.unbindCompanyManager(uemUserId);
     }
 
 }

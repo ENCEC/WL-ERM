@@ -1,11 +1,6 @@
 package com.share.auth.domain;
-
-import com.share.auth.model.entity.UemCustomerType;
-import com.share.auth.model.vo.UemCompanyCargoTypeDTO;
 import io.swagger.annotations.Api;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * @date 20201021
@@ -97,8 +92,6 @@ public class UemCompanyDto {
 
     /**审批状态（0待审批，1审批通过，2审批拒绝）*/
     private String auditStatus;
-
-    List<UemCustomerType> uemCustomerTypeList;
     /**上级企业名称*/
     private String belongCompanyName;
     /**国家code*/
@@ -111,8 +104,6 @@ public class UemCompanyDto {
     private String locDistrictCode;
     /**是否重点企业（0否，1是）*/
     private Boolean isFocusCompany;
-
-    List<UemCompanyCargoTypeDTO> uemCompanyCargoTypeDTOList;
 
 
 

@@ -332,9 +332,6 @@ public class UemUserServiceImpl implements UemUserService {
         // 其他用户登录
         if (Objects.nonNull(user) && Objects.equals(user.getPassword(), password)) {
             log.info("查询到登录用户,用户id：" + user.getUemUserId());
-            // 校验用户与应用ID是否匹配（物口办只能登陆物口办的应用） 2账号安全
-            AndExpression expression = QUemUserCompany.uemUserId.eq$(user.getUemUserId()).and(QUemUserCompany.quitTime.isNull()).and(QUemUserCompany.auditStatus.ne$("2"));
-            UemUserCompany uemUserCompany = QUemUserCompany.uemUserCompany.selectOne().where(expression).execute();
             // 校验账号启/禁用
             if (user.getIsValid() == null || !user.getIsValid()) {
                 return ENABLED_MESSAGE;

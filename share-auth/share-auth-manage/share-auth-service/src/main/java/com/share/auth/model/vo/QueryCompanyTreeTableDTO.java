@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
 import com.share.auth.domain.UemCompanyRoleVO;
-import com.share.auth.domain.UemCustomerTypeDTO;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -183,10 +182,6 @@ public class QueryCompanyTreeTableDTO implements Serializable{
     private Boolean haveChildCompany;
 
     private List<QueryCompanyTreeTableDTO> childrenList;
-
-    private List<UemCustomerTypeDTO> uemCustomerTypeList;
-
-    private List<UemCompanyCargoTypeDTO> uemCompanyCargoTypeDTOList;
 
     /**企业权限配置列表*/
     private List<UemCompanyRoleVO> uemCompanyRoleVoList;

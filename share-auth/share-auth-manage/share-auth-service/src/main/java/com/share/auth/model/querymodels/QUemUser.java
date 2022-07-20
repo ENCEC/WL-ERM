@@ -13,14 +13,7 @@ import java.util.Date;
 
 import com.share.auth.model.entity.SysApplication;
 import com.share.auth.model.entity.UemCompany;
-import com.share.auth.model.entity.UemCompanyManager;
 import com.share.auth.model.entity.UemLog;
-import com.share.auth.model.entity.UemUserCompany;
-import com.share.auth.model.querymodels.QSysApplication;
-import com.share.auth.model.querymodels.QUemCompany;
-import com.share.auth.model.querymodels.QUemCompanyManager;
-import com.share.auth.model.querymodels.QUemLog;
-import com.share.auth.model.querymodels.QUemUserCompany;
 
 /**
 * @author daoServiceGenerator
@@ -74,9 +67,7 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> userType = uemUser.fieldOf("userType", String.class);
     public static final FieldExpression<String> wxId = uemUser.fieldOf("wxId", String.class);
 
-    public static final BaseModelExpression<UemCompanyManager, Long> uemCompanyManager = new QUemCompanyManager(uemUser, "uemCompanyManager");
     public static final BaseModelExpression<SysApplication, Long> sysApplication = new QSysApplication(uemUser, "sysApplication");
-    public static final BaseModelExpression<UemUserCompany, Long> uemUserCompany = new QUemUserCompany(uemUser, "uemUserCompany");
     public static final BaseModelExpression<UemLog, Long> uemLog = new QUemLog(uemUser, "uemLog");
     public static final BaseModelExpression<UemCompany, Long> uemCompany = new QUemCompany(uemUser, "uemCompany");
 

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
-import com.share.auth.model.vo.UemCompanyCargoTypeDTO;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -185,10 +184,6 @@ public class ReviewCompanyDTO implements Serializable {
 
     /**是否重点企业（0否，1是）*/
     private Boolean isFocusCompany;
-
-    private List<UemCustomerTypeDTO> uemCustomerTypeList;
-
-    private List<UemCompanyCargoTypeDTO> uemCompanyCargoTypeDTOList;
 
     /**企业已选择和未选择的权限信息*/
     private List<UemCompanyConfigPermissionVO> allPermissionList;

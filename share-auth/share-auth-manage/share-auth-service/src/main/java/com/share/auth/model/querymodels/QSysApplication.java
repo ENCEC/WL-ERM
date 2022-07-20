@@ -4,7 +4,6 @@ import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.SysApplication;
-import com.share.auth.model.entity.SysPublishConfig;
 
 import java.util.Date;
 
@@ -35,8 +34,6 @@ public class QSysApplication extends BaseModelExpression<SysApplication, Long> {
     public static final FieldExpression<Integer> recordVersion = sysApplication.fieldOf("recordVersion", Integer.class);
     public static final FieldExpression<String> relatedEnterprise = sysApplication.fieldOf("relatedEnterprise", String.class);
     public static final FieldExpression<Long> sysApplicationId = sysApplication.fieldOf("sysApplicationId", Long.class);
-
-    public static final BaseModelExpression<SysPublishConfig, Long> SysPublishConfig = new QSysPublishConfig(sysApplication, "SysPublishConfig");
 
     public QSysApplication() {
         super("SysApplication", SysApplication.class);

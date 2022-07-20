@@ -866,35 +866,6 @@ public class UemUserServiceImpl implements UemUserService {
                 uemUserDto.setAuditTime(uemIdCard.getAuditTime());
             }
             uemUserDto.setHasRole(false);
-            UemUserCompany uemUserCompany = QUemUserCompany.uemUserCompany.selectOne().where(
-                    QUemUserCompany.uemUserId.eq$(userInfoModel.getUemUserId()).and(QUemUserCompany.quitTime.isNull())
-                            .and(QUemUserCompany.auditStatus.ne$(CodeFinal.ACTIVE_TYPE_TWO))
-            ).execute();
-            // 绑定企业用户
-            if (Objects.nonNull(uemUserCompany)) {
-                uemUserDto.setBlindStatus(uemUserCompany.getAuditStatus());
-                UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUserCompany.getUemCompanyId());
-                uemUserDto.setCompanyAuditStatus(uemCompany.getAuditStatus());
-                uemUserDto.setCompanyNameCn(uemCompany.getCompanyNameCn());
-                uemUserDto.setCompanyIsValid(uemCompany.getIsValid());
-                uemUserDto.setHasBind(true);
-                uemUserDto.setOrganizationType(uemCompany.getOrganizationType());
-                uemUserDto.setOrgCode(uemCompany.getOrganizationCode());
-//                // 是否有角色判断
-//                hasRole(userInfoModel, uemUserDto);
-                // 判断用户是否是企业用户、企业信息是否展示
-                enterpriseUserJudgment(uemUserCompany, userInfoModel, uemUserDto, uemCompany);
-                // 绑定企业审核中，判断绑定企业是否有企业管理员，若有返回企业管理员姓名
-                if (Objects.equals(uemUserCompany.getAuditStatus(), GlobalEnum.AuditStatusEnum.NO_AUDIT.getCode())) {
-                    this.bindCompanyHasManager(uemUserDto, uemUserCompany.getUemCompanyId());
-                }
-                //企业用户标识
-                uemUserDto.setIdentity(GlobalEnum.UserIdentity.COMPANY_ADMIN.getCode());
-            } else {
-                // 标志普通/启用用户身份
-                uemUserDto.setIdentity(GlobalEnum.UserIdentity.ORDINARY.getCode());
-                uemUserDto.setHasBind(false);
-            }
             // 用户类型为国交管理员
             if (Objects.equals(uemUserDto.getUserType(), GlobalEnum.UserType.IMPT_ADMIN.getCode())) {
                 uemUserDto.setIdentity(GlobalEnum.UserIdentity.IMPT_ADMIN.getCode());
@@ -915,63 +886,6 @@ public class UemUserServiceImpl implements UemUserService {
             uemUserDto.setIdentity(GlobalEnum.UserIdentity.ADMIN.getCode());
         }
         return CommonResult.getSuccessResultData(uemUserDto);
-    }
-
-    /**
-     * 绑定企业是否有企业管理员
-     * @param uemUserDto 用户信息
-     * @param bindCompanyId 绑定企业id
-     */
-    private void bindCompanyHasManager(UemUserDto uemUserDto, Long bindCompanyId) {
-        // 默认用户所属企业的没有企业管理员
-        uemUserDto.setHasCompanyManager(Boolean.FALSE);
-        // 获取用户所属企业的企业管理员
-        List<UemUser> companyManagerList = QUemUser.uemUser.select(QUemUser.uemUser.fieldContainer()).where(
-                QUemUser.uemCompanyManager.chain(QUemCompanyManager.uemCompanyId).eq$(bindCompanyId)
-                        .and(QUemUser.uemCompanyManager.chain(QUemCompanyManager.auditStatus).eq$(CodeFinal.AUDIT_STATUS_ONE))
-                        .and(QUemUser.isValid.eq$(true))
-        ).execute();
-        // 存在企业管理员，获取企业管理员名称
-        if (CollectionUtils.isNotEmpty(companyManagerList)) {
-            uemUserDto.setHasCompanyManager(Boolean.TRUE);
-            String companyManagerNames = companyManagerList.stream().map(UemUser::getName).filter(StringUtils::isNotBlank).collect(Collectors.joining("，"));
-            uemUserDto.setCompanyManagerNames(companyManagerNames);
-        }
-    }
-
-    /**
-     * 判断是否企业用户
-     *
-     * @param uemUserCompany
-     * @param userInfoModel
-     * @param uemUserDto
-     * @return
-     * @author huanghwh
-     * @date 2021/5/7 上午9:38
-     */
-    private void enterpriseUserJudgment(UemUserCompany uemUserCompany, AuthUserInfoModel userInfoModel, UemUserDto uemUserDto, UemCompany uemCompany) {
-        if (Boolean.FALSE.equals(uemUserCompany.getUserRole())) {
-            UemCompanyManager uemCompanyManager = QUemCompanyManager.uemCompanyManager.selectOne().where(
-                    QUemCompanyManager.uemUserId.eq$(userInfoModel.getUemUserId())
-                            .and(QUemCompanyManager.auditStatus.eq$(CodeFinal.AUDIT_STATUS_ZERO))).execute();
-            // 是否正在申请企业管理员
-            if (Objects.nonNull(uemCompanyManager)) {
-                uemUserDto.setShowManagerButton(GlobalEnum.ShowManagerButton.COMPANY_ADMIN_NO_AUDIT.getCode());
-            } else {
-                uemUserDto.setShowManagerButton(GlobalEnum.ShowManagerButton.COMPANY_ADMIN_NO_APPLY.getCode());
-            }
-            // 标志普通/启用用户身份
-            uemUserDto.setIdentity(GlobalEnum.UserIdentity.ORDINARY.getCode());
-        } else {
-            // 标志企业管理员
-            uemUserDto.setIdentity(GlobalEnum.UserIdentity.COMPANY_ADMIN.getCode());
-            uemUserDto.setShowManagerButton(GlobalEnum.ShowManagerButton.COMPANY_ADMIN_AUDIT_PASS.getCode());
-        }
-        if (CodeFinal.AUDIT_STATUS_ZERO.equals(uemCompany.getAuditStatus())) {
-            // 企业信息审核中不展示
-            uemUserDto.setHasBind(false);
-            uemUserDto.setShowManagerButton(GlobalEnum.ShowManagerButton.COMPANY_NO_AUDIT.getCode());
-        }
     }
 
     /**
@@ -1060,8 +974,6 @@ public class UemUserServiceImpl implements UemUserService {
             // 删除用户、用户角色
             QUemUser.uemUser.delete().id(sourceUemUser.getUemUserId()).execute();
             QUemUserRole.uemUserRole.delete().where(QUemUserRole.uemUserId.eq$(sourceUemUser.getUemUserId())).execute();
-            // 删除用户企业绑定关系
-            QUemUserCompany.uemUserCompany.delete().where(QUemUserCompany.uemUserId.eq$(sourceUemUser.getUemUserId())).execute();
         }
         // 新增操作
         if (Objects.equals(uemUserOperateVO.getOptionType(), GlobalEnum.OptionTypeEnum.INSERT.getCode())) {
@@ -1073,8 +985,6 @@ public class UemUserServiceImpl implements UemUserService {
             QUemUser.uemUser.save(uemUser);
             // 设置默认角色
             this.insertDefaultRole(uemUser.getUemUserId());
-            // 设置用户企业绑定关系
-            this.insertUemUserCompany(uemUser);
         }
         // 修改操作
         if (Objects.equals(uemUserOperateVO.getOptionType(), GlobalEnum.OptionTypeEnum.UPDATE.getCode())) {
@@ -1087,38 +997,8 @@ public class UemUserServiceImpl implements UemUserService {
             uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
             // 保存
             QUemUser.uemUser.save(uemUser);
-            // 修改绑定企业
-            if (!Objects.equals(sourceUemUser.getBlindCompanny(), uemUser.getBlindCompanny())) {
-                // 设置用户企业绑定关系
-                this.insertUemUserCompany(uemUser);
-            }
         }
         return OperateResultVO.getSuccessMessage(uemUserOperateVO.getOptionType(), null, uemUserOperateVO.getLoginNo());
-    }
-
-    /**
-     * 新增用户企业绑定
-     * @param uemUser 用户
-     */
-    private void insertUemUserCompany(UemUser uemUser) {
-        // 删除原先绑定关系
-        QUemUserCompany.uemUserCompany.delete().where(QUemUserCompany.uemUserId.eq$(uemUser.getUemUserId())).execute();
-        if (Objects.nonNull(uemUser.getBlindCompanny())) {
-            UemUserCompany uemUserCompany = new UemUserCompany();
-            uemUserCompany.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-            // 用户
-            uemUserCompany.setUemUserId(uemUser.getUemUserId());
-            // 企业
-            uemUserCompany.setUemCompanyId(uemUser.getBlindCompanny());
-            // 默认普通用户
-            uemUserCompany.setUserRole(false);
-            // 绑定时间
-            uemUserCompany.setEntryTime(new Date());
-            // 默认审批通过
-            uemUserCompany.setAuditStatus(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode());
-            // 保存
-            QUemUserCompany.uemUserCompany.save(uemUserCompany);
-        }
     }
 
     /**

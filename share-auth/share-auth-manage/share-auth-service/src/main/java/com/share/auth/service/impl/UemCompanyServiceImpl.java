@@ -10,12 +10,10 @@ import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.ec.core.security.IUser;
 import com.gillion.exception.BusinessRuntimeException;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.constants.GlobalConstant;
 import com.share.auth.domain.*;
-import com.share.auth.domain.platform.UemCompanyDTO;
 import com.share.auth.enums.GlobalEnum;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
@@ -30,7 +28,6 @@ import com.share.file.api.ShareFileInterface;
 import com.share.file.domain.FastDfsUploadResult;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
-import com.share.support.util.DateUtils;
 import com.share.support.util.MD5EnCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -43,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.Collator;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -94,54 +90,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
 
     @Autowired
     private DefaultUserService defaultUserService;
-
-    /**
-     * @Author:chenxf
-     * @Description: 查询承运商企业信息
-     * @Date: 11:27 2020/10/26
-     * @Param: [opType] 企业类型，“cys”：承运商；
-     * @Return:java.lang.String
-     */
-    @Override
-    public Map<String, Object> queryUemCompanyForCustomerType(String opType) {
-        String companyTypeCode;
-        if (CARRIER.equals(opType)) {
-            companyTypeCode = LOGIN_LOGISTICS_SUPPLY;
-        } else {
-            companyTypeCode = LOGIN_LOGISTICS_REQUIREMENT;
-        }
-        List<UemCustomerType> uemCustomerTypeList = QUemCustomerType.uemCustomerType.select(QUemCustomerType.uemCustomerType.fieldContainer())
-                .where(QUemCustomerType.companyTypeCode.eq(":companyTypeCode")
-                        .and(QUemCustomerType.selectedItemCode.in$("S1", "S2", "S3", "S4", "S5", "S6")))
-                .execute(ImmutableMap.of("companyTypeCode", companyTypeCode));
-        Set<Long> uemCompanyIdSet = uemCustomerTypeList.stream().map(UemCustomerType::getUemCompanyId).collect(Collectors.toSet());
-        List<QueryCompanyDTO> queryCompanyDTOList = QUemCompany.uemCompany.select(
-                QUemCompany.uemCompanyId,
-                QUemCompany.companyCode,
-                QUemCompany.organizationType,
-                QUemCompany.companyNameCn,
-                QUemCompany.companyAbbreviName,
-                QUemCompany.companyNameEn,
-                QUemCompany.organizationCode,
-                QUemCompany.memoryCode,
-                QUemCompany.legalType,
-                QUemCompany.legalName,
-                QUemCompany.legalCard,
-                QUemCompany.contact,
-                QUemCompany.contactTel,
-                QUemCompany.locCountryName,
-                QUemCompany.locCityName,
-                QUemCompany.locDistrictName,
-                QUemCompany.locAddress
-        ).where(
-                QUemCompany.uemCompanyId.in$(uemCompanyIdSet)
-                        .and(QUemCompany.isValid.eq$(true))
-                        .and(QUemCompany.auditStatus.eq$(CodeFinal.AUDIT_STATUS_ONE)
-                                .and(QUemCompany.carrierType.eq$("0").or(QUemCompany.carrierType.isNull()))
-                                .and(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_ZERO).or(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_TWO)).or(QUemCompany.dataSource.isNull())))
-        ).mapperTo(QueryCompanyDTO.class).execute();
-        return QueryResultUtils.getSuccessData(QueryResultUtils.QUERY_SUCCESS, queryCompanyDTOList);
-    }
 
     /**
      * @Author:chenxf
@@ -256,9 +204,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
         UemCompany uemCompany = new UemCompany();
         // 获取新增/修改后的企业信息
         BeanUtils.copyProperties(queryCompanyTreeTableDTO, uemCompany);
-        // 获取新增/修改后的企业用户类型信息
-        List<UemCustomerTypeDTO> uemCustomerTypeDTOList = queryCompanyTreeTableDTO.getUemCustomerTypeList();
-        List<UemCustomerType> uemCustomerTypeList = Lists.newArrayList();
 
         // 如果是新增，及企业管理员新增设置审批信息
         uemCompany.setAuditor(user.getUemUserId());
@@ -276,29 +221,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
         // 新增企业信息
         log.info("新增企业信息：{}", uemCompany);
         QUemCompany.uemCompany.save(uemCompany);
-        // 重新插入企业用户类型表数据
-        reInsertEnterpriseUserTypeTableData(uemCustomerTypeDTOList, uemCustomerTypeList, uemCompany, queryCompanyTreeTableDTO);
-        // 新增一条企业历史记录表数据
-        UemCompanyHistory uemCompanyHistory = new UemCompanyHistory();
-        BeanUtils.copyProperties(uemCompany, uemCompanyHistory);
-        uemCompanyHistory.setAuditStatus(CodeFinal.AUDIT_STATUS_ONE);
-        uemCompanyHistory.setAuditTime(new Date());
-        uemCompanyHistory.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        uemCompanyHistory.setIsValid(true);
-        uemCompanyHistory.setUemCompanyId(uemCompany.getUemCompanyId());
-        // 新增记录时需要设置历史记录表id为空，因为上面copy的时候会copy这个字段
-        uemCompanyHistory.setUemCompanyHistoryId(null);
-        if (org.apache.commons.lang3.StringUtils.isEmpty(uemCompany.getCompanyCode())) {
-            uemCompanyHistory.setCompanyCode(getMaxCompanyCode());
-            QUemCompanyHistory.uemCompanyHistory.save(uemCompanyHistory);
-        } else {
-            QUemCompanyHistory.uemCompanyHistory.save(uemCompanyHistory);
-        }
-        // 保存历史记录表数据后更新企业表uemCompanyHistoryId字段
-        log.info("更新uemCompany的uemCompanyHistoryId，companyCode");
-        QUemCompany.uemCompany.update(QUemCompany.uemCompanyHistoryId, QUemCompany.companyCode)
-                .where(QUemCompany.uemCompanyId.eq(":uemCompanyId"))
-                .execute(uemCompanyHistory.getUemCompanyHistoryId(), uemCompanyHistory.getCompanyCode(), uemCompany.getUemCompanyId());
         // 新增企业权限配置
         this.addUemCompanyRole(queryCompanyTreeTableDTO.getUemCompanyRoleVoList(), uemCompany.getUemCompanyId());
         return CommonResult.getSuccessResultData("保存成功");
@@ -334,14 +256,8 @@ public class UemCompanyServiceImpl implements UemCompanyService {
         UemCompany uemCompany = new UemCompany();
         // 获取新增/修改后的企业信息
         BeanUtils.copyProperties(queryCompanyTreeTableDTO, uemCompany);
-        // 获取新增/修改后的企业用户类型信息
-        List<UemCustomerTypeDTO> uemCustomerTypeDTOList = queryCompanyTreeTableDTO.getUemCustomerTypeList();
-        List<UemCustomerType> uemCustomerTypeList = Lists.newArrayList();
-
         // 如果是修改,需要把原来的企业用户类型和货物数据删除
         uemCompany.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        QUemCustomerType.uemCustomerType.delete().where(QUemCustomerType.uemCompanyId.eq$(uemCompany.getUemCompanyId())).execute();
-        QUemCompanyCargoType.uemCompanyCargoType.delete().where(QUemCompanyCargoType.uemCompanyId.eq$(uemCompany.getUemCompanyId())).execute();
 
         if (Objects.nonNull(uemCompany.getBelongCompany())) {
             UemCompany belongCompany = QUemCompany.uemCompany.selectOne().byId(uemCompany.getBelongCompany());
@@ -360,76 +276,11 @@ public class UemCompanyServiceImpl implements UemCompanyService {
         if (!Objects.equals(sourceUemCompany.getTopCompany(), uemCompany.getTopCompany())) {
             this.updateTopCompany(uemCompany, CodeFinal.RECURSION_START_LEVEL);
         }
-
-        // 重新插入企业用户类型表数据
-        reInsertEnterpriseUserTypeTableData(uemCustomerTypeDTOList, uemCustomerTypeList, uemCompany, queryCompanyTreeTableDTO);
-        // 新增一条企业历史记录表数据
-        UemCompanyHistory uemCompanyHistory = new UemCompanyHistory();
-        BeanUtils.copyProperties(uemCompany, uemCompanyHistory);
-        uemCompanyHistory.setAuditStatus(CodeFinal.AUDIT_STATUS_ONE);
-        uemCompanyHistory.setAuditTime(new Date());
-        uemCompanyHistory.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        uemCompanyHistory.setIsValid(true);
-        uemCompanyHistory.setUemCompanyId(uemCompany.getUemCompanyId());
-        // 新增记录时需要设置历史记录表id为空，因为上面copy的时候会copy这个字段
-        uemCompanyHistory.setUemCompanyHistoryId(null);
-        if (org.apache.commons.lang3.StringUtils.isEmpty(uemCompany.getCompanyCode())) {
-            QUemCompanyHistory.uemCompanyHistory.tag("CompanyCode").save(uemCompanyHistory);
-        } else {
-            QUemCompanyHistory.uemCompanyHistory.save(uemCompanyHistory);
-        }
-        // 保存历史记录表数据后更新企业表uemCompanyHistoryId字段
-        log.info("更新uemCompany的uemCompanyHistoryId，companyCode");
-        QUemCompany.uemCompany.update(QUemCompany.uemCompanyHistoryId, QUemCompany.companyCode)
-                .where(QUemCompany.uemCompanyId.eq(":uemCompanyId"))
-                .execute(uemCompanyHistory.getUemCompanyHistoryId(), uemCompanyHistory.getCompanyCode(), uemCompany.getUemCompanyId());
-
         // 删除企业已配置的权限
         QUemCompanyRole.uemCompanyRole.delete().where(QUemCompanyRole.uemCompanyId.eq$(uemCompany.getUemCompanyId())).execute();
         // 新增企业权限配置
         this.addUemCompanyRole(queryCompanyTreeTableDTO.getUemCompanyRoleVoList(), uemCompany.getUemCompanyId());
         return CommonResult.getSuccessResultData("修改成功");
-    }
-
-    /**
-     * 重新插入企业用户类型表数据
-     *
-     * @param uemCustomerTypeDTOList
-     * @param uemCustomerTypeList
-     * @param uemCompany
-     * @param queryCompanyTreeTableDTO
-     * @return
-     * @author huanghwh
-     * @date 2021/5/6 上午10:45
-     */
-    private void reInsertEnterpriseUserTypeTableData(List<UemCustomerTypeDTO> uemCustomerTypeDTOList, List<UemCustomerType> uemCustomerTypeList, UemCompany uemCompany, QueryCompanyTreeTableDTO queryCompanyTreeTableDTO) {
-        for (UemCustomerTypeDTO uemCustomerTypeDTO : uemCustomerTypeDTOList) {
-            UemCustomerType uemCustomerType = new UemCustomerType();
-            BeanUtils.copyProperties(uemCustomerTypeDTO, uemCustomerType);
-            uemCustomerType.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-            uemCustomerType.setUemCompanyId(uemCompany.getUemCompanyId());
-            uemCustomerTypeList.add(uemCustomerType);
-        }
-        if (CollectionUtils.isNotEmpty(uemCustomerTypeList)) {
-            QUemCustomerType.uemCustomerType.save(uemCustomerTypeList);
-            //重新插入货物类型数据
-            if (CodeFinal.LOGIN_LOGISTICS_REQUIREMENT.equals(uemCustomerTypeList.get(0).getCompanyTypeCode())) {
-                List<UemCompanyCargoTypeDTO> uemCompanyCargoTypeDTOList = queryCompanyTreeTableDTO.getUemCompanyCargoTypeDTOList();
-                List<UemCompanyCargoType> uemCompanyCargoTypeList = org.apache.commons.compress.utils.Lists.newArrayList();
-                UemCompanyCargoType uemCompanyCargoType;
-                for (UemCompanyCargoTypeDTO uemCompanyCargoDTO : uemCompanyCargoTypeDTOList) {
-                    uemCompanyCargoType = new UemCompanyCargoType();
-                    BeanUtils.copyProperties(uemCompanyCargoDTO, uemCompanyCargoType);
-                    uemCompanyCargoType.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-                    uemCompanyCargoType.setUemCompanyId(uemCompany.getUemCompanyId());
-                    uemCompanyCargoType.setUemCompanyCargoTypeId(null);
-                    uemCompanyCargoTypeList.add(uemCompanyCargoType);
-                }
-                if (CollectionUtils.isNotEmpty(uemCompanyCargoTypeList)) {
-                    QUemCompanyCargoType.uemCompanyCargoType.save(uemCompanyCargoTypeList);
-                }
-            }
-        }
     }
 
     /**
@@ -461,12 +312,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
                 reviewCompanyDTO.setAuditorName(sysPlatformUser.getName());
             }
         }
-        List<UemCustomerTypeDTO> uemCustomerTypeDTOList = QUemCustomerType.uemCustomerType.select(QUemCustomerType.uemCustomerType.fieldContainer()).where(
-                QUemCustomerType.uemCompanyId.eq$(uemCompanyId)).mapperTo(UemCustomerTypeDTO.class).execute();
-        reviewCompanyDTO.setUemCustomerTypeList(uemCustomerTypeDTOList);
-        List<UemCompanyCargoTypeDTO> uemCompanyCargoTypeDTOList = QUemCompanyCargoType.uemCompanyCargoType.select().where(QUemCompanyCargoType.uemCompanyId.eq$(uemCompanyId)).mapperTo(UemCompanyCargoTypeDTO.class).execute();
-        reviewCompanyDTO.setUemCompanyCargoTypeDTOList(uemCompanyCargoTypeDTOList);
-
         // 获取企业权限配置信息
         this.getUemCompanyRoleInfo(reviewCompanyDTO);
 
@@ -768,7 +613,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
             UemCompany sourceUemCompany = QUemCompany.uemCompany.selectOne(QUemCompany.uemCompany.fieldContainer()).where(QUemCompany.orgCode.eq$(uemCompanyOperateVO.getOrgCode())).execute();
             // 删除企业、企业用户类型
             QUemCompany.uemCompany.delete().id(sourceUemCompany.getUemCompanyId()).execute();
-            QUemCustomerType.uemCustomerType.delete().where(QUemCustomerType.uemCompanyId.eq$(sourceUemCompany.getUemCompanyId())).execute();
         }
         // 新增操作
         if (Objects.equals(uemCompanyOperateVO.getOptionType(), GlobalEnum.OptionTypeEnum.INSERT.getCode())) {
@@ -777,8 +621,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
             this.setUemCompanyByOperateVO(uemCompanyOperateVO, uemCompany);
             uemCompany.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
             QUemCompany.uemCompany.save(uemCompany);
-            // 新增企业类型
-            this.insertM1CustomerType(uemCompany.getUemCompanyId());
         }
         // 修改操作
         if (Objects.equals(uemCompanyOperateVO.getOptionType(), GlobalEnum.OptionTypeEnum.UPDATE.getCode())) {
@@ -848,20 +690,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
         }
         // 更新
         QUemCompany.uemCompany.save(uemCompanyList);
-    }
-
-    /**
-     * 新增组织机构类型(LOGIN_MECHANISM_TYPE)、部委组织（M1）
-     *
-     * @param uemCompanyId 企业id
-     */
-    private void insertM1CustomerType(Long uemCompanyId) {
-        UemCustomerType uemCustomerType = new UemCustomerType();
-        uemCustomerType.setUemCompanyId(uemCompanyId);
-        uemCustomerType.setCompanyTypeCode("LOGIN_MECHANISM_TYPE");
-        uemCustomerType.setSelectedItemCode("M1");
-        uemCustomerType.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        QUemCustomerType.uemCustomerType.save(uemCustomerType);
     }
 
     /**
@@ -1056,75 +884,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
         return null;
     }
 
-    @Override
-    public List<UemCompanyVO> queryCompanyByRule(String companyTypeCode, Boolean isMatch, List<String> itemCodes) {
-        if (StringUtils.isBlank(companyTypeCode)) {
-            log.info("根据规则查询企业，参数companyTypeCode不能为空");
-            return null;
-        }
-        // 默认false
-        if (Objects.isNull(isMatch)) {
-            isMatch = false;
-        }
-        if (CollectionUtils.isEmpty(itemCodes)) {
-            log.info("根据规则查询企业，参数itemCodes不能为空");
-            return null;
-        }
-        log.info("根据规则查询企业查询参数companyTypeCode：{}，isMatch：{}， itemCodes：{}", companyTypeCode, isMatch, itemCodes.toString());
-        // 匹配的企业信息
-        List<UemCompanyVO> matchCompanyList = QUemCompany.uemCompany
-                .select(QUemCompany.uemCompany.fieldContainer())
-                .where(QUemCompany.auditStatus.eq$(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode())
-                        .and(QUemCompany.isValid.eq$(true))
-                        .and(QUemCompany.carrierType.eq$(GlobalEnum.CarrierType.REGISTER.getCode()).or(QUemCompany.carrierType.isNull()))
-                        .and(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_ZERO).or(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_TWO)).or(QUemCompany.dataSource.isNull()))
-                        .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.companyTypeCode).eq$(companyTypeCode))
-                        .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.selectedItemCode).in$(itemCodes)))
-                .groupBy(QUemCompany.uemCompanyId.getFieldName())
-                .mapperTo(UemCompanyVO.class)
-                .execute();
-        // 查询匹配信息
-        if (isMatch) {
-            return matchCompanyList;
-        }
-        // 匹配的企业id
-        List<Long> companyId = matchCompanyList.stream().map(UemCompanyVO::getUemCompanyId).collect(Collectors.toList());
-        // 查询不匹配信息
-        return QUemCompany.uemCompany
-                .select(QUemCompany.uemCompany.fieldContainer())
-                .where(QUemCompany.auditStatus.eq$(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode())
-                        .and(QUemCompany.isValid.eq$(true))
-                        .and(QUemCompany.carrierType.eq$(GlobalEnum.CarrierType.REGISTER.getCode()).or(QUemCompany.carrierType.isNull()))
-                        .and(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_ZERO).or(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_TWO)).or(QUemCompany.dataSource.isNull()))
-                        .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.companyTypeCode).eq$(companyTypeCode))
-                        .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.selectedItemCode).in$("S1", "S2", "S3", "S4", "S5", "S6"))
-                        .and(QUemCompany.uemCompanyId.notIn(":companyId")))
-                .groupBy(QUemCompany.uemCompanyId.getFieldName())
-                .mapperTo(UemCompanyVO.class)
-                .execute(ImmutableMap.of("companyId", companyId));
-    }
-
-
-    @Override
-    public Page<UemCompanyVO> queryUemCompanyByCompanyType(QueryUemCompanyConditionVO queryUemCompanyConditionVO) {
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(queryUemCompanyConditionVO.getKeyword())) {
-            queryUemCompanyConditionVO.setKeyword("%" + queryUemCompanyConditionVO.getKeyword() + "%");
-        }
-        return QUemCompany.uemCompany
-                .select(QUemCompany.uemCompany.fieldContainer())
-                .where(QUemCompany.auditStatus.eq$("1")
-                        .and(QUemCompany.isValid.eq$(true))
-                        .and(QUemCompany.carrierType.eq$("0").or(QUemCompany.carrierType.isNull()))
-                        .and(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_ZERO).or(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_TWO)).or(QUemCompany.dataSource.isNull()))
-                        .and(QUemCompany.companyNameCn.like(":keyword"))
-                        .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.companyTypeCode).eq(":companyTypeCode"))
-                        .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.selectedItemCode).in(":itemCodes"))
-                        .and(QUemCompany.uemCompanyId.notIn(":notInUemCompanyIds")))
-                .groupBy(QUemCompany.uemCompanyId)
-                .paging(Objects.isNull(queryUemCompanyConditionVO.getCurrentPage()) ? 1 : queryUemCompanyConditionVO.getCurrentPage(), Objects.isNull(queryUemCompanyConditionVO.getPageSize()) ? 10 : queryUemCompanyConditionVO.getPageSize())
-                .mapperTo(UemCompanyVO.class)
-                .execute(queryUemCompanyConditionVO);
-    }
 
     @Override
     public List<Long> querySubordinateCompanyIds(Long companyId, List<String> selectedItemCodes) {
@@ -1178,177 +937,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
                 .mapperTo(UemCompany.class)
                 .execute(conditionVO);
         return uemCompanyList.stream().map(UemCompany::getUemCompanyId).collect(Collectors.toList());
-    }
-
-    @Override
-    public Map<Long, String> querySuperiorProvinceCompanyProvince(List<Long> companyIds) {
-        // 判空
-        if (CollectionUtils.isEmpty(companyIds)) {
-            log.error("companyIds企业id集合不能为空");
-            throw new BusinessRuntimeException("companyIds企业id集合不能为空");
-        }
-        // 查询企业
-        List<UemCompany> uemCompanyList = QUemCompany.uemCompany.select(QUemCompany.uemCompany.fieldContainer())
-                .where(QUemCompany.uemCompanyId.in$(companyIds)).execute();
-        // 判断企业id是否都存在企业信息
-        if (CollectionUtils.isEmpty(uemCompanyList)) {
-            log.error("companyIds企业id集合，不存在对应企业信息");
-            throw new BusinessRuntimeException("companyIds企业id集合，不存在对应企业信息");
-        }
-        // 查询为粮企的企业
-        List<CompanyCustomTypeVO> r5CompanyList = this.queryR5CompanyList(companyIds);
-        // 粮企企业id集合
-        Set<Long> r5CompanyIdSet = r5CompanyList.stream().map(CompanyCustomTypeVO::getUemCompanyId).collect(Collectors.toSet());
-
-        // 企业id-上级省厅企业省份对应关系
-        Map<Long, String> companyIdProvinceMap = new HashMap<>(16);
-        // 获取上级省厅企业
-        for (UemCompany uemCompany : uemCompanyList) {
-            // 粮企企业，获取当前企业的省份
-            if (r5CompanyIdSet.contains(uemCompany.getUemCompanyId())) {
-                companyIdProvinceMap.put(uemCompany.getUemCompanyId(), uemCompany.getLocProvinceName());
-                continue;
-            }
-            // 其他企业，递归获取上级省厅企业
-            CompanyCustomTypeVO companyCustomTypeVO = this.getSuperiorProvinceCompany(uemCompany.getBelongCompany(), 0);
-            companyIdProvinceMap.put(uemCompany.getUemCompanyId(), Objects.isNull(companyCustomTypeVO) ? null : companyCustomTypeVO.getLocProvinceName());
-        }
-        return companyIdProvinceMap;
-    }
-
-    /**
-     * 查询企业类型为粮企的企业
-     *
-     * @param companyIds 企业id
-     * @return 粮企企业
-     */
-    private List<CompanyCustomTypeVO> queryR5CompanyList(List<Long> companyIds) {
-        // 判空
-        if (Objects.isNull(companyIds)) {
-            companyIds = new ArrayList<>();
-        }
-        return QUemCompany.uemCompany.select(
-                QUemCompany.uemCompanyId,
-                QUemCompany.belongCompany,
-                QUemCompany.belongCompanyName,
-                QUemCompany.topCompany,
-                QUemCompany.locProvinceCode,
-                QUemCompany.locProvinceName,
-                QUemCompany.uemCustomerType.chain(QUemCustomerType.companyTypeCode).as("companyTypeCode"),
-                QUemCompany.uemCustomerType.chain(QUemCustomerType.selectedItemCode).as("selectedItemCode")
-        ).where(
-                QUemCompany.auditStatus.eq$("1")
-                        .and(QUemCompany.isValid.eq$(true))
-                        .and(QUemCompany.carrierType.eq$("0").or(QUemCompany.carrierType.isNull()))
-                        .and(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_ZERO).or(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_TWO)).or(QUemCompany.dataSource.isNull()))
-                        .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.companyTypeCode).eq$(CodeFinal.LOGIN_LOGISTICS_REQUIREMENT))
-                        .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.selectedItemCode).eq$(CodeFinal.LOGIN_LOGISTICS_REQUIREMENT_R5))
-                        .and(QUemCompany.uemCompanyId.in(":companyIds"))
-        ).mapperTo(CompanyCustomTypeVO.class).execute(ImmutableMap.of("companyIds", companyIds));
-
-    }
-
-    /**
-     * 递归获取上级省厅企业
-     *
-     * @param superiorCompanyId 上级企业id
-     * @param level             递归层级（最多100层）
-     * @return 上级省厅企业
-     */
-    private CompanyCustomTypeVO getSuperiorProvinceCompany(Long superiorCompanyId, int level) {
-        // 上级企业id为空
-        if (Objects.isNull(superiorCompanyId)) {
-            log.info("上级企业id为空");
-            return null;
-        }
-        int maxLevel = 100;
-        if (level == maxLevel) {
-            return null;
-        }
-        level++;
-        // 查询上级企业类型
-        List<CompanyCustomTypeVO> companyList = QUemCompany.uemCompany.select(
-                QUemCompany.uemCompanyId,
-                QUemCompany.belongCompany,
-                QUemCompany.belongCompanyName,
-                QUemCompany.topCompany,
-                QUemCompany.locProvinceCode,
-                QUemCompany.locProvinceName,
-                QUemCompany.uemCustomerType.chain(QUemCustomerType.companyTypeCode).as("companyTypeCode"),
-                QUemCompany.uemCustomerType.chain(QUemCustomerType.selectedItemCode).as("selectedItemCode")
-        ).where(
-                QUemCompany.auditStatus.eq$("1")
-                        .and(QUemCompany.isValid.eq$(true))
-                        .and(QUemCompany.carrierType.eq$("0").or(QUemCompany.carrierType.isNull()))
-                        .and(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_ZERO).or(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_TWO)).or(QUemCompany.dataSource.isNull()))
-                        .and(QUemCompany.uemCompanyId.eq$(superiorCompanyId)))
-                .mapperTo(CompanyCustomTypeVO.class)
-                .execute();
-        // 判空
-        if (CollectionUtils.isEmpty(companyList)) {
-            return null;
-        }
-        // 判断是否省厅企业
-        List<CompanyCustomTypeVO> provinceCompanyList = companyList.stream()
-                .filter(vo -> Objects.equals(vo.getCompanyTypeCode(), CodeFinal.LOGIN_MECHANISM_TYPE) && Objects.equals(vo.getSelectedItemCode(), CodeFinal.LOGIN_MECHANISM_TYPE_M2))
-                .collect(Collectors.toList());
-        // 返回省厅企业
-        if (CollectionUtils.isNotEmpty(provinceCompanyList)) {
-            return provinceCompanyList.get(0);
-        }
-        // 上级企业不是省厅企业，递归查询上级企业
-        return this.getSuperiorProvinceCompany(companyList.get(0).getBelongCompany(), level);
-    }
-
-
-    @Override
-    public List<String> querySubordinateProvinceCompanyProvince(Long companyId) {
-        if (Objects.isNull(companyId)) {
-            log.error("companyId企业id不能为空");
-            throw new BusinessRuntimeException("companyId企业id不能为空");
-        }
-        // 递归获取下级企业
-        List<UemCompany> subordinateCompany = new ArrayList<>();
-        this.querySubordinateCompany(companyId, subordinateCompany, 0);
-        // 企业列表
-        List<CompanyCustomTypeVO> provinceCompanyList;
-        // 判空
-        if (CollectionUtils.isNotEmpty(subordinateCompany)) {
-            // 下级企业id
-            List<Long> subordinateCompanyId = subordinateCompany.stream().map(UemCompany::getUemCompanyId).collect(Collectors.toList());
-            // 获取下级企业为省厅的企业
-            provinceCompanyList = QUemCompany.uemCompany.select(
-                    QUemCompany.uemCompanyId,
-                    QUemCompany.belongCompany,
-                    QUemCompany.belongCompanyName,
-                    QUemCompany.topCompany,
-                    QUemCompany.locProvinceCode,
-                    QUemCompany.locProvinceName,
-                    QUemCompany.uemCustomerType.chain(QUemCustomerType.companyTypeCode).as("companyTypeCode"),
-                    QUemCompany.uemCustomerType.chain(QUemCustomerType.selectedItemCode).as("selectedItemCode")
-            ).where(
-                    QUemCompany.auditStatus.eq$("1")
-                            .and(QUemCompany.isValid.eq$(true))
-                            .and(QUemCompany.carrierType.eq$("0").or(QUemCompany.carrierType.isNull()))
-                            .and(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_ZERO).or(QUemCompany.dataSource.eq$(CodeFinal.DATA_SOURCE_TWO)).or(QUemCompany.dataSource.isNull()))
-                            .and(QUemCompany.uemCompanyId.in$(subordinateCompanyId))
-                            .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.companyTypeCode).eq$(CodeFinal.LOGIN_MECHANISM_TYPE))
-                            .and(QUemCompany.uemCustomerType.chain(QUemCustomerType.selectedItemCode).eq$(CodeFinal.LOGIN_MECHANISM_TYPE_M2))
-            ).mapperTo(CompanyCustomTypeVO.class).execute();
-        } else {
-            provinceCompanyList = new ArrayList<>();
-        }
-
-        // 查询为粮企的企业
-        List<CompanyCustomTypeVO> r5CompanyList = this.queryR5CompanyList(null);
-        provinceCompanyList.addAll(r5CompanyList);
-        // 获取企业省份
-        return provinceCompanyList.stream()
-                .map(CompanyCustomTypeVO::getLocProvinceName)
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
-                .distinct()
-                .sorted((v1, v2) -> Collator.getInstance(Locale.CHINA).compare(v1, v2))
-                .collect(Collectors.toList());
     }
 
     /**
@@ -1627,29 +1215,5 @@ public class UemCompanyServiceImpl implements UemCompanyService {
     @Override
     public void updateCompanyValid(QueryCompanyTreeTableDTO queryCompanyTreeTableDTO) {
         QUemCompany.uemCompany.save(queryCompanyTreeTableDTO);
-    }
-
-    /**
-     * @return
-     * @Author cec
-     * @Description 获取companyCode
-     * @Date 2021/10/25 15:36
-     * @Param
-     **/
-    private String getMaxCompanyCode() {
-        String dateStr = DateUtils.getDateStr(DateUtils.getNowDate()).replaceAll("-","");
-        //取出最后一条
-        UemCompanyHistory uemCompanyHistory = DSContext.customization("CZT_getMaxCompanyCode").selectOne()
-                .mapperTo(UemCompanyHistory.class)
-                .execute();
-        //判断是否为空
-        if (ObjectUtils.isEmpty(uemCompanyHistory) || ObjectUtils.isEmpty(uemCompanyHistory.getCompanyCode())) {
-            return "JHDM" + dateStr.substring(2,8) + "00001";
-        }
-        String oldCode = uemCompanyHistory.getCompanyCode();
-        int newCode = Integer.valueOf(oldCode.substring(10)) + 1;
-        String companyCode = "JHDM" + dateStr.substring(2,8) + String.format("%05d", newCode);
-        log.info("生成公司物流交换代码：{}", companyCode);
-        return companyCode;
     }
 }
