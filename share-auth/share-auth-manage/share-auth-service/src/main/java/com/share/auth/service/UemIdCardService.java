@@ -38,24 +38,6 @@ public interface UemIdCardService {
      */
     ResultHelper<Map<String, Object>> saveUemCompany(UemCompanyDto uemCompanyDto);
 
-    /**
-     * 申请绑定企业
-     *
-     * @param uemCompanyManageDto 管理员表封装类
-     * @return Map<String, Object>
-     * @author xrp
-     */
-    ResultHelper<Object> bindUemCompany(UemCompanyManageDto uemCompanyManageDto);
-
-    /**
-     * 申请管理员
-     *
-     * @param uemCompanyManageDto 管理员表封装类
-     * @return Map<String, Object>
-     * @author xrp
-     */
-    ResultHelper<Object> applyAdmin(UemCompanyManageDto uemCompanyManageDto);
-
 
     /**绑定原物流交换代码
      * @param  userid 物流交换代码

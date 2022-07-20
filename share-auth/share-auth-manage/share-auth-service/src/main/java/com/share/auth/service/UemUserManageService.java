@@ -8,7 +8,6 @@ import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author xrp
@@ -76,32 +75,4 @@ public interface UemUserManageService {
      * @return 重置结果
      */
     ResultHelper<String> resetUemUserPassword(Long uemUserId);
-
-    /**
-     * 校验平台客服指定管理员
-     * @param uemUserId 用户id
-     * @return 校验结果
-     */
-    ResultHelper<String> validBindCompanyManager(Long uemUserId);
-
-    /**
-     * 平台客服指定管理员
-     * @param uemUserId 用户id
-     * @return 指定结果
-     */
-    ResultHelper<String> bindCompanyManager(Long uemUserId);
-
-    /**
-     * 校验平台客服解绑管理员
-     * @param uemUserId 用户id
-     * @return 校验结果
-     */
-    ResultHelper<String> validUnbindCompanyManager(Long uemUserId);
-
-    /**
-     * 平台客服解绑管理员
-     * @param uemUserId 用户id
-     * @return 解绑结果
-     */
-    ResultHelper<String> unbindCompanyManager(Long uemUserId);
 }

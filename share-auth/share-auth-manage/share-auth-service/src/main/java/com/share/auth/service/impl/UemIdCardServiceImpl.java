@@ -11,12 +11,10 @@ import com.google.common.collect.ImmutableMap;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.QueryUserIdCardDTO;
 import com.share.auth.domain.UemCompanyDto;
-import com.share.auth.domain.UemCompanyManageDto;
 import com.share.auth.domain.UemIdCardDto;
 import com.share.auth.enums.GlobalEnum;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
-import com.share.auth.model.vo.UemCompanyCargoTypeDTO;
 import com.share.auth.model.vo.UserIdCardQueryVO;
 import com.share.auth.service.MsgSendService;
 import com.share.auth.service.UemIdCardService;
@@ -34,18 +32,14 @@ import com.share.message.domain.MsgSmsApiVO;
 import com.share.message.domain.UserVO;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
-import com.share.support.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -184,8 +178,6 @@ public class UemIdCardServiceImpl implements UemIdCardService {
         Long uemUserId = user.getUemUserId();
         //企业中文名称
         String companyNameCn = uemCompanyDto.getCompanyNameCn();
-        // 企业用户类型
-        List<UemCustomerType> uemCustomerTypeList = uemCompanyDto.getUemCustomerTypeList();
         if (StringUtils.isEmpty(uemCompanyDto.getFileUrlId())) {
             return CommonResult.getFaildResultData("企业证书不能为空");
         }
@@ -197,33 +189,8 @@ public class UemIdCardServiceImpl implements UemIdCardService {
         uemCompany.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         int savedUemCompany = QUemCompany.uemCompany.save(uemCompany);
         log.info(uemCompany.getUemCompanyId().toString());
-        // 保存历史记录
-        UemCompanyHistory uemCompanyHistory = this.setUemCompanyHistoryInfo(uemCompanyDto);
-        uemCompanyHistory.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        uemCompanyHistory.setUemCompanyId(uemCompany.getUemCompanyId());
-        int savedUemCompanyHistory = QUemCompanyHistory.uemCompanyHistory.save(uemCompanyHistory);
-        uemCompany.setUemCompanyHistoryId(uemCompanyHistory.getUemCompanyHistoryId());
         QUemCompany.uemCompany.selective(QUemCompany.uemCompanyHistoryId).execute(uemCompany);
 
-        if (!CollectionUtils.isEmpty(uemCustomerTypeList)) {
-            String companyTypeCode = uemCustomerTypeList.get(0).getCompanyTypeCode();
-            for (UemCustomerType uemCustomerType : uemCustomerTypeList) {
-                if (!StringUtils.equals(companyTypeCode, uemCustomerType.getCompanyTypeCode())) {
-                    return CommonResult.getFaildResultData("企业无法同时选择物流提供方和需求方");
-                }
-                uemCustomerType.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-                uemCustomerType.setUemCompanyId(uemCompany.getUemCompanyId());
-            }
-            QUemCustomerType.uemCustomerType.save(uemCustomerTypeList);
-            // 需方保存货物类型
-            if (CodeFinal.LOGIN_LOGISTICS_REQUIREMENT.equals(uemCustomerTypeList.get(0).getCompanyTypeCode())) {
-                List<UemCompanyCargoTypeDTO> uemCompanyCargoTypeDTOList = uemCompanyDto.getUemCompanyCargoTypeDTOList();
-                if (CollectionUtils.isEmpty(uemCompanyCargoTypeDTOList)) {
-                    return CommonResult.getFaildResultData("需求方企业必须选择经营货物类型");
-                }
-                this.saveUemCompanyCargoType(uemCompany, uemCompanyCargoTypeDTOList);
-            }
-        }
         // 绑定公司
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
 
@@ -232,32 +199,6 @@ public class UemIdCardServiceImpl implements UemIdCardService {
         uemUser.setBlindCompannyTime(new Date());
         uemUser.setUemUserId(uemUserId);
         QUemUser.uemUser.save(uemUser);
-
-        UemUserCompany uemUserCompany = new UemUserCompany();
-        uemUserCompany.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        uemUserCompany.setUemUserId(uemUserId);
-        uemUserCompany.setUemCompanyId(uemCompany.getUemCompanyId());
-        uemUserCompany.setEntryTime(new Date());
-        uemUserCompany.setUserRole(false);
-        uemUserCompany.setAuditStatus(CodeFinal.AUDIT_STATUS_ONE);
-        int savedCount = QUemUserCompany.uemUserCompany.save(uemUserCompany);
-        //缺少企业证书的接口
-        if (savedCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM
-                && savedUemCompany > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM
-                && savedUemCompanyHistory > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
-            //短信通知平台客服
-            msgSendService.notifyAuditCompany(companyNameCn);
-            // 返回成功信息
-            Map<String, Object> map = new HashMap<>(16);
-            map.put("successData", "提交企业成功！");
-            map.put("uemCompanyId", uemCompany.getUemCompanyId().toString());
-            map.put("companyNameCn", companyNameCn);
-            //保存消息 如果用户绑定的企业为空，发送消息
-            if(Objects.isNull(blindCompannyBefore)){
-                this.saveMessageRecordAndNotifier(companyNameCn);
-            }
-            return CommonResult.getSuccessResultData(map);
-        }
 
         return CommonResult.getFaildResultData("提交企业失败");
     }
@@ -387,220 +328,8 @@ public class UemIdCardServiceImpl implements UemIdCardService {
         //县区code
         uemCompany.setLocDistrictCode(uemCompanyDto.getLocDistrictCode());
         uemCompany.setCarrierType("0");
-        uemCompany.setCompanyCode(getMaxCompanyCode());
         uemCompany.setIsFocusCompany(Objects.isNull(uemCompanyDto.getIsFocusCompany()) ? false : uemCompanyDto.getIsFocusCompany());
         return uemCompany;
-    }
-
-    /**
-     * 设置历史公司信息
-     *
-     * @param uemCompanyDto 公司信息
-     * @return 历史公司信息
-     */
-    private UemCompanyHistory setUemCompanyHistoryInfo(UemCompanyDto uemCompanyDto) {
-        UemCompanyHistory uemCompanyHistory = new UemCompanyHistory();
-        //物流交换代码
-        String companyCode = uemCompanyDto.getCompanyCode();
-        uemCompanyHistory.setCompanyCode((companyCode == null) ? "" : companyCode);
-        //企业或机构类型
-        uemCompanyHistory.setOrganizationType(uemCompanyDto.getOrganizationType());
-        //企业中文名称
-        uemCompanyHistory.setCompanyNameCn(uemCompanyDto.getCompanyNameCn());
-        //企业简称
-        uemCompanyHistory.setCompanyAbbreviName(uemCompanyDto.getCompanyAbbreviName());
-        //统一社会信用代码或机构代码
-        uemCompanyHistory.setOrganizationCode(uemCompanyDto.getOrganizationCode());
-        //企业证书
-        uemCompanyHistory.setFileUrlId(uemCompanyDto.getFileUrlId());
-        //法人类型
-        uemCompanyHistory.setLegalType(uemCompanyDto.getLegalType());
-        //法人名称
-        uemCompanyHistory.setLegalName(uemCompanyDto.getLegalName());
-        //法人身份证
-        uemCompanyHistory.setLegalCard(uemCompanyDto.getLegalCard());
-        //企业联系人
-        uemCompanyHistory.setContact(uemCompanyDto.getContact());
-        //联系人手机
-        uemCompanyHistory.setContactTel(uemCompanyDto.getContactTel());
-        //联系人邮箱
-        uemCompanyHistory.setContactMail(uemCompanyDto.getContactMail());
-        //企业电话
-        uemCompanyHistory.setCompanyTel(uemCompanyDto.getCompanyTel());
-        //所在地区 城市
-        uemCompanyHistory.setLocCityName(uemCompanyDto.getLocCityName());
-        //所在地区 省份
-        uemCompanyHistory.setLocProvinceName(uemCompanyDto.getLocProvinceName());
-        //所在地区 地区
-        uemCompanyHistory.setLocDistrictName(uemCompanyDto.getLocDistrictName());
-        //所在地区 国家
-        uemCompanyHistory.setLocCountryName(uemCompanyDto.getLocCountryName());
-        //详细地址
-        uemCompanyHistory.setLocAddress(uemCompanyDto.getLocAddress());
-        //上级企业
-        String belongCompany = uemCompanyDto.getBelongCompany();
-        if (!StringUtils.isEmpty(belongCompany)) {
-            uemCompanyHistory.setBelongCompany(Long.valueOf(belongCompany));
-        }
-        uemCompanyHistory.setDataSource(CodeFinal.DATA_SOURCE_ZERO);
-        uemCompanyHistory.setIsValid(true);
-        //查看下级数据
-        Boolean isSuperior = uemCompanyDto.getIsSuperior();
-        uemCompanyHistory.setIsSuperior(isSuperior != null);
-        uemCompanyHistory.setAuditStatus(CodeFinal.AUDIT_STATUS_ZERO);
-        //上级企业名称
-        uemCompanyHistory.setBelongCompanyName(uemCompanyDto.getBelongCompanyName());
-        //国家code
-        uemCompanyHistory.setLocCountryCode(uemCompanyDto.getLocCountryCode());
-        //省份Code
-        uemCompanyHistory.setLocProvinceCode(uemCompanyDto.getLocProvinceCode());
-        //城市code
-        uemCompanyHistory.setLocCityCode(uemCompanyDto.getLocCityCode());
-        //县区code
-        uemCompanyHistory.setLocDistrictCode(uemCompanyDto.getLocDistrictCode());
-
-        return uemCompanyHistory;
-    }
-
-    /**
-     * 保存公司货物类型
-     *
-     * @param uemCompany                 公司信息
-     * @param uemCompanyCargoTypeDTOList 公司货物类型
-     */
-    private void saveUemCompanyCargoType(UemCompany uemCompany, List<UemCompanyCargoTypeDTO> uemCompanyCargoTypeDTOList) {
-        List<UemCompanyCargoType> uemCompanyCargoTypeList = Lists.newArrayList();
-        UemCompanyCargoType uemCompanyCargoType;
-        for (UemCompanyCargoTypeDTO uemCompanyCargoDTO : uemCompanyCargoTypeDTOList) {
-            uemCompanyCargoType = new UemCompanyCargoType();
-            BeanUtils.copyProperties(uemCompanyCargoDTO, uemCompanyCargoType);
-            uemCompanyCargoType.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-            uemCompanyCargoType.setUemCompanyId(uemCompany.getUemCompanyId());
-            uemCompanyCargoType.setUemCompanyCargoTypeId(null);
-            uemCompanyCargoTypeList.add(uemCompanyCargoType);
-        }
-        if (CollectionUtils.isNotEmpty(uemCompanyCargoTypeList)) {
-            QUemCompanyCargoType.uemCompanyCargoType.save(uemCompanyCargoTypeList);
-        }
-    }
-
-    /**
-     * 申请绑定企业
-     *
-     * @param uemCompanyManageDto 管理员表封装类
-     * @return Map<String, Object>
-     * @author xrp
-     */
-    @Override
-    public ResultHelper<Object> bindUemCompany(UemCompanyManageDto uemCompanyManageDto) {
-
-        //获取当前用户信息
-        AuthUserInfoModel user = (AuthUserInfoModel) userService.getCurrentLoginUser();
-        if (Objects.isNull(user) || Objects.isNull(user.getUemUserId())) {
-            return CommonResult.getFaildResultData("无法获取当前用户信息，请重新登录！");
-        }
-        //绑定企业
-        String blindCompanny = uemCompanyManageDto.getBlindCompanny();
-        //上传管理员申请认证函
-        String fileName = uemCompanyManageDto.getFileName();
-        //公正函上传地址id
-        String fileUrlId = uemCompanyManageDto.getFileUrlId();
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(user.getUemUserId());
-        if (uemUser.getBlindCompanny() != null) {
-            return CommonResult.getFaildResultData("当前用户未解绑企业，无法绑定新企业，请确认！");
-        }
-        List<UemCompanyManager> uemCompanyManagerList = QUemCompanyManager.uemCompanyManager.select().where(
-                QUemCompanyManager.uemCompanyId.eq$(Long.valueOf(blindCompanny))
-                        .and(QUemCompanyManager.auditStatus.eq$(CodeFinal.AUDIT_STATUS_ONE))
-        ).execute();
-        if (StringUtils.isEmpty(fileName) && CollectionUtils.isEmpty(uemCompanyManagerList)) {
-            return CommonResult.getFaildResultData("当前企业暂无企业管理员，请提交管理员申请！");
-        }
-
-        int saveCount = 0;
-        Date date = new Date();
-        UemUserCompany uemUserCompany = new UemUserCompany();
-        uemUserCompany.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-
-        uemUserCompany.setUemUserId(user.getUemUserId());
-        uemUserCompany.setUemCompanyId(Long.valueOf(blindCompanny));
-        uemUserCompany.setEntryTime(date);
-        uemUserCompany.setUserRole(false);
-        uemUserCompany.setAuditStatus(CodeFinal.AUDIT_STATUS_ZERO);
-        saveCount = QUemUserCompany.uemUserCompany.save(uemUserCompany);
-        if (CollectionUtils.isNotEmpty(uemCompanyManagerList)) {
-            msgSendService.notifyAuditCompanyUser(uemUser.getAccount(), Long.valueOf(blindCompanny));
-        }
-        //申请管理员
-        if (!StringUtils.isEmpty(fileName)) {
-            UemCompanyManager uemCompanyManager = new UemCompanyManager();
-            uemCompanyManager.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-            uemCompanyManager.setUemUserId(user.getUemUserId());
-            uemCompanyManager.setUemCompanyId(Long.valueOf(blindCompanny));
-            uemCompanyManager.setEfileDate(new Date());
-            uemCompanyManager.setFileUrlId(fileUrlId);
-            uemCompanyManager.setAuditStatus(CodeFinal.AUDIT_STATUS_ZERO);
-            saveCount = QUemCompanyManager.uemCompanyManager.save(uemCompanyManager);
-            UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(Long.valueOf(blindCompanny));
-            if (Objects.nonNull(uemCompany) && StringUtils.equals(CodeFinal.AUDIT_STATUS_ONE, uemCompany.getAuditStatus())
-                    && CollectionUtils.isEmpty(uemCompanyManagerList)) {
-                //企业资质已审核通过，发送短信通知平台客服进行企业管理员审核
-                msgSendService.notifyAuditCompanyManage(uemCompany.getCompanyNameCn());
-            }
-        }
-        if (saveCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
-            return CommonResult.getSuccessResultData("申请绑定成功！");
-        } else {
-            return CommonResult.getFaildResultData("申请绑定失败！");
-        }
-    }
-
-    /**
-     * 申请管理员
-     *
-     * @param uemCompanyManageDto 管理员表封装类
-     * @return Map<String, Object>
-     * @author xrp
-     */
-    @Override
-    public ResultHelper<Object> applyAdmin(UemCompanyManageDto uemCompanyManageDto) {
-        //获取当前用户信息
-        AuthUserInfoModel user = (AuthUserInfoModel) userService.getCurrentLoginUser();
-        //企业ID
-        String uemCompanyId = uemCompanyManageDto.getUemCompanyId();
-        //公正函上传地址id
-        String fileUrlId = uemCompanyManageDto.getFileUrlId();
-
-        if (Objects.isNull(user.getUemUserId())) {
-            return CommonResult.getFaildResultData("用户ID不能为空");
-        }
-        if (StringUtils.isEmpty(uemCompanyId)) {
-            return CommonResult.getFaildResultData("企业ID不能为空");
-        }
-
-        UemCompanyManager uemCompanyManager = new UemCompanyManager();
-        uemCompanyManager.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        uemCompanyManager.setUemUserId(user.getUemUserId());
-        uemCompanyManager.setUemCompanyId(Long.valueOf(uemCompanyId));
-        uemCompanyManager.setFileUrlId(fileUrlId);
-        uemCompanyManager.setEfileDate(new Date());
-        uemCompanyManager.setAuditStatus(CodeFinal.AUDIT_STATUS_ZERO);
-
-        int saveCount = QUemCompanyManager.uemCompanyManager.save(uemCompanyManager);
-
-        //缺少上传管理员申请认证函和下载认证函模板
-        if (saveCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
-            //短信通知平台客服
-            UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(Long.valueOf(uemCompanyId));
-            if (Objects.nonNull(uemCompany) && StringUtils.equals(CodeFinal.AUDIT_STATUS_ONE, uemCompany.getAuditStatus())) {
-                //企业资质已审核通过，发送短信通知平台客服进行企业管理员审核
-                msgSendService.notifyAuditCompanyManage(uemCompany.getCompanyNameCn());
-            }
-            return CommonResult.getSuccessResultData("已提交申请管理员");
-        } else {
-            return CommonResult.getFaildResultData("提交失败！");
-        }
-
     }
 
     /**
@@ -978,30 +707,6 @@ public class UemIdCardServiceImpl implements UemIdCardService {
         // 调用公共服务接口发送短信
         msgApiService.sendMsg(msgSmsApiVO);
         log.info("实名认证审核，发送短信结束，时间" + System.currentTimeMillis());
-    }
-
-    /**
-     * @return
-     * @Author cec
-     * @Description 获取companyCode
-     * @Date 2021/10/25 15:36
-     * @Param
-     **/
-    private String getMaxCompanyCode() {
-        String dateStr = DateUtils.getDateStr(DateUtils.getNowDate()).replaceAll("-", "");
-        //取出最后一条
-        UemCompanyHistory uemCompanyHistory = DSContext.customization("CZT_getMaxCompanyCode").selectOne()
-                .mapperTo(UemCompanyHistory.class)
-                .execute();
-        //判断是否为空
-        if (ObjectUtils.isEmpty(uemCompanyHistory) || ObjectUtils.isEmpty(uemCompanyHistory.getCompanyCode())) {
-            return "JHDM" + dateStr.substring(2, 8) + "00001";
-        }
-        String oldCode = uemCompanyHistory.getCompanyCode();
-        int newCode = Integer.valueOf(oldCode.substring(10)) + 1;
-        String companyCode = "JHDM" + dateStr.substring(2, 8) + String.format("%05d", newCode);
-        log.info("生成公司物流交换代码：{}", companyCode);
-        return companyCode;
     }
 
 

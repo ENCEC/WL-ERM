@@ -3,16 +3,10 @@ package com.share.auth.controller;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.share.auth.domain.*;
 import com.share.auth.domain.QueryUemCompanyConditionVO;
-import com.share.auth.domain.daoService.CargoTypeDTO;
-import com.share.auth.domain.daoService.CargoTypeVO;
-import com.share.auth.model.entity.UemCompany;
-import com.share.auth.model.entity.UemIdCard;
-import com.share.auth.model.entity.UemUser;
 import com.share.auth.model.vo.CompanyTreeTableQueryVO;
 import com.share.auth.model.vo.QueryCompanyTreeTableDTO;
 import com.share.auth.model.vo.UemCompanyNameVO;
 import com.share.auth.model.vo.UemUserVO;
-import com.share.auth.service.CargoTypeService;
 import com.share.auth.service.UemCompanyService;
 import com.share.auth.util.QueryResultUtils;
 import com.share.support.result.CommonResult;
@@ -42,26 +36,6 @@ public class UemCompanyController {
 
     @Autowired
     private UemCompanyService uemCompanyService;
-
-    @Autowired
-    private CargoTypeService cargoTypeService;
-    /**
-     * @Author:chenxf
-     * @Description: 查询承运商企业/提供商企业
-     * @Date: 11:31 2020/10/26
-     * @Param: [opType] 查询企业类型,"cys":承运商;
-     * @Return:java.lang.String
-     *
-     */
-    @PostMapping(value = "/company/queryCompanyForCustomerType")
-    @ApiOperation(value = "查询承运商企业/提供商企业",notes = "返回承运商/提供商企业信息")
-    @ApiImplicitParam(name = "opType", value = "查询企业类型", required = true, dataType = "String", paramType = "queryCompanyForCustomerType")
-    public Map<String,Object> queryCompanyForCustomerType(@RequestParam(value = "opType") String opType){
-        if (StringUtils.isEmpty(opType)){
-            return QueryResultUtils.getFailData("查询企业类型为空");
-        }
-        return uemCompanyService.queryUemCompanyForCustomerType(opType);
-    }
 
     /**
      * @Author:chenxf
@@ -215,34 +189,6 @@ public class UemCompanyController {
     }
 
     /**
-     * 根据规则查询企业
-     * @param companyTypeCode 企业类型代码
-     * @param isMatch 是否匹配，默认false
-     * @param itemCodes 企业类型选中代码
-     * @return 根据规则匹配的企业
-     */
-    @ApiOperation("根据规则查询企业")
-    @GetMapping(value = "/company/queryCompanyByRule")
-    public List<UemCompanyVO> queryCompanyByRule(@RequestParam(value = "companyTypeCode") String companyTypeCode,
-                                                 @RequestParam(value = "isMatch") Boolean isMatch,
-                                                 @RequestParam(value = "itemCodes") List<String> itemCodes) {
-        return uemCompanyService.queryCompanyByRule(companyTypeCode, isMatch, itemCodes);
-    }
-
-
-    /**
-     * 根据企业类型分页查询企业
-     * @param queryUemCompanyConditionVO 查询条件
-     * @return 分页
-     */
-    @ApiOperation("根据企业类型分页查询企业")
-    @PostMapping(value ="/company/queryUemCompanyByCompanyType")
-    @ResponseBody
-    public Page<UemCompanyVO> queryUemCompanyByCompanyType(@RequestBody QueryUemCompanyConditionVO queryUemCompanyConditionVO) {
-        return uemCompanyService.queryUemCompanyByCompanyType(queryUemCompanyConditionVO);
-    }
-
-    /**
      * 获取所有企业（非机关单位）的管理人信息列表
      * @Author: cjh
      * @return UemUser
@@ -265,30 +211,6 @@ public class UemCompanyController {
     public List<Long> querySubordinateCompanyIds(@RequestParam(value = "companyId") Long companyId,
                                                  @RequestParam(value = "selectedItemCodes") List<String> selectedItemCodes) {
         return uemCompanyService.querySubordinateCompanyIds(companyId, selectedItemCodes);
-    }
-
-    /**
-     * 根据企业id获取上级省厅企业省份
-     * @param companyIds 企业id
-     * @return 企业id-上级省厅企业省份对应关系
-     */
-    @ApiOperation("根据企业id获取上级省厅企业省份")
-    @GetMapping(value = "/querySuperiorProvinceCompanyProvince")
-    @ResponseBody
-    public Map<Long, String> querySuperiorProvinceCompanyProvince(@RequestParam(value = "companyIds") List<Long> companyIds) {
-        return uemCompanyService.querySuperiorProvinceCompanyProvince(companyIds);
-    }
-
-    /**
-     * 根据企业id获取下级省厅企业省份、粮企企业省份
-     * @param companyId 企业id
-     * @return 企业id的下级省厅企业省份、粮企企业省份
-     */
-    @ApiOperation("根据企业id获取下级省厅企业的省份信息、粮企企业省份")
-    @GetMapping(value = "/querySubordinateProvinceCompanyProvince")
-    @ResponseBody
-    public List<String> querySubordinateProvinceCompanyProvince(@RequestParam(value = "companyId") Long companyId) {
-        return uemCompanyService.querySubordinateProvinceCompanyProvince(companyId);
     }
 
     /**
@@ -388,21 +310,6 @@ public class UemCompanyController {
     @ApiImplicitParam(name = "UemCompanyNameDTO", value = "企业名称信息封装类", dataType = "List<Long>",type = "query")
     public List<UemCompanyVO> queryOrgCode(@RequestBody String name){
         List<UemCompanyVO> uemCompanies = uemCompanyService.queryOrgCode(name);
-        return uemCompanies;
-    }
-
-    /**
-     * 选中的商品属性
-     * @Author: Linja
-     * @param cargoTypeDTO 查询条件
-     * @return UemCompanyVO 企业信息封装类
-     */
-    @PostMapping("/company/queryCargoType")
-    @ResponseBody
-    @ApiOperation(value = "根据ID数组查询企业信息", notes = "根据ID数组查询企业信息")
-    @ApiImplicitParam(name = "UemCompanyNameDTO", value = "企业名称信息封装类", dataType = "List<Long>",type = "query")
-    public List<CargoTypeVO> queryCargoType(@RequestBody CargoTypeDTO cargoTypeDTO){
-        List<CargoTypeVO> uemCompanies = cargoTypeService.queryChosenGoods(cargoTypeDTO);
         return uemCompanies;
     }
 

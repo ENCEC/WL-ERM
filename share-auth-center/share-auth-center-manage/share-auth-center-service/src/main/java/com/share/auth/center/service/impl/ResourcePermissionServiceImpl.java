@@ -1,6 +1,4 @@
 package com.share.auth.center.service.impl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gillion.utils.CommonResult;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -10,12 +8,10 @@ import com.share.auth.center.constants.AuthenticationConfig;
 import com.share.auth.center.credential.CredentialProcessor;
 import com.share.auth.center.enums.GlobalEnum;
 import com.share.auth.center.model.entity.OauthClientDetails;
-import com.share.auth.center.model.entity.UemUserPermission;
 import com.share.auth.center.model.entity.SysPlatformUser;
 import com.share.auth.center.model.entity.UemUser;
 import com.share.auth.center.model.entity.UemUserRole;
 import com.share.auth.center.model.querymodels.QOauthClientDetails;
-import com.share.auth.center.model.querymodels.QUemUserPermission;
 import com.share.auth.center.model.querymodels.QSysPlatformUser;
 import com.share.auth.center.model.querymodels.QUemUser;
 import com.share.auth.center.model.querymodels.QUemUserRole;
@@ -282,10 +278,7 @@ public class ResourcePermissionServiceImpl implements ResourcePermissionService,
                 roleList.add(userInfoModel.getSysRoleId());
             } else if (allowNoRoleClientIdList.contains(sysApplicationId)) {
                 roleList.add(customerServiceRoleId.equals(userInfoModel.getSysRoleId()) ? customerServiceRoleId : 1L);
-            } else if (Objects.equals(userInfoModel.getSource(), GlobalEnum.UserSource.NTIP.getCode())) {
-                String redirectUrl = this.getRedirectUrlByPermission(userInfoModel, sysApplicationId);
-                return CommonResult.failure().errorMessages("302", redirectUrl);
-            } else {
+            }  else {
                 return CommonResult.failure().errorMessages("访问受限，用户没有访问权限" + path);
             }
         }
@@ -338,28 +331,6 @@ public class ResourcePermissionServiceImpl implements ResourcePermissionService,
             log.error("{}页面参数URLEncoder编码失败：{}", this.errorPage, e.getMessage(), e);
         }
         return this.errorPage + "?" + paramEncode;
-    }
-
-    /**
-     * 获取国家综合交通运输信息平台用户没权限页面
-     * @param userInfoModel 用户
-     * @param sysApplicationId 应用id
-     * @return 没权限页面
-     */
-    private String getRedirectUrlByPermission(User userInfoModel, Long sysApplicationId) {
-        // 是否存在待审核/审核通过的申请记录
-        List<UemUserPermission> permissionList = QUemUserPermission.uemUserPermission
-                .select(QUemUserPermission.uemUserPermission.fieldContainer())
-                .where(QUemUserPermission.sysApplicationId.eq$(sysApplicationId)
-                        .and(QUemUserPermission.uemUserId.eq$(userInfoModel.getUemUserId()))
-                        .and(QUemUserPermission.auditStatus.ne$(GlobalEnum.AuditStatusEnum.AUDIT_REJECT.getCode())))
-                .execute();
-        if (CollectionUtils.isEmpty(permissionList)) {
-            // 权限申请页面
-            return this.permissionApplyPage;
-        }
-        // 权限申请中页面
-        return this.permissionApplyingPage;
     }
 
     /**

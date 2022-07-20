@@ -62,18 +62,4 @@ public interface MsgSendService {
      * @author tujx
      */
     void notifyAuditCompanyManage(String companyName);
-
-    /**
-     * 短信通知企业管理员-有待审核绑定用户
-     *
-     * @Author:chenxf
-     * @Description: 短信通知企业管理员-有待审核绑定用户
-     * @Date: 15:02 2021/2/24
-     * @param account  账号
-     * @param uemCompanyId 公司id
-     * @Return:void
-     *
-     */
-    void notifyAuditCompanyUser(String account, Long uemCompanyId);
-
 }

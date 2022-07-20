@@ -14,11 +14,8 @@ import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.enums.GlobalEnum;
 import com.share.auth.model.entity.SysPlatformUser;
 import com.share.auth.model.entity.UemCompany;
-import com.share.auth.model.entity.UemCompanyManager;
-import com.share.auth.model.entity.UemCustomerType;
 import com.share.auth.model.entity.UemIdCard;
 import com.share.auth.model.entity.UemUser;
-import com.share.auth.model.entity.UemUserCompany;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.service.UemUserManageService;
 import com.share.auth.service.UemUserService;
@@ -27,7 +24,6 @@ import com.share.auth.user.DefaultUserService;
 import com.share.auth.util.MessageUtil;
 import com.share.file.api.ShareFileInterface;
 import com.share.file.domain.FastDfsUploadResult;
-import com.share.file.domain.FileInfoVO;
 import com.share.message.api.MsgApiService;
 import com.share.message.domain.MsgSmsApiVO;
 import com.share.message.domain.SendMsgReturnVo;
@@ -42,12 +38,9 @@ import org.apache.http.entity.ContentType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -60,8 +53,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author xrp
@@ -124,15 +115,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
         if (StringUtils.isNotBlank(uemUserDto.getCompanyNameCn())) {
             uemUserDto.setCompanyNameCn("%" + uemUserDto.getCompanyNameCn() + "%");
-        }
-        if (CollectionUtils.isNotEmpty(uemUserDto.getSelectedItemCode())) {
-            List<UemCustomerType> uemCustomerTypeList = QUemCustomerType.uemCustomerType.select(
-                    QUemCustomerType.uemCustomerType.fieldContainer()
-            ).where(
-                    QUemCustomerType.selectedItemCode.in$(uemUserDto.getSelectedItemCode())
-            ).execute();
-            List<Long> uemCompanyIdList = uemCustomerTypeList.stream().map(UemCustomerType::getUemCompanyId).distinct().collect(toList());
-            uemUserDto.setUemCompanyIdList(uemCompanyIdList);
         }
         // 查询条件
         AndExpression andExpression = QUemUser.account.like(":account")
@@ -374,12 +356,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         if (Objects.isNull(uemUserId)) {
             CommonResult.getFaildResultData("用户信息主键不能为空");
         }
-        //企业管理员表
-        QUemCompanyManager.uemCompanyManager.delete().where(QUemCompanyManager.uemUserId.eq$(uemUserId)).execute();
-        //实名信息表
+       //实名信息表
         QUemIdCard.uemIdCard.delete().where(QUemIdCard.uemUserId.eq$(uemUserId)).execute();
-        //用户企业绑定表
-        QUemUserCompany.uemUserCompany.delete().where(QUemUserCompany.uemUserId.eq$(uemUserId)).execute();
         //用户角色表
         QUemUserRole.uemUserRole.delete().where(QUemUserRole.uemUserId.eq$(uemUserId)).execute();
         //用户表
@@ -509,19 +487,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             this.addUemIdCard(uemUserDto, uemUser, sysPlatformUser);
         }
 
-        // 绑定企业、默认角色
-        if (StringUtils.isNotBlank(uemUserDto.getBlindCompanny())) {
-            log.info("平台客服新增用户，进行绑定企业blindCompanny：{}", uemUserDto.getBlindCompanny());
-            UemUserCompany uemUserCompany = this.bindCompany(uemUserDto, uemUser);
-
-            // 是否添加管理员
-            if (Objects.equals(uemUserDto.getIsCompanyManager(), Boolean.TRUE)) {
-                log.info("平台客服新增用户，进行绑定企业：{}后，添加企业管理员", uemUserDto.getBlindCompanny());
-                // 添加管理员
-                this.addUemCompanyManager(uemUser, uemUserCompany, sysPlatformUser);
-            }
-        }
-
         // 异步发送短信通知
         ThreadFactory nameThreadFactory = new ThreadFactoryBuilder().setNameFormat("platformUserSaveUemUser-sendMsg-pool-%d").build();
         ThreadPoolExecutor threadPoolExecutor
@@ -566,83 +531,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         } catch (Exception e){
             log.error("调用推送服务失败：{}", e.getMessage(), e);
         }
-    }
-
-    /**
-     * 添加管理员
-     * @param uemUser 用户信息
-     * @param uemUserCompany 用户企业绑定关系
-     * @param sysPlatformUser 平台客服
-     */
-    private void addUemCompanyManager(UemUser uemUser, UemUserCompany uemUserCompany, SysPlatformUser sysPlatformUser) {
-        // 管理员信息
-        UemCompanyManager uemCompanyManager = new UemCompanyManager();
-        uemCompanyManager.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        // 用户id
-        uemCompanyManager.setUemUserId(uemUser.getUemUserId());
-        // 企业id
-        uemCompanyManager.setUemCompanyId(uemUser.getBlindCompanny());
-        // 认证函提交时间
-        Calendar date = Calendar.getInstance();
-        uemCompanyManager.setEfileDate(date.getTime());
-        // 认证函文件
-        String fileUrlId = this.uploadDefaultFile(CodeFinal.FILE_TYPE_THREE, managerFilePath);
-        uemCompanyManager.setFileUrlId(fileUrlId);
-        // 审核信息
-        uemCompanyManager.setAuditStatus(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode());
-        uemCompanyManager.setAuditTime(date.getTime());
-        uemCompanyManager.setAuditor(sysPlatformUser.getSysPlatformUserId());
-        // 保存
-        QUemCompanyManager.uemCompanyManager.save(uemCompanyManager);
-
-        // 更新用户类型
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUser.setUserType(CodeFinal.USER_TYPE_TWO);
-        QUemUser.uemUser.save(uemUser);
-
-        //更新用户企业绑定关系的用户类型
-        uemUserCompany.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUserCompany.setUserRole(true);
-        QUemUserCompany.uemUserCompany.save(uemUserCompany);
-    }
-
-    /**
-     * 绑定企业
-     * @param uemUserDto 客服新增的用户信息
-     * @param uemUser 用户信息
-     * @return 用户企业绑定关系
-     */
-    private UemUserCompany bindCompany(UemUserDto uemUserDto, UemUser uemUser) {
-        // 新增用户-企业绑定关系
-        UemUserCompany uemUserCompany = new UemUserCompany();
-        uemUserCompany.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        // 用户id
-        uemUserCompany.setUemUserId(uemUser.getUemUserId());
-        // 企业id
-        uemUserCompany.setUemCompanyId(Long.valueOf(uemUserDto.getBlindCompanny()));
-        // 用户角色：企业普通用户
-        uemUserCompany.setUserRole(false);
-        // 绑定企业时间
-        uemUserCompany.setEntryTime(new Date());
-        // 审核状态
-        uemUserCompany.setAuditStatus(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode());
-        // 保存
-        QUemUserCompany.uemUserCompany.save(uemUserCompany);
-
-        // 更新用户信息
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        // 用户类型：企业用户
-        uemUser.setUserType(CodeFinal.USER_TYPE_ONE);
-        // 绑定企业
-        uemUser.setBlindCompanny(uemUserCompany.getUemCompanyId());
-        uemUser.setBlindCompannyTime(uemUserCompany.getEntryTime());
-        // 更新
-        QUemUser.uemUser.save(uemUser);
-
-        // 设置默认角色
-        uemUserService.defaultUemUserRole(uemUser.getUemUserId(), uemUser.getBlindCompanny());
-
-        return uemUserCompany;
     }
 
     /**
@@ -916,225 +804,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         } catch (Exception e){
             log.error("调用推送服务失败：{}", e.getMessage(), e);
         }
-    }
-
-    @Override
-    public ResultHelper<String> validBindCompanyManager(Long uemUserId) {
-        // 校验用户信息
-        User user = (User)defaultUserService.getCurrentLoginUser();
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(user.getUemUserId());
-        // 判空
-        if (Objects.isNull(sysPlatformUser)) {
-            throw new RuntimeException("当前用户不是平台客服");
-        }
-
-        // 校验用户id
-        if (Objects.isNull(uemUserId)) {
-            throw new RuntimeException("用户id不能为空");
-        }
-        log.info("平台客服为用户id：{}的用户指定管理员", uemUserId);
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
-        // 判空
-        if (Objects.isNull(uemUser)) {
-            throw new RuntimeException("用户不存在");
-        }
-
-        // 校验用户是否绑定企业
-        if (Objects.isNull(uemUser.getBlindCompanny())) {
-            log.error("用户id:{}，uemUser的blindCompany的值为空", uemUser.getUemUserId());
-            throw new RuntimeException("该用户未绑定企业或未通过企业审核，无法指定管理员");
-        }
-
-        // 获取用户绑定的企业信息
-        UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUser.getBlindCompanny());
-        // 判空
-        if (Objects.isNull(uemCompany)) {
-            log.error("用户id:{}，其绑定的企业id：{}，不存在该企业", uemUser.getUemUserId(), uemUser.getBlindCompanny());
-            throw new RuntimeException("该用户绑定的企业不存在，无法指定管理员");
-        }
-        // 校验用户绑定的企业是否审批通过
-        if (!Objects.equals(uemCompany.getAuditStatus(), GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode())) {
-            log.error("用户id:{}，根据其blindCompany：{}查询企业，企业的审核状态为：{}，未审核通过", uemUser.getUemUserId(), uemUser.getBlindCompanny(), uemCompany.getAuditStatus());
-            throw new RuntimeException("该用户未绑定企业或未通过企业审核，无法指定管理员");
-        }
-
-        // 获取用户-企业绑定信息
-        UemUserCompany uemUserCompany = QUemUserCompany.uemUserCompany.selectOne().where(
-                QUemUserCompany.uemUserId.eq$(uemUser.getUemUserId())
-                        .and(QUemUserCompany.uemCompanyId.eq$(uemUser.getBlindCompanny()))
-                        .and(QUemUserCompany.auditStatus.eq$(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode()))
-                        .and(QUemUserCompany.quitTime.isNull())
-        ).execute();
-        // 校验用户是否绑定企业
-        if (Objects.isNull(uemUserCompany)) {
-            log.error("根据用户id:{}，用户的绑定企业blindCompany:{}，在用户-企业绑定关系uemUserCompany表中，未找到auditStatus为审批通过、quitTime为空的记录",
-                    uemUser.getUemUserId(), uemUser.getBlindCompanny());
-            throw new RuntimeException("该用户未绑定企业或未通过企业审核，无法指定管理员");
-        }
-
-        // 校验用户是否管理员
-        if (Objects.equals(uemUser.getUserType(), CodeFinal.USER_TYPE_TWO) || Objects.equals(uemUserCompany.getUserRole(), Boolean.TRUE)) {
-            log.error("用户id：{}，用户信息uemUser中的用户类型userType为：{}，用户-企业绑定关系uemUserCompany中的用户角色userRole为：{}，标识该用户为企业管理员",
-                    uemUser.getUemUserId(), uemUser.getUserType(), uemUserCompany.getUserRole());
-            throw new RuntimeException("该用户已经是企业管理员");
-        }
-
-        // 获取用户审批中、审批通过的管理员申请记录
-        List<UemCompanyManager> uemCompanyManagerList = QUemCompanyManager.uemCompanyManager.select().where(
-                QUemCompanyManager.uemUserId.eq$(uemUser.getUemUserId())
-                        .and(QUemCompanyManager.uemCompanyId.eq$(uemUser.getBlindCompanny()))
-                        .and(QUemCompanyManager.auditStatus.ne$(GlobalEnum.AuditStatusEnum.AUDIT_REJECT.getCode()))
-        ).execute();
-        // 校验用户是否为企业管理员或申请管理员审批中
-        for (UemCompanyManager uemCompanyManager : uemCompanyManagerList) {
-            // 审批中
-            if (Objects.equals(uemCompanyManager.getAuditStatus(), GlobalEnum.AuditStatusEnum.NO_AUDIT.getCode())) {
-                log.error("用户id：{}，存在管理员申请审批中记录：{}", uemUser.getUemUserId(), uemCompanyManager);
-                throw new RuntimeException("该用户企业管理员申请中");
-            }
-            // 审批通过
-            if (Objects.equals(uemCompanyManager.getAuditStatus(), GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode())) {
-                log.error("用户id：{}，存在管理员申请审批通过的记录：{}", uemUser.getUemUserId(), uemCompanyManager);
-                throw new RuntimeException("该用户已经是企业管理员");
-            }
-        }
-        return CommonResult.getSuccessResultData();
-    }
-
-    @Override
-    public ResultHelper<String> bindCompanyManager(Long uemUserId) {
-        // 校验
-        this.validBindCompanyManager(uemUserId);
-        // 客服
-        User user = (User)defaultUserService.getCurrentLoginUser();
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(user.getUemUserId());
-        // 用户
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
-        // 获取用户-企业绑定信息
-        UemUserCompany uemUserCompany = QUemUserCompany.uemUserCompany.selectOne().where(
-                QUemUserCompany.uemUserId.eq$(uemUser.getUemUserId())
-                        .and(QUemUserCompany.uemCompanyId.eq$(uemUser.getBlindCompanny()))
-                        .and(QUemUserCompany.auditStatus.eq$(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode()))
-                        .and(QUemUserCompany.quitTime.isNull())
-        ).execute();
-        // 为用户添加管理员
-        this.addUemCompanyManager(uemUser, uemUserCompany, sysPlatformUser);
-
-        return CommonResult.getSuccessResultData("指定管理员成功");
-    }
-
-    @Override
-    public ResultHelper<String> validUnbindCompanyManager(Long uemUserId) {
-        // 校验用户信息
-        UemUser uemUser = this.validUserInfo(uemUserId);
-
-        // 校验用户是否绑定企业
-        if (Objects.isNull(uemUser.getBlindCompanny())) {
-            log.error("用户id:{}，uemUser的blindCompany的值为空", uemUser.getUemUserId());
-            throw new RuntimeException("该用户未绑定企业或未通过企业审核，无法解绑管理员");
-        }
-
-        // 获取用户绑定的企业信息
-        UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUser.getBlindCompanny());
-        // 判空
-        if (Objects.isNull(uemCompany)) {
-            log.error("用户id:{}，其绑定的企业id：{}，不存在该企业", uemUser.getUemUserId(), uemUser.getBlindCompanny());
-            throw new RuntimeException("该用户绑定的企业不存在，无法解绑管理员");
-        }
-        // 校验用户绑定的企业是否审批通过
-        if (!Objects.equals(uemCompany.getAuditStatus(), GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode())) {
-            log.error("用户id:{}，根据其blindCompany：{}查询企业，企业的审核状态为：{}，未审核通过", uemUser.getUemUserId(), uemUser.getBlindCompanny(), uemCompany.getAuditStatus());
-            throw new RuntimeException("该用户未绑定企业或未通过企业审核，无法解绑管理员");
-        }
-
-        // 获取用户-企业绑定关系中，审核通过且未解绑的信息
-        UemUserCompany uemUserCompany = QUemUserCompany.uemUserCompany.selectOne().where(
-                QUemUserCompany.uemUserId.eq$(uemUser.getUemUserId())
-                        .and(QUemUserCompany.uemCompanyId.eq$(uemUser.getBlindCompanny()))
-                        .and(QUemUserCompany.auditStatus.eq$(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode()))
-                        .and(QUemUserCompany.quitTime.isNull())
-        ).execute();
-        // 校验用户是否绑定企业
-        if (Objects.isNull(uemUserCompany)) {
-            log.error("根据用户id:{}，用户的绑定企业blindCompany:{}，在用户-企业绑定关系uemUserCompany表中，未找到auditStatus为审批通过、quitTime为空的记录",
-                    uemUser.getUemUserId(), uemUser.getBlindCompanny());
-            throw new RuntimeException("该用户未绑定企业或未通过企业审核，无法解绑管理员");
-        }
-
-        // 校验用户是否管理员
-        if (!Objects.equals(uemUser.getUserType(), CodeFinal.USER_TYPE_TWO) || !Objects.equals(uemUserCompany.getUserRole(), Boolean.TRUE)) {
-            log.error("用户id：{}，用户信息uemUser中的用户类型userType为：{}，用户-企业绑定关系uemUserCompany中的用户角色userRole为：{}，标识该用户不是企业管理员",
-                    uemUser.getUemUserId(), uemUser.getUserType(), uemUserCompany.getUserRole());
-            throw new RuntimeException("该用户不是企业管理员");
-        }
-
-        // 获取用户审批通过的管理员申请记录
-        UemCompanyManager uemCompanyManager = QUemCompanyManager.uemCompanyManager.selectOne().where(
-                QUemCompanyManager.uemUserId.eq$(uemUser.getUemUserId())
-                        .and(QUemCompanyManager.uemCompanyId.eq$(uemUser.getBlindCompanny()))
-                        .and(QUemCompanyManager.auditStatus.eq$(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode()))
-        ).execute();
-        // 校验用户企业管理员是否存在审批通过的记录
-        if (Objects.isNull(uemCompanyManager)) {
-            log.error("用户id：{}，用户绑定的企业id：{}，在uemCompanyManager表中不存在管理员申请审批通过的记录", uemUser.getUemUserId(), uemUser.getBlindCompanny());
-            throw new RuntimeException("该用户不是企业管理员");
-        }
-        return CommonResult.getSuccessResultData();
-    }
-
-    @Override
-    public ResultHelper<String> unbindCompanyManager(Long uemUserId) {
-        // 校验
-        this.validUnbindCompanyManager(uemUserId);
-
-        // 用户
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
-        // 获取用户-企业绑定关系中，审核通过且未解绑的信息
-        UemUserCompany uemUserCompany = QUemUserCompany.uemUserCompany.selectOne().where(
-                QUemUserCompany.uemUserId.eq$(uemUser.getUemUserId())
-                        .and(QUemUserCompany.uemCompanyId.eq$(uemUser.getBlindCompanny()))
-                        .and(QUemUserCompany.auditStatus.eq$(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode()))
-                        .and(QUemUserCompany.quitTime.isNull())
-        ).execute();
-        // 获取用户审批通过的管理员申请记录
-        UemCompanyManager uemCompanyManager = QUemCompanyManager.uemCompanyManager.selectOne().where(
-                QUemCompanyManager.uemUserId.eq$(uemUser.getUemUserId())
-                        .and(QUemCompanyManager.uemCompanyId.eq$(uemUser.getBlindCompanny()))
-                        .and(QUemCompanyManager.auditStatus.eq$(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode()))
-        ).execute();
-
-        // 删除用户的企业管理员记录
-        this.deleteUemCompanyManager(uemUser, uemUserCompany, uemCompanyManager);
-
-        return CommonResult.getSuccessResultData("解绑管理员成功");
-    }
-
-
-    /**
-     * 删除用户的企业管理员记录
-     * @param uemUser 用户
-     * @param uemUserCompany 用户-企业绑定关系
-     * @param uemCompanyManager 企业管理员记录
-     */
-    private void deleteUemCompanyManager(UemUser uemUser, UemUserCompany uemUserCompany, UemCompanyManager uemCompanyManager){
-        // 使用方系统ID
-        String systemId = MessageUtil.getApplicationCode();
-        FileInfoVO fileInfoVO = new FileInfoVO();
-        fileInfoVO.setSystemId(systemId);
-        fileInfoVO.setFileKey(uemCompanyManager.getFileUrlId());
-        shareFileInterface.deleteFile(fileInfoVO);
-        // 删除管理员记录
-        QUemCompanyManager.uemCompanyManager.deleteById(uemCompanyManager.getUemCompanyManagerId());
-
-        // 修改用户为企业用户
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUser.setUserType(CodeFinal.USER_TYPE_ONE);
-        QUemUser.uemUser.save(uemUser);
-
-        // 修改用户-企业绑定关系中用户角色为企业用户
-        uemUserCompany.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUserCompany.setUserRole(false);
-        QUemUserCompany.uemUserCompany.save(uemUserCompany);
     }
 
 }
