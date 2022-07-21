@@ -99,10 +99,6 @@ private static final long serialVersionUID=1;
     @Column(name = "email")
     private String email;
 
-    /**政务账号绑定ID*/
-    @Column(name = "gvm_id")
-    private String gvmId;
-
     /**身份证号码*/
     @Column(name = "id_card")
     private String idCard;
@@ -184,13 +180,9 @@ private static final long serialVersionUID=1;
     @Column(name = "sex")
     private Boolean sex;
 
-    /**用户来源(0-用户注册，1-管理员新增，2-国家综合交通运输信息平台，3-一期数据)*/
+    /**用户来源(0-用户注册，1-管理员新增)*/
     @Column(name = "source")
     private String source;
-
-    /**国家综合平台用户工号*/
-    @Column(name = "staff_code")
-    private String staffCode;
 
     /**人员岗位*/
     @Column(name = "staff_duty")

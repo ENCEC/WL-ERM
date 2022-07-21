@@ -1089,8 +1089,6 @@ public class UemUserServiceImpl implements UemUserService {
         }
         // 用户姓名
         uemUser.setName(uemUserOperateVO.getStaffName());
-        // 员工代码
-        uemUser.setStaffCode(uemUserOperateVO.getStaffCode());
         // 员工岗位
         uemUser.setStaffDuty(uemUserOperateVO.getStaffDuty());
         // 员工级别
