@@ -184,8 +184,6 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String telephone;
     /** 所属组织代码*/
     private String orgCode;
-    /** 国家综合平台用户工号*/
-    private String staffCode;
     /** 人员岗位*/
     private String staffDuty;
     /** 人员级别*/

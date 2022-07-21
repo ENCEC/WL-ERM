@@ -188,7 +188,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.idCard,
                         QUemUser.cardBackUrlId,
                         QUemUser.telephone,
-                        QUemUser.staffCode,
                         QUemUser.staffLevel,
                         QUemUser.staffDuty,
                         QUemUser.orgCode,

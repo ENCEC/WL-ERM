@@ -72,9 +72,6 @@ public class UemUserVO extends BaseModel implements Serializable{
     /**邮箱*/
     private String email;
 
-    /**政务账号绑定ID*/
-    private String gvmId;
-
     /**身份证号码*/
     private String idCard;
 
@@ -136,11 +133,8 @@ public class UemUserVO extends BaseModel implements Serializable{
     /**性别（0男，1女）*/
     private Boolean sex;
 
-    /**用户来源(0-用户注册，1-管理员新增，2-国家综合交通运输信息平台，3-一期数据)*/
+    /**用户来源(0-用户注册，1-管理员新增)*/
     private String source;
-
-    /**国家综合平台用户工号*/
-    private String staffCode;
 
     /**人员岗位*/
     private String staffDuty;

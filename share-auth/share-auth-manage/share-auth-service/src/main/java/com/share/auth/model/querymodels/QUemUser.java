@@ -36,7 +36,6 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<Long> creatorId = uemUser.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = uemUser.fieldOf("creatorName", String.class);
     public static final FieldExpression<String> email = uemUser.fieldOf("email", String.class);
-    public static final FieldExpression<String> gvmId = uemUser.fieldOf("gvmId", String.class);
     public static final FieldExpression<String> idCard = uemUser.fieldOf("idCard", String.class);
     public static final FieldExpression<Date> invalidTime = uemUser.fieldOf("invalidTime", Date.class);
     public static final FieldExpression<Boolean> isAgreemeent = uemUser.fieldOf("isAgreemeent", Boolean.class);
@@ -57,7 +56,6 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> seqNo = uemUser.fieldOf("seqNo", String.class);
     public static final FieldExpression<Boolean> sex = uemUser.fieldOf("sex", Boolean.class);
     public static final FieldExpression<String> source = uemUser.fieldOf("source", String.class);
-    public static final FieldExpression<String> staffCode = uemUser.fieldOf("staffCode", String.class);
     public static final FieldExpression<String> staffDuty = uemUser.fieldOf("staffDuty", String.class);
     public static final FieldExpression<String> staffDutyCode = uemUser.fieldOf("staffDutyCode", String.class);
     public static final FieldExpression<String> staffLevel = uemUser.fieldOf("staffLevel", String.class);
