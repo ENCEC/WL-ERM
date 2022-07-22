@@ -418,7 +418,6 @@ public class UemCompanyServiceImpl implements UemCompanyService {
         uemCompany.setOrganizationCode(vaccineCompanyDTO.getOrganizationCode());
         uemCompany.setContact(vaccineCompanyDTO.getContact());
         uemCompany.setContactTel(vaccineCompanyDTO.getContactTel());
-        uemCompany.setInternationalBusinessFileUrl(vaccineCompanyDTO.getInternationalBusinessFileUrl());
         uemCompany.setAuditStatus(CodeFinal.AUDIT_STATUS_ONE);
         uemCompany.setIsValid(true);
         // 设置承运商企业类型-非注册
