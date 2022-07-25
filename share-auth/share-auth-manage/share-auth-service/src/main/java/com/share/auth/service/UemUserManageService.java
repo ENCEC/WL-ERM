@@ -5,32 +5,35 @@ import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
 
 /**
- * @author xrp
- * @date 2020/11/3 0003
+ * 用户管理模块
+ *
+ * @author xuzt <xuzt@gillion.com.cn>
+ * @date 2022-07-25
  */
 @Api("用户管理模块")
 public interface UemUserManageService {
 
-    /**用户管理
-     * @param uemUserDto 用户表封装类
+    /**
+     * 查询用户信息
+     *
+     * @param uemUserDto 用户信息封装类
      * @return Page<UemUserDto>
-     * @author xrp
-     * */
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-25
+     */
     Page<UemUserDto> queryUemUser(UemUserDto uemUserDto);
 
     /**
      * 用户管理详情
      *
      * @param uemUserId 用户ID
-     * @return List<UemUserDto>
-     * @author xrp
+     * @return UemUserDto
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-25
      */
-    List<UemUserDto> getUemUser(String uemUserId);
+    UemUserDto getUemUser(Long uemUserId);
 
     /**
      * 用户管理 启停
@@ -39,40 +42,41 @@ public interface UemUserManageService {
      * @return Map<String, Object>
      * @author xrp
      */
-    ResultHelper<Object> uemUserStartStop(UemUserDto uemUserDto);
+    ResultHelper<?> uemUserStartStop(UemUserDto uemUserDto);
 
 
     /**
      * 修改用户信息
-     *
-     * @param uemUserDto
-     * @return
-     * @throws
-     * @author tujx
+     * @param uemUserEditDTO 用户表封装类
+     * @return com.share.support.result.ResultHelper<java.lang.Object>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-25
      */
-    ResultHelper<Object> editUemUser(@RequestBody UemUserEditDTO uemUserDto);
+    ResultHelper<?> editUemUser(UemUserEditDTO uemUserEditDTO);
 
     /**
-     * 删除用户信息
+     * 用户逻辑删除
      *
-     * @param uemUserId 用户主键id
-     * @return
-     * @throws
-     * @author tujx
+     * @param uemUserId 用户ID
+     * @return com.share.support.result.ResultHelper<?>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-25
      */
-    ResultHelper<Object> deleteUemUser(Long uemUserId);
+    ResultHelper<?> deleteUemUser(Long uemUserId);
 
     /**
-     * 平台客服新增用户
-     * @param uemUserDto 用户信息
+     * 管理员新增用户
+     *
+     * @param uemUserEditDTO 用户信息
      * @return 新增结果
      */
-    ResultHelper<String> saveUemUser(UemUserDto uemUserDto);
+    ResultHelper<?> saveUemUser(UemUserEditDTO uemUserEditDTO);
 
     /**
-     * 平台客服重置用户密码
+     * 管理员重置用户密码
+     *
      * @param uemUserId 用户id
      * @return 重置结果
      */
-    ResultHelper<String> resetUemUserPassword(Long uemUserId);
+    ResultHelper<?> resetUemUserPassword(Long uemUserId);
 }

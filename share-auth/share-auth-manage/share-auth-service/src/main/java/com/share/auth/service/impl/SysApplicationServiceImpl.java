@@ -1,7 +1,6 @@
 package com.share.auth.service.impl;
 
 import com.gillion.ds.client.DSContext;
-import com.gillion.ds.client.api.queryobject.expressions.AndExpression;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.google.common.collect.ImmutableMap;
@@ -9,26 +8,23 @@ import com.google.common.collect.Lists;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.QueryApplicationDTO;
 import com.share.auth.domain.SysApplicationDto;
-import com.share.auth.domain.UemUserDto;
-import com.share.auth.model.entity.*;
-import com.share.auth.model.querymodels.*;
+import com.share.auth.model.entity.SysApplication;
+import com.share.auth.model.querymodels.QSysApplication;
 import com.share.auth.service.SysApplicationService;
 import com.share.auth.service.SysRoleService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import com.share.support.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author chenxf
@@ -267,26 +263,27 @@ public class SysApplicationServiceImpl implements SysApplicationService {
      */
     @Override
     public ResultHelper<List<SysApplication>> queryApplicationForCompanyRole() {
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
-        if (Objects.isNull(userInfoModel) || userInfoModel.getUemUserId() == null) {
-            return CommonResult.getFaildResultData("获取用户信息失败！请重新登录");
-        }
-        if (Objects.isNull(userInfoModel.getBlindCompanny())) {
-            return CommonResult.getFaildResultData("用户未绑定企业！请重新登录");
-        }
-        // 查询企业可分配权限的应用
-        List<SysApplication> sysApplications = QSysRole.sysRole.select(
-                QSysRole.sysApplicationId,
-                QSysRole.sysRole.chain(QSysApplication.applicationName).as("applicationName"),
-                QSysRole.sysRole.chain(QSysApplication.isValid).as("isValid")
-        ).where(
-                QSysRole.isValid.eq$(Boolean.TRUE)
-                        .and(QSysRole.sysRole.chain(QSysApplication.isValid).eq$(Boolean.TRUE))
-                        .and(QSysRole.uemCompanyRole.chain(QUemCompanyRole.uemCompanyId).eq$(userInfoModel.getBlindCompanny()))
-        ).groupBy(QSysRole.sysApplicationId)
-                .mapperTo(SysApplication.class)
-                .execute();
-        return CommonResult.getSuccessResultData(sysApplications);
+//        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+//        if (Objects.isNull(userInfoModel) || userInfoModel.getUemUserId() == null) {
+//            return CommonResult.getFaildResultData("获取用户信息失败！请重新登录");
+//        }
+//        if (Objects.isNull(userInfoModel.getBlindCompanny())) {
+//            return CommonResult.getFaildResultData("用户未绑定企业！请重新登录");
+//        }
+//        // 查询企业可分配权限的应用
+//        List<SysApplication> sysApplications = QSysRole.sysRole.select(
+//                QSysRole.sysApplicationId,
+//                QSysRole.sysRole.chain(QSysApplication.applicationName).as("applicationName"),
+//                QSysRole.sysRole.chain(QSysApplication.isValid).as("isValid")
+//        ).where(
+//                QSysRole.isValid.eq$(Boolean.TRUE)
+//                        .and(QSysRole.sysRole.chain(QSysApplication.isValid).eq$(Boolean.TRUE))
+//                        .and(QSysRole.uemCompanyRole.chain(QUemCompanyRole.uemCompanyId).eq$(userInfoModel.getBlindCompanny()))
+//        ).groupBy(QSysRole.sysApplicationId)
+//                .mapperTo(SysApplication.class)
+//                .execute();
+//        return CommonResult.getSuccessResultData(sysApplications);
+        return null;
     }
 
     /**
@@ -298,34 +295,36 @@ public class SysApplicationServiceImpl implements SysApplicationService {
      */
     @Override
     public ResultHelper<List<SysApplication>> queryApplicationForCompanyRoleByUser(Long uemUserId) {
-        UemUser uemUserTemp = QUemUser.uemUser.selectOne().byId(uemUserId);
-
-        if (Objects.isNull(uemUserTemp.getBlindCompanny())) {
-            return CommonResult.getFaildResultData("用户未绑定企业！");
-        }
-        // 查询企业可分配权限的应用
-        List<SysApplication> sysApplications = QSysRole.sysRole.select(
-                QSysRole.sysApplicationId,
-                QSysRole.sysRole.chain(QSysApplication.applicationName).as("applicationName"),
-                QSysRole.sysRole.chain(QSysApplication.isValid).as("isValid")
-        ).where(
-                QSysRole.isValid.eq$(Boolean.TRUE)
-                        .and(QSysRole.sysRole.chain(QSysApplication.isValid).eq$(Boolean.TRUE))
-                        .and(QSysRole.uemCompanyRole.chain(QUemCompanyRole.uemCompanyId).eq$(uemUserTemp.getBlindCompanny()))
-        ).groupBy(QSysRole.sysApplicationId)
-                .mapperTo(SysApplication.class)
-                .execute();
-        return CommonResult.getSuccessResultData(sysApplications);
+//        UemUser uemUserTemp = QUemUser.uemUser.selectOne().byId(uemUserId);
+//
+//        if (Objects.isNull(uemUserTemp.getBlindCompanny())) {
+//            return CommonResult.getFaildResultData("用户未绑定企业！");
+//        }
+//        // 查询企业可分配权限的应用
+//        List<SysApplication> sysApplications = QSysRole.sysRole.select(
+//                QSysRole.sysApplicationId,
+//                QSysRole.sysRole.chain(QSysApplication.applicationName).as("applicationName"),
+//                QSysRole.sysRole.chain(QSysApplication.isValid).as("isValid")
+//        ).where(
+//                QSysRole.isValid.eq$(Boolean.TRUE)
+//                        .and(QSysRole.sysRole.chain(QSysApplication.isValid).eq$(Boolean.TRUE))
+//                        .and(QSysRole.uemCompanyRole.chain(QUemCompanyRole.uemCompanyId).eq$(uemUserTemp.getBlindCompanny()))
+//        ).groupBy(QSysRole.sysApplicationId)
+//                .mapperTo(SysApplication.class)
+//                .execute();
+//        return CommonResult.getSuccessResultData(sysApplications);
+        return null;
     }
 
     @Override
     public ResultHelper<SysApplication> getSysApplicationByClientId(String clientId) {
-        List<SysApplication> applications = QOauthClientDetails.oauthClientDetails.select(
-                QOauthClientDetails.sysApplication.chain(QSysApplication.sysApplicationId).as("sysApplicationId"),
-                QOauthClientDetails.sysApplication.chain(QSysApplication.applicationName).as("applicationName"),
-                QOauthClientDetails.sysApplication.chain(QSysApplication.applicationRemark).as("applicationRemark"))
-                .where(QOauthClientDetails.clientId.eq$(clientId)).mapperTo(SysApplication.class).execute();
-        return CommonResult.getSuccessResultData(CollectionUtils.isEmpty(applications) ? null : applications.get(0));
+//        List<SysApplication> applications = QOauthClientDetails.oauthClientDetails.select(
+//                QOauthClientDetails.sysApplication.chain(QSysApplication.sysApplicationId).as("sysApplicationId"),
+//                QOauthClientDetails.sysApplication.chain(QSysApplication.applicationName).as("applicationName"),
+//                QOauthClientDetails.sysApplication.chain(QSysApplication.applicationRemark).as("applicationRemark"))
+//                .where(QOauthClientDetails.clientId.eq$(clientId)).mapperTo(SysApplication.class).execute();
+//        return CommonResult.getSuccessResultData(CollectionUtils.isEmpty(applications) ? null : applications.get(0));
+        return null;
     }
 
     /**

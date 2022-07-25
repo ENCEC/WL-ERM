@@ -6,27 +6,27 @@ import com.gillion.saas.redis.SassRedisInterface;
 import com.google.common.collect.ImmutableMap;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.constants.GlobalConstant;
-import com.share.auth.enums.GlobalEnum;
-import com.share.auth.model.vo.UserAndCompanyVo;
-import com.share.auth.service.MsgSendService;
-import com.share.auth.service.SysRoleService;
-import com.share.auth.util.PasswordUtils;
-import com.share.support.model.Company;
-import com.share.support.model.Role;
 import com.share.auth.domain.UemUserDto;
+import com.share.auth.enums.GlobalEnum;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.model.vo.OperateResultVO;
 import com.share.auth.model.vo.UemUserOperateVO;
+import com.share.auth.model.vo.UserAndCompanyVo;
+import com.share.auth.service.MsgSendService;
+import com.share.auth.service.SysRoleService;
 import com.share.auth.service.UemUserService;
 import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.auth.util.MessageUtil;
+import com.share.auth.util.PasswordUtils;
 import com.share.message.api.EmailTemplateService;
 import com.share.message.api.MsgApiService;
 import com.share.message.domain.MsgSmsApiVO;
 import com.share.message.domain.SendEmailVO;
 import com.share.message.domain.SendMsgReturnVo;
+import com.share.support.model.Company;
+import com.share.support.model.Role;
 import com.share.support.model.User;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -44,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * @author xrp
@@ -1040,61 +1039,61 @@ public class UemUserServiceImpl implements UemUserService {
      * @param uemUser 用户信息
      */
     private void setUemUserByOperateVO(UemUserOperateVO uemUserOperateVO, UemUser uemUser) {
-        // 新增用户，设置默认新增信息
-        if (Objects.equals(uemUserOperateVO.getOptionType(), GlobalEnum.OptionTypeEnum.INSERT.getCode())) {
-            // 用户名是已存在，若已存在，添加前缀 GJIM_
-            UemUser loginNo = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).where(QUemUser.account.eq$(uemUserOperateVO.getLoginNo())).execute();
-            if (Objects.isNull(loginNo)) {
-                uemUser.setAccount(uemUserOperateVO.getLoginNo());
-            } else {
-                uemUser.setAccount(GlobalConstant.PREFIX_GJIM + uemUserOperateVO.getLoginNo());
-            }
-            // 审核状态：默认审核通过
-            uemUser.setAuditStatus(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode());
-            uemUser.setAuditTime(new Date());
-            // 用户类型-普通用户
-            uemUser.setUserType(GlobalEnum.UserType.GENERAL_USER.getCode());
-            // 同意协议
-            uemUser.setIsAgreemeent(true);
-            // 密码
-            uemUser.setPassword("");
-            // 来源：2
-            uemUser.setSource(GlobalEnum.UserSource.NTIP.getCode());
-        }
-        // 手机号
-        if (StringUtils.isBlank(uemUserOperateVO.getStaffPhone())) {
-            uemUser.setMobile("");
-        } else {
-            uemUser.setMobile(uemUserOperateVO.getStaffPhone());
-        }
-        // 固定电话
-        uemUser.setTelephone(uemUserOperateVO.getFixphone());
-        // 邮箱
-        uemUser.setEmail(uemUserOperateVO.getStaffMail());
-        // 所属组织机构代码
-        uemUser.setOrgCode(uemUserOperateVO.getOrgId());
-        // 所属企业不一致，更新
-        UemCompany uemCompany = QUemCompany.uemCompany.selectOne(QUemCompany.uemCompany.fieldContainer()).where(QUemCompany.orgCode.eq$(uemUserOperateVO.getOrgId())).execute();
-        if (!Objects.equals(uemCompany.getBelongCompany(), uemCompany.getUemCompanyId())) {
-            uemUser.setBlindCompanny(uemCompany.getUemCompanyId());
-            uemUser.setBlindCompannyTime(new Date());
-        }
-
-        // 是否修改启用禁用状态
-        Boolean invalid = GlobalEnum.StaffStatusEnum.getInvalidByCode(uemUserOperateVO.getStaffStatus());
-        if (Objects.nonNull(invalid) && !Objects.equals(invalid, uemUser.getIsValid())) {
-            // 修改
-            uemUser.setIsValid(invalid);
-            uemUser.setInvalidTime(new Date());
-        }
-        // 用户姓名
-        uemUser.setName(uemUserOperateVO.getStaffName());
-        // 员工岗位
-        uemUser.setStaffDuty(uemUserOperateVO.getStaffDuty());
-        // 员工级别
-        uemUser.setStaffLevel(uemUserOperateVO.getStaffLvl());
-        // 排序
-        uemUser.setSeqNo(uemUserOperateVO.getSeqNo());
+//        // 新增用户，设置默认新增信息
+//        if (Objects.equals(uemUserOperateVO.getOptionType(), GlobalEnum.OptionTypeEnum.INSERT.getCode())) {
+//            // 用户名是已存在，若已存在，添加前缀 GJIM_
+//            UemUser loginNo = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).where(QUemUser.account.eq$(uemUserOperateVO.getLoginNo())).execute();
+//            if (Objects.isNull(loginNo)) {
+//                uemUser.setAccount(uemUserOperateVO.getLoginNo());
+//            } else {
+//                uemUser.setAccount(GlobalConstant.PREFIX_GJIM + uemUserOperateVO.getLoginNo());
+//            }
+//            // 审核状态：默认审核通过
+//            uemUser.setAuditStatus(GlobalEnum.AuditStatusEnum.AUDIT_PASS.getCode());
+//            uemUser.setAuditTime(new Date());
+//            // 用户类型-普通用户
+//            uemUser.setUserType(GlobalEnum.UserType.GENERAL_USER.getCode());
+//            // 同意协议
+//            uemUser.setIsAgreemeent(true);
+//            // 密码
+//            uemUser.setPassword("");
+//            // 来源：2
+//            uemUser.setSource(GlobalEnum.UserSource.NTIP.getCode());
+//        }
+//        // 手机号
+//        if (StringUtils.isBlank(uemUserOperateVO.getStaffPhone())) {
+//            uemUser.setMobile("");
+//        } else {
+//            uemUser.setMobile(uemUserOperateVO.getStaffPhone());
+//        }
+//        // 固定电话
+//        uemUser.setTelephone(uemUserOperateVO.getFixphone());
+//        // 邮箱
+//        uemUser.setEmail(uemUserOperateVO.getStaffMail());
+//        // 所属组织机构代码
+//        uemUser.setOrgCode(uemUserOperateVO.getOrgId());
+//        // 所属企业不一致，更新
+//        UemCompany uemCompany = QUemCompany.uemCompany.selectOne(QUemCompany.uemCompany.fieldContainer()).where(QUemCompany.orgCode.eq$(uemUserOperateVO.getOrgId())).execute();
+//        if (!Objects.equals(uemCompany.getBelongCompany(), uemCompany.getUemCompanyId())) {
+//            uemUser.setBlindCompanny(uemCompany.getUemCompanyId());
+//            uemUser.setBlindCompannyTime(new Date());
+//        }
+//
+//        // 是否修改启用禁用状态
+//        Boolean invalid = GlobalEnum.StaffStatusEnum.getInvalidByCode(uemUserOperateVO.getStaffStatus());
+//        if (Objects.nonNull(invalid) && !Objects.equals(invalid, uemUser.getIsValid())) {
+//            // 修改
+//            uemUser.setIsValid(invalid);
+//            uemUser.setInvalidTime(new Date());
+//        }
+//        // 用户姓名
+//        uemUser.setName(uemUserOperateVO.getStaffName());
+//        // 员工岗位
+//        uemUser.setStaffDuty(uemUserOperateVO.getStaffDuty());
+//        // 员工级别
+//        uemUser.setStaffLevel(uemUserOperateVO.getStaffLvl());
+//        // 排序
+//        uemUser.setSeqNo(uemUserOperateVO.getSeqNo());
     }
 
     /**
