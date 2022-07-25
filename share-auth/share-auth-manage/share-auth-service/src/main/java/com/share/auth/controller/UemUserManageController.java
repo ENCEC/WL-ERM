@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,7 @@ public class UemUserManageController {
 
     @Autowired
     private UemUserManageService uemUserManageService;
+
     @Autowired
     private AuthCenterInterface authCenterInterface;
 
@@ -126,11 +128,11 @@ public class UemUserManageController {
     }
 
     /**
-     * 平台客服新增用户
+     * 管理员新增用户
      * @param uemUserDto 用户信息
      * @return 新增结果
      */
-    @ApiOperation("平台客服新增用户")
+    @ApiOperation("管理员新增用户")
     @ResponseBody
     @PostMapping(value = "/saveUemUser")
     public ResultHelper<String> saveUemUser(@RequestBody UemUserDto uemUserDto) {
@@ -138,11 +140,11 @@ public class UemUserManageController {
     }
 
     /**
-     * 平台客服重置用户密码
+     * 管理员重置用户密码
      * @param uemUserId 用户id
      * @return 重置结果
      */
-    @ApiOperation("平台客服重置用户密码")
+    @ApiOperation("管理员重置用户密码")
     @ResponseBody
     @GetMapping(value = "/resetUemUserPassword")
     public ResultHelper<String> resetUemUserPassword(Long uemUserId) {
