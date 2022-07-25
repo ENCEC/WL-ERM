@@ -1,19 +1,17 @@
 package com.share.auth.service.impl;
 
-import com.gillion.ds.client.api.queryobject.expressions.AndExpression;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
-import com.gillion.exception.BusinessRuntimeException;
 import com.google.common.collect.Lists;
-import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.SysRoleDTO;
-import com.share.auth.enums.GlobalEnum;
-import com.share.auth.model.entity.*;
-import com.share.auth.model.querymodels.*;
+import com.share.auth.model.entity.SysRole;
+import com.share.auth.model.entity.SysRoleResource;
+import com.share.auth.model.querymodels.QSysResource;
+import com.share.auth.model.querymodels.QSysRole;
+import com.share.auth.model.querymodels.QSysRoleResource;
 import com.share.auth.model.vo.SysRoleQueryVO;
 import com.share.auth.model.workflow.RoleVO;
 import com.share.auth.service.SysRoleService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -27,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author chenxf
@@ -179,7 +176,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         // 先删掉之前分配的菜单资源
         List<SysRoleResource> sysRoleResourceList = QSysRoleResource.sysRoleResource.select().where(
                 QSysRoleResource.sysRoleId.eq$(sysRoleDTO.getSysRoleId())
-                        .and(QSysRoleResource.sysResource.chain(
+                        .and(QSysRoleResource.sysRoleResource.chain(
                                 QSysResource.resourceType).eq$(1).or(QSysResource.resourceType.eq$(2)
                         ))
         ).execute();
@@ -221,33 +218,34 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public List<SysRoleDTO> querySysRoleByAppAndCompany(SysRoleQueryVO sysRoleQueryVo) {
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel)userService.getCurrentLoginUser();
-        if (Objects.isNull(userInfoModel)){
-            log.error("获取登录信息为空");
-            throw new BusinessRuntimeException("获取登录信息失败");
-        }
-        if (userInfoModel.getUemUserId() == null){
-            log.error("获取登录信息的用户id为空");
-            throw new BusinessRuntimeException("获取登录信息失败");
-        }
-        if (Objects.isNull(userInfoModel.getBlindCompanny())){
-            log.error("获取登录信息，用户未绑定企业");
-            throw new BusinessRuntimeException("用户未绑定企业，请确认！");
-        }
-        if (Objects.isNull(sysRoleQueryVo)|| Objects.isNull(sysRoleQueryVo.getSysApplicationId())){
-            log.error("入参错误，应用id不存在");
-            throw new BusinessRuntimeException("入参错误，请确认");
-        }
-        // 查询企业可分配权限的角色
-        return QSysRole.sysRole.select(
-                QSysRole.sysRole.fieldContainer()
-        ).where(
-                QSysRole.isValid.eq$(Boolean.TRUE)
-                        .and(QSysRole.sysApplicationId.eq$(sysRoleQueryVo.getSysApplicationId()))
-                        .and(QSysRole.sysRole.chain(QSysApplication.isValid).eq$(Boolean.TRUE))
-                        .and(QSysRole.uemCompanyRole.chain(QUemCompanyRole.uemCompanyId).eq$(userInfoModel.getBlindCompanny()))
-        ).mapperTo(SysRoleDTO.class)
-                .execute();
+//        AuthUserInfoModel userInfoModel = (AuthUserInfoModel)userService.getCurrentLoginUser();
+//        if (Objects.isNull(userInfoModel)){
+//            log.error("获取登录信息为空");
+//            throw new BusinessRuntimeException("获取登录信息失败");
+//        }
+//        if (userInfoModel.getUemUserId() == null){
+//            log.error("获取登录信息的用户id为空");
+//            throw new BusinessRuntimeException("获取登录信息失败");
+//        }
+//        if (Objects.isNull(userInfoModel.getBlindCompanny())){
+//            log.error("获取登录信息，用户未绑定企业");
+//            throw new BusinessRuntimeException("用户未绑定企业，请确认！");
+//        }
+//        if (Objects.isNull(sysRoleQueryVo)|| Objects.isNull(sysRoleQueryVo.getSysApplicationId())){
+//            log.error("入参错误，应用id不存在");
+//            throw new BusinessRuntimeException("入参错误，请确认");
+//        }
+//        // 查询企业可分配权限的角色
+//        return QSysRole.sysRole.select(
+//                QSysRole.sysRole.fieldContainer()
+//        ).where(
+//                QSysRole.isValid.eq$(Boolean.TRUE)
+//                        .and(QSysRole.sysApplicationId.eq$(sysRoleQueryVo.getSysApplicationId()))
+//                        .and(QSysRole.sysRole.chain(QSysApplication.isValid).eq$(Boolean.TRUE))
+//                        .and(QSysRole.uemCompanyRole.chain(QUemCompanyRole.uemCompanyId).eq$(userInfoModel.getBlindCompanny()))
+//        ).mapperTo(SysRoleDTO.class)
+//                .execute();
+        return null;
     }
 
     /**
@@ -260,26 +258,27 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public List<SysRoleDTO> querySysRoleByAppAndCompanyByUser(SysRoleQueryVO sysRoleQueryVo) {
-        UemUser uemUserTemp = QUemUser.uemUser.selectOne().byId(sysRoleQueryVo.getUemUserId());
-
-        if (Objects.isNull(uemUserTemp.getBlindCompanny())){
-            log.error("用户未绑定企业");
-            throw new BusinessRuntimeException("用户未绑定企业，请确认！");
-        }
-        if (Objects.isNull(sysRoleQueryVo.getSysApplicationId())){
-            log.error("入参错误，应用id不存在");
-            throw new BusinessRuntimeException("入参错误，请确认！");
-        }
-        // 查询企业可分配权限的角色
-        return QSysRole.sysRole.select(
-                QSysRole.sysRole.fieldContainer()
-        ).where(
-                QSysRole.isValid.eq$(Boolean.TRUE)
-                        .and(QSysRole.sysApplicationId.eq$(sysRoleQueryVo.getSysApplicationId()))
-                        .and(QSysRole.sysRole.chain(QSysApplication.isValid).eq$(Boolean.TRUE))
-                        .and(QSysRole.uemCompanyRole.chain(QUemCompanyRole.uemCompanyId).eq$(uemUserTemp.getBlindCompanny()))
-        ).mapperTo(SysRoleDTO.class)
-                .execute();
+//        UemUser uemUserTemp = QUemUser.uemUser.selectOne().byId(sysRoleQueryVo.getUemUserId());
+//
+//        if (Objects.isNull(uemUserTemp.getBlindCompanny())){
+//            log.error("用户未绑定企业");
+//            throw new BusinessRuntimeException("用户未绑定企业，请确认！");
+//        }
+//        if (Objects.isNull(sysRoleQueryVo.getSysApplicationId())){
+//            log.error("入参错误，应用id不存在");
+//            throw new BusinessRuntimeException("入参错误，请确认！");
+//        }
+//        // 查询企业可分配权限的角色
+//        return QSysRole.sysRole.select(
+//                QSysRole.sysRole.fieldContainer()
+//        ).where(
+//                QSysRole.isValid.eq$(Boolean.TRUE)
+//                        .and(QSysRole.sysApplicationId.eq$(sysRoleQueryVo.getSysApplicationId()))
+//                        .and(QSysRole.sysRole.chain(QSysApplication.isValid).eq$(Boolean.TRUE))
+//                        .and(QSysRole.uemCompanyRole.chain(QUemCompanyRole.uemCompanyId).eq$(uemUserTemp.getBlindCompanny()))
+//        ).mapperTo(SysRoleDTO.class)
+//                .execute();
+        return null;
     }
 
     /**
