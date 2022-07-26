@@ -1,6 +1,10 @@
 package com.share.auth.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ds.entity.base.BaseModel;
+import com.gillion.ec.core.utils.Long2String;
+import com.gillion.ec.core.utils.String2Long;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,6 +25,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**id*/
     @ApiModelProperty("id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long uemUserId;
 
     /**用户名*/
@@ -33,6 +39,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**审批客服*/
     @ApiModelProperty("审批客服")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long auditor;
 
     /**审批备注*/
@@ -53,6 +61,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**绑定企业*/
     @ApiModelProperty("绑定企业")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long blindCompanny;
 
     /**身份证反面图片地址id*/
@@ -69,6 +79,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**创建人id*/
     @ApiModelProperty("创建人id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long creatorId;
 
     /**创建人名称*/
@@ -85,6 +97,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**学历（0：专科 1：本科 2：研究生 3：博士生）*/
     @ApiModelProperty("学历（0：专科 1：本科 2：研究生 3：博士生）")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long education;
 
     /**邮箱*/
@@ -129,6 +143,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**在职状态（0：试用员工 1：正式员工 2：离职员工）*/
     @ApiModelProperty("在职状态（0：试用员工 1：正式员工 2：离职员工）")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long jobStatus;
 
     /**离职时间*/
@@ -141,6 +157,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**婚姻状况（0：未婚 1：已婚 2：离婚）*/
     @ApiModelProperty("婚姻状况（0：未婚 1：已婚 2：离婚）")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long maritalStatus;
 
     /**手机号*/
@@ -149,6 +167,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**修改人id*/
     @ApiModelProperty("修改人id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long modifierId;
 
     /**修改人名称*/
@@ -173,6 +193,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**来源应用*/
     @ApiModelProperty("来源应用")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long oriApplication;
 
     /**密码*/
@@ -181,6 +203,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**所属项目ID*/
     @ApiModelProperty("所属项目ID")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long projectId;
 
     /**所属项目名称*/
@@ -245,6 +269,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**岗位职称ID*/
     @ApiModelProperty("岗位职称ID")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long technicalTitleId;
 
     /**固定电话*/
@@ -253,6 +279,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**用户所属部门ID*/
     @ApiModelProperty("用户所属部门ID")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long uemDeptId;
 
     /**用户类型（0-普通用户，1-企业用户，2-企业管理员）*/

@@ -21,7 +21,7 @@ public interface UemUserManageService {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-25
      */
-    Page<UemUserDto> queryUemUser(UemUserDto uemUserDto);
+    ResultHelper<Page<UemUserDto>> queryUemUser(UemUserDto uemUserDto);
 
     /**
      * 用户管理详情
@@ -31,7 +31,7 @@ public interface UemUserManageService {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-25
      */
-    UemUserDto getUemUser(Long uemUserId);
+    ResultHelper<UemUserDto> getUemUser(Long uemUserId);
 
     /**
      * 用户管理 启停

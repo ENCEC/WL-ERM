@@ -9,6 +9,7 @@ import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -43,26 +44,28 @@ public class UemUserManageController {
      * @date 2022-07-25
      */
     @ApiOperation("根据用户名、姓名或启禁用状态查询用户信息")
-    @ApiImplicitParam(name = "uemUserDto", value = "用户信息封装类", required = true, dataType = "UemUserDto")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "account", value = "用户名", dataTypeClass = String.class, paramType = "body"),
+            @ApiImplicitParam(name = "name", value = "真实姓名", dataTypeClass = String.class, paramType = "body"),
+            @ApiImplicitParam(name = "isValid", value = "启用/禁用状态", dataTypeClass = Boolean.class, paramType = "body")
+    })
     @PostMapping("/queryUemUser")
     public ResultHelper<Page<UemUserDto>> queryUemUser(@RequestBody UemUserDto uemUserDto) {
-        Page<UemUserDto> page = uemUserManageService.queryUemUser(uemUserDto);
-        return CommonResult.getSuccessResultData(page);
+        return uemUserManageService.queryUemUser(uemUserDto);
     }
 
     /**
      * 获取用户信息
      *
-     * @param uemUserId 用户ID
-     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.UemUserDto>>
      * @date 2022-07-25
      */
     @ApiOperation("获取用户信息")
-    @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataType = "Long")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataTypeClass = Long.class, paramType = "body")
+    })
     @GetMapping("/getUemUser")
     public ResultHelper<UemUserDto> getUemUser(@RequestParam Long uemUserId) {
-        UemUserDto uemUserDto = uemUserManageService.getUemUser(uemUserId);
-        return CommonResult.getSuccessResultData(uemUserDto);
+        return uemUserManageService.getUemUser(uemUserId);
     }
 
     /**
@@ -103,15 +106,15 @@ public class UemUserManageController {
     /**
      * 删除用户信息
      *
-     * @param uemUserId 用户ID
-     * @return com.share.support.result.ResultHelper<?>
      * @date 2022-07-25
      */
     @ApiOperation("删除用户信息")
-    @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataType = "Long")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataTypeClass = Long.class, paramType = "body")
+    })
     @PostMapping("/deleteUemUser")
-    public ResultHelper<?> deleteUemUser(@RequestParam Long uemUserId) {
-        return uemUserManageService.deleteUemUser(uemUserId);
+    public ResultHelper<?> deleteUemUser(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.deleteUemUser(uemUserDto.getUemUserId());
     }
 
     /**
@@ -138,13 +141,14 @@ public class UemUserManageController {
     /**
      * 管理员重置用户密码
      *
-     * @param uemUserId 用户id
-     * @return com.share.support.result.ResultHelper<?>
      * @date 2022-07-25
      */
     @ApiOperation("管理员重置用户密码")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataTypeClass = Long.class, paramType = "body")
+    })
     @PostMapping(value = "/resetUemUserPassword")
-    public ResultHelper<?> resetUemUserPassword(@RequestParam Long uemUserId) {
-        return uemUserManageService.resetUemUserPassword(uemUserId);
+    public ResultHelper<?> resetUemUserPassword(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.resetUemUserPassword(uemUserDto.getUemUserId());
     }
 }
