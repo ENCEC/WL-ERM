@@ -11,7 +11,8 @@ import com.share.auth.model.querymodels.QUemUser;
 import com.share.auth.service.UemUserManageService;
 import com.share.auth.service.UemUserService;
 import com.share.auth.user.DefaultUserService;
-import com.share.message.api.MsgApiService;
+import com.share.message.api.EmailTemplateService;
+import com.share.message.domain.SendEmailVO;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import com.share.support.util.MD5EnCodeUtils;
@@ -24,9 +25,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 用户信息管理
@@ -45,7 +44,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     private UemUserService uemUserService;
 
     @Autowired
-    private MsgApiService msgApiService;
+    private EmailTemplateService emailTemplateService;
 
     /**
      * 查询用户信息
@@ -76,8 +75,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         int pageSize = (uemUserDto.getPageSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : uemUserDto.getPageSize();
 
         return QUemUser.uemUser.select(
-                QUemUser.uemUserId, QUemUser.account, QUemUser.name,
-                QUemUser.mobile, QUemUser.email, QUemUser.isValid
+                QUemUser.uemUser.fieldContainer()
         ).where(
                 QUemUser.account.like(":account")
                         .and(QUemUser.name.like(":name"))
@@ -202,10 +200,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
         // 逻辑删除
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUser.setIsValid(false);
-        uemUser.setInvalidTime(new Date());
+        uemUser.setIsDeleted(true);
         int rowCount = QUemUser.uemUser
-                .selective(QUemUser.isValid, QUemUser.invalidTime)
+                .selective(QUemUser.isDeleted)
                 .update(uemUser);
         // 检查是否更新成功
         if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
@@ -257,7 +254,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否新增成功,并异步发送邮件通知
         if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
-            sendEmailToNewUser(uemUser, passwordText);
+            sendEmailWithPassword(uemUser.getAccount(), uemUser.getEmail(), passwordText, false);
             return CommonResult.getSuccessResultData("用户新增成功");
         } else {
             return CommonResult.getFaildResultData("用户新增失败");
@@ -286,13 +283,13 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         String passwordText = RandomUtil.randomString(12);
         String password = MD5EnCodeUtils.MD5EnCode(passwordText);
         password = MD5EnCodeUtils.encryptionPassword(password);
+        // 更新用户
         uemUser.setPassword(password);
-        // 新增用户
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         int rowCount = QUemUser.uemUser.save(uemUser);
-        // 检查是否新增成功,并异步发送邮件通知
+        // 检查是否更新成功,并异步发送邮件通知
         if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
-            sendEmailToNewUser(uemUser, passwordText);
+            sendEmailWithPassword(uemUser.getAccount(), uemUser.getEmail(), passwordText, true);
             return CommonResult.getSuccessResultData("重置密码成功");
         } else {
             return CommonResult.getFaildResultData("重置密码失败");
@@ -302,12 +299,27 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     /**
      * 新增用户时异步发送短信提醒给新用户
      *
-     * @param uemUser 用户信息
+     * @param account 用户名
+     * @param email 邮件地址
      * @param passwordText 新密码
+     * @param isReset true:发送重置密码邮件; false:发送新增用户邮件
      * @date 2022-07-25
      */
     @Async
-    public void sendEmailToNewUser(UemUser uemUser, String passwordText) {
-        log.debug("send email, " + uemUser.getAccount() + ", " + passwordText);
+    public void sendEmailWithPassword(String account, String email, String passwordText, boolean isReset) {
+//        ThreadUtil.sleep(1000);
+        // 设置模板参数
+        Map<String, Object> params = new HashMap<>(10);
+        params.put("account", account);
+        params.put("password", passwordText);
+        // 设置邮件参数
+        SendEmailVO sendEmailVO = new SendEmailVO();
+        sendEmailVO.setToEmail(email);
+        sendEmailVO.setEmailTemplateCode(isReset ? "" : "");
+        sendEmailVO.setSystemId("");
+        sendEmailVO.setMarcoAndAttachParams(params);
+        // 发送邮件
+        log.debug("send email, " + account + ", " + passwordText);
+        emailTemplateService.sendEmail(sendEmailVO);
     }
 }

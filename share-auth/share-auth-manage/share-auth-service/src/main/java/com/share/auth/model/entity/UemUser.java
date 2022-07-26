@@ -137,6 +137,10 @@ private static final long serialVersionUID=1;
     @Column(name = "is_agreemeent")
     private Boolean isAgreemeent;
 
+    /**逻辑删除flag*/
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     /**是否显示（0显示，1隐藏）*/
     @Column(name = "is_displayed")
     private Boolean isDisplayed;

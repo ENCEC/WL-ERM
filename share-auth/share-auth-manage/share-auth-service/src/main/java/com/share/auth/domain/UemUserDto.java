@@ -40,7 +40,7 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String auditRemark;
 
     /**审批状态（0待审批，1审批通过，2审批失败）*/
-    @ApiModelProperty("审批状态")
+    @ApiModelProperty("审批状态（0待审批，1审批通过，2审批失败）")
     private String auditStatus;
 
     /**审批时间*/
@@ -84,7 +84,7 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String deptName;
 
     /**学历（0：专科 1：本科 2：研究生 3：博士生）*/
-    @ApiModelProperty("学历")
+    @ApiModelProperty("学历（0：专科 1：本科 2：研究生 3：博士生）")
     private Long education;
 
     /**邮箱*/
@@ -112,23 +112,23 @@ public class UemUserDto extends BaseModel implements Serializable {
     private Date invalidTime;
 
     /**是否同意协议(0不同意，1同意)*/
-    @ApiModelProperty("是否同意协议")
+    @ApiModelProperty("是否同意协议(0不同意，1同意)")
     private Boolean isAgreemeent;
 
     /**是否显示（0显示，1隐藏）*/
-    @ApiModelProperty("是否显示")
+    @ApiModelProperty("是否显示（0显示，1隐藏）")
     private Boolean isDisplayed;
 
     /**是否锁定（0-否；1-是）*/
-    @ApiModelProperty("是否锁定")
+    @ApiModelProperty("是否锁定（0-否；1-是）")
     private Boolean isLocked;
 
     /**是否禁用(0禁用,1启用)*/
-    @ApiModelProperty("是否禁用")
+    @ApiModelProperty("是否禁用(0禁用,1启用)")
     private Boolean isValid;
 
     /**在职状态（0：试用员工 1：正式员工 2：离职员工）*/
-    @ApiModelProperty("在职状态")
+    @ApiModelProperty("在职状态（0：试用员工 1：正式员工 2：离职员工）")
     private Long jobStatus;
 
     /**离职时间*/
@@ -140,7 +140,7 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String leaveReason;
 
     /**婚姻状况（0：未婚 1：已婚 2：离婚）*/
-    @ApiModelProperty("婚姻状况")
+    @ApiModelProperty("婚姻状况（0：未婚 1：已婚 2：离婚）")
     private Long maritalStatus;
 
     /**手机号*/
@@ -212,11 +212,11 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String seqNo;
 
     /**性别（0男，1女）*/
-    @ApiModelProperty("性别")
+    @ApiModelProperty("性别（0男，1女）")
     private Boolean sex;
 
     /**用户来源(0-用户注册，1-管理员新增)*/
-    @ApiModelProperty("用户来源")
+    @ApiModelProperty("用户来源(0-用户注册，1-管理员新增)")
     private String source;
 
     /**户籍地址*/
@@ -256,7 +256,7 @@ public class UemUserDto extends BaseModel implements Serializable {
     private Long uemDeptId;
 
     /**用户类型（0-普通用户，1-企业用户，2-企业管理员）*/
-    @ApiModelProperty("用户类型")
+    @ApiModelProperty("用户类型（0-普通用户，1-企业用户，2-企业管理员）")
     private String userType;
 
     /**微信绑定ID*/
