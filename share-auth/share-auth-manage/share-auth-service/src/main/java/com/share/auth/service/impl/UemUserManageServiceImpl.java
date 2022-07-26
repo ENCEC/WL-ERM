@@ -121,15 +121,15 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     public ResultHelper<?> uemUserStartStop(UemUserDto uemUserDto) {
 
         //用户表ID
-        String uemUserId = uemUserDto.getUemUserId();
+        Long uemUserId = uemUserDto.getUemUserId();
         //是否禁用(0禁用,1启用)
         Boolean isValid = uemUserDto.getIsValid();
 
-        if (StringUtils.isEmpty(uemUserId)) {
+        if (Objects.isNull(uemUserId)) {
             return CommonResult.getFaildResultData("用户ID不能为空");
         }
         UemUser uemUser = new UemUser();
-        uemUser.setUemUserId(Long.valueOf(uemUserId));
+        uemUser.setUemUserId(uemUserId);
         uemUser.setIsValid(isValid);
         uemUser.setInvalidTime(new Date());
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);

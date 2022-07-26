@@ -477,44 +477,44 @@ public class UemUserServiceImpl implements UemUserService {
      * */
     @Override
     public ResultHelper<Object> updatePassword(UemUserDto uemUserDto) {
-        //新密码
-        String newPassword = uemUserDto.getNewPassword();
-        if(StringUtils.isEmpty(newPassword)){
-            return CommonResult.getFaildResultData("新密码不能为空");
-        }
-        if (StringUtils.isEmpty(uemUserDto.getUpdatePwdToken())){
-            return CommonResult.getFaildResultData("非法更新密码，请确认！");
-        }
-        try{
-            String  decPassword = AES128Util.decrypt(newPassword, aesSecretKey);
-            if (!PasswordUtils.matchersPassword(decPassword)){
-                return CommonResult.getFaildResultData(NOT_SECURITY_PROMPT);
-            }
-            newPassword = MD5EnCodeUtils.MD5EnCode(decPassword).substring(8,24);
-        }catch (Exception e){
-            return CommonResult.getFaildResultData(DECODE_FAIL_PROMPT);
-        }
-        // 密码二次加密
-        newPassword = MD5EnCodeUtils.MD5EnCode(newPassword);
-        String uemUserId = sassRedisInterface.get(uemUserDto.getUpdatePwdToken());
-        if (StringUtils.isEmpty(uemUserId)){
-            return CommonResult.getFaildResultData("修改密码有效期已过，请重新找回密码！");
-        }
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(Long.valueOf(uemUserId));
-        if (Objects.nonNull(uemUser) && uemUser.getPassword().equals(newPassword)){
-            return CommonResult.getFaildResultData("该密码与原密码相同");
-        }
-        int updateCount = QUemUser.uemUser.update(QUemUser.password)
-                    .where(QUemUser.uemUserId.eq(":uemUserId"))
-                    .execute(newPassword,uemUserId);
-        if(updateCount > 0){
-            sassRedisInterface.del(uemUserDto.getUpdatePwdToken());
-            return CommonResult.getSuccessResultData("恭喜，新密码已设置成功！");
-        }else{
-            return CommonResult.getFaildResultData("密码更新失败！");
-        }
+//        //新密码
+//        String newPassword = uemUserDto.getNewPassword();
+//        if(StringUtils.isEmpty(newPassword)){
+//            return CommonResult.getFaildResultData("新密码不能为空");
+//        }
+//        if (StringUtils.isEmpty(uemUserDto.getUpdatePwdToken())){
+//            return CommonResult.getFaildResultData("非法更新密码，请确认！");
+//        }
+//        try{
+//            String  decPassword = AES128Util.decrypt(newPassword, aesSecretKey);
+//            if (!PasswordUtils.matchersPassword(decPassword)){
+//                return CommonResult.getFaildResultData(NOT_SECURITY_PROMPT);
+//            }
+//            newPassword = MD5EnCodeUtils.MD5EnCode(decPassword).substring(8,24);
+//        }catch (Exception e){
+//            return CommonResult.getFaildResultData(DECODE_FAIL_PROMPT);
+//        }
+//        // 密码二次加密
+//        newPassword = MD5EnCodeUtils.MD5EnCode(newPassword);
+//        String uemUserId = sassRedisInterface.get(uemUserDto.getUpdatePwdToken());
+//        if (StringUtils.isEmpty(uemUserId)){
+//            return CommonResult.getFaildResultData("修改密码有效期已过，请重新找回密码！");
+//        }
+//        UemUser uemUser = QUemUser.uemUser.selectOne().byId(Long.valueOf(uemUserId));
+//        if (Objects.nonNull(uemUser) && uemUser.getPassword().equals(newPassword)){
+//            return CommonResult.getFaildResultData("该密码与原密码相同");
+//        }
+//        int updateCount = QUemUser.uemUser.update(QUemUser.password)
+//                    .where(QUemUser.uemUserId.eq(":uemUserId"))
+//                    .execute(newPassword,uemUserId);
+//        if(updateCount > 0){
+//            sassRedisInterface.del(uemUserDto.getUpdatePwdToken());
+//            return CommonResult.getSuccessResultData("恭喜，新密码已设置成功！");
+//        }else{
+//            return CommonResult.getFaildResultData("密码更新失败！");
+//        }
 
-
+        return null;
     }
 
     /**
@@ -848,43 +848,44 @@ public class UemUserServiceImpl implements UemUserService {
      */
     @Override
     public ResultHelper<UemUserDto> getLoginUserInfo() {
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
-        if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
-            return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
-        }
-        UemUserDto uemUserDto = QUemUser.uemUser.selectOne().mapperTo(UemUserDto.class).byId(userInfoModel.getUemUserId());
-        if (Objects.nonNull(uemUserDto)) {
-            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
-            if (!userInfoModel.getRecordVersion().equals(uemUserDto.getRecordVersion())) {
-                userService.updateCurrentLoginUser();
-            }
-            // 不返回登录密码
-            uemUserDto.setPassword(null);
-            if (uemUserDto.getUemIdCardId()!=null){
-                UemIdCard uemIdCard = QUemIdCard.uemIdCard.selectOne().byId(uemUserDto.getUemIdCardId());
-                uemUserDto.setAuditTime(uemIdCard.getAuditTime());
-            }
-            uemUserDto.setHasRole(false);
-            // 用户类型为国交管理员
-            if (Objects.equals(uemUserDto.getUserType(), GlobalEnum.UserType.IMPT_ADMIN.getCode())) {
-                uemUserDto.setIdentity(GlobalEnum.UserIdentity.IMPT_ADMIN.getCode());
-                uemUserDto.setHasBind(false);
-            }
-        } else {
-            SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(userInfoModel.getUemUserId());
-            if (Objects.isNull(sysPlatformUser)) {
-                return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
-            }
-            uemUserDto = new UemUserDto();
-            uemUserDto.setAccount(sysPlatformUser.getAccount());
-            uemUserDto.setName(sysPlatformUser.getName());
-            uemUserDto.setMobile(sysPlatformUser.getTel());
-            uemUserDto.setEmail(sysPlatformUser.getMail());
-            uemUserDto.setIsValid(sysPlatformUser.getIsValid());
-            // 标志平台客服
-            uemUserDto.setIdentity(GlobalEnum.UserIdentity.ADMIN.getCode());
-        }
-        return CommonResult.getSuccessResultData(uemUserDto);
+//        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+//        if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
+//            return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
+//        }
+//        UemUserDto uemUserDto = QUemUser.uemUser.selectOne().mapperTo(UemUserDto.class).byId(userInfoModel.getUemUserId());
+//        if (Objects.nonNull(uemUserDto)) {
+//            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
+//            if (!userInfoModel.getRecordVersion().equals(uemUserDto.getRecordVersion())) {
+//                userService.updateCurrentLoginUser();
+//            }
+//            // 不返回登录密码
+//            uemUserDto.setPassword(null);
+//            if (uemUserDto.getUemIdCardId()!=null){
+//                UemIdCard uemIdCard = QUemIdCard.uemIdCard.selectOne().byId(uemUserDto.getUemIdCardId());
+//                uemUserDto.setAuditTime(uemIdCard.getAuditTime());
+//            }
+//            uemUserDto.setHasRole(false);
+//            // 用户类型为国交管理员
+//            if (Objects.equals(uemUserDto.getUserType(), GlobalEnum.UserType.IMPT_ADMIN.getCode())) {
+//                uemUserDto.setIdentity(GlobalEnum.UserIdentity.IMPT_ADMIN.getCode());
+//                uemUserDto.setHasBind(false);
+//            }
+//        } else {
+//            SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(userInfoModel.getUemUserId());
+//            if (Objects.isNull(sysPlatformUser)) {
+//                return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
+//            }
+//            uemUserDto = new UemUserDto();
+//            uemUserDto.setAccount(sysPlatformUser.getAccount());
+//            uemUserDto.setName(sysPlatformUser.getName());
+//            uemUserDto.setMobile(sysPlatformUser.getTel());
+//            uemUserDto.setEmail(sysPlatformUser.getMail());
+//            uemUserDto.setIsValid(sysPlatformUser.getIsValid());
+//            // 标志平台客服
+//            uemUserDto.setIdentity(GlobalEnum.UserIdentity.ADMIN.getCode());
+//        }
+//        return CommonResult.getSuccessResultData(uemUserDto);
+        return null;
     }
 
     /**

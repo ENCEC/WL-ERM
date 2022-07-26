@@ -4,7 +4,6 @@ import com.gillion.ds.client.api.queryobject.model.Page;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.support.result.ResultHelper;
-import io.swagger.annotations.Api;
 
 /**
  * 用户管理模块
@@ -12,7 +11,6 @@ import io.swagger.annotations.Api;
  * @author xuzt <xuzt@gillion.com.cn>
  * @date 2022-07-25
  */
-@Api("用户管理模块")
 public interface UemUserManageService {
 
     /**

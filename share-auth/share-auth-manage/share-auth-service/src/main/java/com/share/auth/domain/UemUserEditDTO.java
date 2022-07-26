@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
-import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,7 +16,7 @@ import java.util.Date;
  * @author xuzt <xuzt@gillion.com.cn>
  * @date 2022-07-25
  */
-@ApiModel("用户信息修改DTO")
+@ApiModel("UemUserEditDTO 用户信息新增/修改接口入参")
 @Data
 public class UemUserEditDTO {
 
@@ -89,7 +88,7 @@ public class UemUserEditDTO {
     /**
      * 人员岗位code
      */
-    @Column(name = "staff_duty_code")
+    @ApiModelProperty("人员岗位code")
     @NotBlank(message = "人员岗位不能为空")
     private String staffDutyCode;
 
