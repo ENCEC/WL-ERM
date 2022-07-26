@@ -1,14 +1,19 @@
 package com.share.auth.service.impl;
 
 import com.gillion.ds.client.api.queryobject.expressions.Expression;
+import com.gillion.ds.client.api.queryobject.model.Page;
+import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.ec.core.security.IUser;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.share.auth.constants.CodeFinal;
+import com.share.auth.domain.PageDto;
 import com.share.auth.domain.QueryResourceDTO;
+import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.domain.SysResourceQueryVO;
+import com.share.auth.model.vo.SysResourceVO;
 import com.share.auth.service.SysResourceService;
 import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
@@ -61,6 +66,8 @@ public class SysResourceServiceImpl implements SysResourceService {
      */
     private static final String IS_VALID = "isValid";
 
+    private static final String SYS_RESOURCE_ID = ":sysResourceId";
+
 
     /**
      * @Author:chenxf
@@ -71,11 +78,11 @@ public class SysResourceServiceImpl implements SysResourceService {
      */
     @Override
     public ResultHelper<List<QueryResourceDTO>> queryResource(SysResourceQueryVO sysResourceQueryVO) {
-        if (Objects.isNull(sysResourceQueryVO.getClientId())){
+        if (Objects.isNull(sysResourceQueryVO.getClientId())) {
             log.info("入参客户端id为空");
             return CommonResult.getFaildResultData("入参客户端id为空");
         }
-        if (Objects.isNull(sysResourceQueryVO.getUid())){
+        if (Objects.isNull(sysResourceQueryVO.getUid())) {
             log.info("入参用户id为空");
             return CommonResult.getFaildResultData("入参用户id为空，请确认！");
         }
@@ -88,7 +95,7 @@ public class SysResourceServiceImpl implements SysResourceService {
 //        // 允许没有角色的账号登录
 //        List<Long> allowNoRoleClientIdList = OauthClientUtils.ALLOW_NO_ROLE_CLIENT_ID;
         // 是否登录公共服务
-        if (allowAdminClientIdList.contains(oauthClientDetails.getSysApplicationId())){
+        if (allowAdminClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
             SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(sysResourceQueryVO.getUid());
             if (Objects.isNull(sysPlatformUser)) {
                 return CommonResult.getFaildResultData("非平台客服无法登录公共服务，请确认！");
@@ -103,18 +110,18 @@ public class SysResourceServiceImpl implements SysResourceService {
         }
         // 校验用户信息
         if (Objects.nonNull(uemUser)) {
-            if (!CodeFinal.AUDIT_STATUS_ONE.equals(uemUser.getAuditStatus())){
+            if (!CodeFinal.AUDIT_STATUS_ONE.equals(uemUser.getAuditStatus())) {
                 log.info("用户{}未实名认证通过，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户未实名认证，请前往实名认证！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户未实名认证，请前往实名认证！");
             }
-            if (Objects.isNull(uemUser.getBlindCompanny())){
+            if (Objects.isNull(uemUser.getBlindCompanny())) {
                 log.info("用户{}未绑定企业，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户未绑定企业，请前往绑定企业！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户未绑定企业，请前往绑定企业！");
             }
             UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUser.getBlindCompanny());
-            if (Objects.isNull(uemCompany) || !CodeFinal.AUDIT_STATUS_ONE.equals(uemCompany.getAuditStatus())){
+            if (Objects.isNull(uemCompany) || !CodeFinal.AUDIT_STATUS_ONE.equals(uemCompany.getAuditStatus())) {
                 log.info("用户{}绑定的企业未审批通过，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户绑定的企业未审批通过！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户绑定的企业未审批通过！");
             }
         }
 
@@ -123,43 +130,43 @@ public class SysResourceServiceImpl implements SysResourceService {
         if (Objects.isNull(sysResourceQueryVO.getSysRoleId())) {
             expression = QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.sysApplicationId.eq$(oauthClientDetails.getSysApplicationId())).and(QUemUserRole.isValid.eq$(true));
         } else {
-            expression =  QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.sysApplicationId.eq$(oauthClientDetails.getSysApplicationId())).and(QUemUserRole.isValid.eq$(true)).and(QUemUserRole.sysRoleId.eq$(sysResourceQueryVO.getSysRoleId()));
+            expression = QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.sysApplicationId.eq$(oauthClientDetails.getSysApplicationId())).and(QUemUserRole.isValid.eq$(true)).and(QUemUserRole.sysRoleId.eq$(sysResourceQueryVO.getSysRoleId()));
         }
 
         // 根据应用id，用户id查出该应用该用户启用的角色
         List<UemUserRole> uemUserRoleList = QUemUserRole.uemUserRole.select(QUemUserRole.sysRoleId)
                 .where(expression)
                 .execute();
-        if (CollectionUtils.isEmpty(uemUserRoleList)){
+        if (CollectionUtils.isEmpty(uemUserRoleList)) {
             // 平台客服登录
             if (Objects.nonNull(sysPlatformUser)) {
-                UemUserRole uemUserRole  = new UemUserRole();
+                UemUserRole uemUserRole = new UemUserRole();
                 uemUserRole.setSysRoleId(0L);
                 uemUserRoleList.add(uemUserRole);
             } else if (allowNoRoleClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
                 // 若登录允许没角色的应用，赋值默认角色，角色id = 0（客服），1（其他用户）
-                UemUserRole uemUserRole  = new UemUserRole();
+                UemUserRole uemUserRole = new UemUserRole();
                 uemUserRole.setSysRoleId(1L);
                 uemUserRoleList.add(uemUserRole);
             } else {
-                log.info("该用户在该应用没有角色，clientId:" + sysResourceQueryVO.getClientId()+ "，用户id" + sysResourceQueryVO.getUid());
+                log.info("该用户在该应用没有角色，clientId:" + sysResourceQueryVO.getClientId() + "，用户id" + sysResourceQueryVO.getUid());
                 return CommonResult.getFaildResultData("该用户在该应用没有角色，请联系客服人员确认！");
             }
         }
         // 根据应用id，启用状态，父级资源id，关联查询上面所查的该用户该应用启用的角色的角色资源表数据，查出所有资源
         List<QueryResourceDTO> queryResourceDTOList = QSysResource.sysResource.select(
-                QSysResource.sysResourceId,
-                QSysResource.resourceLogo,
-                QSysResource.resourceTitle,
-                QSysResource.resourceUrl,
-                QSysResource.resourceSort,
-                QSysResource.component,
-                QSysResource.resourcePid
-        ).where(
-                QSysResource.sysApplicationId.eq(SYS_APPLICATION_ID_PLACEHOLDER)
-                        .and(QSysResource.isValid.eq(IS_VALID_PLACEHOLDER))
-                        .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).eq(":sysRoleId"))
-                        .and(QSysResource.resourceType.eq$(1)))
+                        QSysResource.sysResourceId,
+                        QSysResource.resourceLogo,
+                        QSysResource.resourceTitle,
+                        QSysResource.resourceUrl,
+                        QSysResource.resourceSort,
+                        QSysResource.component,
+                        QSysResource.resourcePid
+                ).where(
+                        QSysResource.sysApplicationId.eq(SYS_APPLICATION_ID_PLACEHOLDER)
+                                .and(QSysResource.isValid.eq(IS_VALID_PLACEHOLDER))
+                                .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).eq(":sysRoleId"))
+                                .and(QSysResource.resourceType.eq$(1)))
                 .mapperTo(QueryResourceDTO.class)
                 .sorting(QSysResource.resourceSort.asc())
                 .execute(ImmutableMap.of(SYS_APPLICATION_ID, oauthClientDetails.getSysApplicationId(), IS_VALID, true, "sysRoleId", uemUserRoleList.get(0).getSysRoleId()));
@@ -173,21 +180,20 @@ public class SysResourceServiceImpl implements SysResourceService {
      * @Date: 15:48 2020/11/16
      * @Param: [sysApplicationId]
      * @Return:java.util.Map<java.lang.String,java.lang.Object>
-     *
      */
     @Override
     public ResultHelper<List<QueryResourceDTO>> queryApplicationResourceTree(Long sysApplicationId) {
         // 查出该应用下所有资源
         List<QueryResourceDTO> queryResourceDTOList = QSysResource.sysResource.select(
-                QSysResource.sysResourceId,
-                QSysResource.resourceTitle,
-                QSysResource.resourceSort,
-                QSysResource.resourcePid,
-                QSysResource.resourceRemark
-        ).where(
-                QSysResource.sysApplicationId.eq(SYS_APPLICATION_ID_PLACEHOLDER)
-                        .and(QSysResource.isValid.eq(IS_VALID_PLACEHOLDER))
-                        .and(QSysResource.resourceType.eq$(1).or(QSysResource.resourceType.eq$(2))))
+                        QSysResource.sysResourceId,
+                        QSysResource.resourceTitle,
+                        QSysResource.resourceSort,
+                        QSysResource.resourcePid,
+                        QSysResource.resourceRemark
+                ).where(
+                        QSysResource.sysApplicationId.eq(SYS_APPLICATION_ID_PLACEHOLDER)
+                                .and(QSysResource.isValid.eq(IS_VALID_PLACEHOLDER))
+                                .and(QSysResource.resourceType.eq$(1).or(QSysResource.resourceType.eq$(2))))
                 .mapperTo(QueryResourceDTO.class)
                 .execute(ImmutableMap.of(SYS_APPLICATION_ID, sysApplicationId, IS_VALID, true));
 
@@ -201,24 +207,23 @@ public class SysResourceServiceImpl implements SysResourceService {
      * @Date: 15:50 2020/11/16
      * @Param: [queryResourceDTOList]
      * @Return:java.util.List<com.share.auth.domain.QueryResourceDTO>
-     *
      */
-    private List<QueryResourceDTO> dealWithResource(List<QueryResourceDTO> queryResourceDTOList, boolean isSort){
+    private List<QueryResourceDTO> dealWithResource(List<QueryResourceDTO> queryResourceDTOList, boolean isSort) {
         // 第一级资源集合
         List<QueryResourceDTO> parentList = Lists.newArrayList();
         // 第一级以下的资源按父级资源id保存到map中,key为父级资源id，value为子资源信息集合
         Map<Long, List<QueryResourceDTO>> childrenMap = new HashMap<>(16);
         List<QueryResourceDTO> childrenList = null;
         // 将资源分开
-        for (QueryResourceDTO queryResourceDTO: queryResourceDTOList) {
-            if (Objects.isNull(queryResourceDTO.getResourcePid())){
+        for (QueryResourceDTO queryResourceDTO : queryResourceDTOList) {
+            if (Objects.isNull(queryResourceDTO.getResourcePid())) {
                 // 父级资源id为空的是第一级资源
                 parentList.add(queryResourceDTO);
-            }else {
+            } else {
                 // 父级资源不为空的按父级资源id添加到map中
-                if (CollectionUtils.isNotEmpty(childrenMap.get(queryResourceDTO.getResourcePid()))){
+                if (CollectionUtils.isNotEmpty(childrenMap.get(queryResourceDTO.getResourcePid()))) {
                     childrenList = childrenMap.get(queryResourceDTO.getResourcePid());
-                }else {
+                } else {
                     childrenList = Lists.newArrayList();
                 }
                 childrenList.add(queryResourceDTO);
@@ -237,19 +242,18 @@ public class SysResourceServiceImpl implements SysResourceService {
      * @Date: 16:46 2020/11/16
      * @Param: [queryResourceDTOList, childrenMap]
      * @Return:java.util.List<com.share.auth.domain.QueryResourceDTO>
-     *
      */
-    private List<QueryResourceDTO> dealWithChildrenResource(List<QueryResourceDTO> queryResourceDTOList, Map<Long, List<QueryResourceDTO>> childrenMap, boolean isSort){
-        for (QueryResourceDTO parent: queryResourceDTOList) {
+    private List<QueryResourceDTO> dealWithChildrenResource(List<QueryResourceDTO> queryResourceDTOList, Map<Long, List<QueryResourceDTO>> childrenMap, boolean isSort) {
+        for (QueryResourceDTO parent : queryResourceDTOList) {
             List<QueryResourceDTO> childrenList = childrenMap.get(parent.getSysResourceId());
-            if (CollectionUtils.isNotEmpty(childrenList)){
+            if (CollectionUtils.isNotEmpty(childrenList)) {
                 childrenList = dealWithChildrenResource(childrenList, childrenMap, isSort);
                 parent.setHaveChildrenResource(true);
-                if (isSort){
+                if (isSort) {
                     childrenList.sort(Comparator.comparingInt(QueryResourceDTO::getResourceSort));
                 }
                 parent.setChildrenResourceList(childrenList);
-            }else {
+            } else {
                 parent.setHaveChildrenResource(false);
             }
         }
@@ -266,17 +270,17 @@ public class SysResourceServiceImpl implements SysResourceService {
      * @Date: 15:48 2020/11/16
      */
     @Override
-    public ResultHelper<Map<String , List<QueryResourceDTO>>> queryResourceAllSystem(SysResourceQueryVO sysResourceQueryVO){
+    public ResultHelper<Map<String, List<QueryResourceDTO>>> queryResourceAllSystem(SysResourceQueryVO sysResourceQueryVO) {
         IUser user = defaultUserService.getCurrentLoginUser();
         sysResourceQueryVO.setUid(Long.valueOf(user.getUserId().toString()));
-        if (ObjectUtils.isEmpty(Long.valueOf(user.getUserId().toString()))){
+        if (ObjectUtils.isEmpty(Long.valueOf(user.getUserId().toString()))) {
             return CommonResult.getFaildResultData("请先登入系统！");
         }
 //        if (Objects.isNull(sysResourceQueryVO.getClientId())){
 //            log.info("入参客户端id为空");
 //            return CommonResult.getFaildResultData("入参客户端id为空");
 //        }
-        if (Objects.isNull(sysResourceQueryVO.getUid())){
+        if (Objects.isNull(sysResourceQueryVO.getUid())) {
             log.info("入参用户id为空");
             return CommonResult.getFaildResultData("入参用户id为空，请确认！");
         }
@@ -304,18 +308,18 @@ public class SysResourceServiceImpl implements SysResourceService {
         }
         // 校验用户信息
         if (Objects.nonNull(uemUser)) {
-            if (!CodeFinal.AUDIT_STATUS_ONE.equals(uemUser.getAuditStatus())){
+            if (!CodeFinal.AUDIT_STATUS_ONE.equals(uemUser.getAuditStatus())) {
                 log.info("用户{}未实名认证通过，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户未实名认证，请前往用户中心实名认证！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户未实名认证，请前往用户中心实名认证！");
             }
-            if (Objects.isNull(uemUser.getBlindCompanny())){
+            if (Objects.isNull(uemUser.getBlindCompanny())) {
                 log.info("用户{}未绑定企业，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户未绑定企业，请前往用户中心绑定企业！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户未绑定企业，请前往用户中心绑定企业！");
             }
             UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUser.getBlindCompanny());
-            if (Objects.isNull(uemCompany) || !CodeFinal.AUDIT_STATUS_ONE.equals(uemCompany.getAuditStatus())){
+            if (Objects.isNull(uemCompany) || !CodeFinal.AUDIT_STATUS_ONE.equals(uemCompany.getAuditStatus())) {
                 log.info("用户{}绑定的企业未审批通过，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户绑定的企业未审批通过！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户绑定的企业未审批通过！");
             }
         }
 
@@ -325,7 +329,7 @@ public class SysResourceServiceImpl implements SysResourceService {
             expression = QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.isValid.eq$(true))
                     .and(QUemUserRole.uemUserRole.chain(QSysApplication.isValid).eq$(true));
         } else {
-            expression =  QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.isValid.eq$(true))
+            expression = QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.isValid.eq$(true))
                     .and(QUemUserRole.sysRoleId.eq$(sysResourceQueryVO.getSysRoleId()))
                     .and(QUemUserRole.uemUserRole.chain(QSysApplication.isValid).eq$(true));
         }
@@ -334,10 +338,10 @@ public class SysResourceServiceImpl implements SysResourceService {
         List<UemUserRole> uemUserRoleList = QUemUserRole.uemUserRole.select(QUemUserRole.sysRoleId)
                 .where(expression)
                 .execute();
-        if (CollectionUtils.isEmpty(uemUserRoleList)){
+        if (CollectionUtils.isEmpty(uemUserRoleList)) {
             // 平台客服登录
             if (Objects.nonNull(sysPlatformUser)) {
-                UemUserRole uemUserRole  = new UemUserRole();
+                UemUserRole uemUserRole = new UemUserRole();
                 uemUserRole.setSysRoleId(0L);
                 uemUserRoleList.add(uemUserRole);
             }
@@ -348,7 +352,7 @@ public class SysResourceServiceImpl implements SysResourceService {
 //                uemUserRoleList.add(uemUserRole);
 //            }
             else {
-                log.info("该用户在该应用没有角色，clientId:" + sysResourceQueryVO.getClientId()+ "，用户id:" + sysResourceQueryVO.getUid());
+                log.info("该用户在该应用没有角色，clientId:" + sysResourceQueryVO.getClientId() + "，用户id:" + sysResourceQueryVO.getUid());
                 return CommonResult.getFaildResultData("该用户在该应用没有角色，请联系客服人员确认！");
             }
         }
@@ -356,34 +360,35 @@ public class SysResourceServiceImpl implements SysResourceService {
         List<Long> roleIdList = uemUserRoleList.stream().map(p -> p.getSysRoleId()).distinct().collect(Collectors.toList());
         // 根据应用id，启用状态，父级资源id，关联查询上面所查的该用户该应用启用的角色的角色资源表数据，查出所有资源
         List<QueryResourceDTO> queryResourceDTOList = QSysResource.sysResource.select(
-                QSysResource.sysApplicationId, QSysResource.sysResourceId,
-                QSysResource.resourceLogo, QSysResource.resourceTitle,
-                QSysResource.resourceUrl, QSysResource.resourceSort,
-                QSysResource.component, QSysResource.resourcePid, QSysResource.componentName
-        ).where(QSysResource.isValid.eq$(true)
-                .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).in$(roleIdList))
-                .and(QSysResource.resourceType.eq$(1)))
+                        QSysResource.sysApplicationId, QSysResource.sysResourceId,
+                        QSysResource.resourceLogo, QSysResource.resourceTitle,
+                        QSysResource.resourceUrl, QSysResource.resourceSort,
+                        QSysResource.component, QSysResource.resourcePid, QSysResource.componentName
+                ).where(QSysResource.isValid.eq$(true)
+                        .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).in$(roleIdList))
+                        .and(QSysResource.resourceType.eq$(1)))
                 .mapperTo(QueryResourceDTO.class)
-                .sorting(QSysResource.resourceSort.asc(),QSysResource.sysResourceId.asc())
+                .sorting(QSysResource.resourceSort.asc(), QSysResource.sysResourceId.asc())
                 .execute();
         Map<Long, List<QueryResourceDTO>> queryResourceDTOMap = queryResourceDTOList.stream().collect(Collectors.groupingBy(QueryResourceDTO::getSysApplicationId));
-        Map<String , List<QueryResourceDTO>> queryResourceDTOListMap = new HashMap<>();
+        Map<String, List<QueryResourceDTO>> queryResourceDTOListMap = new HashMap<>();
         //所有系统转换
         List<Long> sysApplicationIds = new ArrayList<>(queryResourceDTOMap.keySet());
         List<SysApplication> sysApplicationList = QSysApplication.sysApplication.select().where(QSysApplication.sysApplicationId.in$(sysApplicationIds)).execute();
-        Map<Long,SysApplication> sysApplicationMap = sysApplicationList.stream().collect(Collectors.toMap(SysApplication::getSysApplicationId, a -> a,(k1,k2)->k1));
-        for(Long key  : queryResourceDTOMap.keySet()){
+        Map<Long, SysApplication> sysApplicationMap = sysApplicationList.stream().collect(Collectors.toMap(SysApplication::getSysApplicationId, a -> a, (k1, k2) -> k1));
+        for (Long key : queryResourceDTOMap.keySet()) {
             List<QueryResourceDTO> dtoList = queryResourceDTOMap.get(key);
             SysApplication sysApplication = sysApplicationMap.get(key);
             dtoList = dealWithResource(dtoList, true);
             //dtoList.sort(Comparator.comparing(QueryResourceDTO::getSysResourceId));
-            queryResourceDTOListMap.put(sysApplication.getApplicationName(),dtoList);
+            queryResourceDTOListMap.put(sysApplication.getApplicationName(), dtoList);
         }
         return CommonResult.getSuccessResultData(queryResourceDTOListMap);
     }
 
     /**
      * 根据应用ID、用户ID和页面URL获取页面的按钮列表
+     *
      * @param sysResourceQueryVO -
      * @return 页面中允许的按钮列表
      */
@@ -391,18 +396,18 @@ public class SysResourceServiceImpl implements SysResourceService {
     public ResultHelper<List<QueryResourceDTO>> queryButtonInPage(SysResourceQueryVO sysResourceQueryVO) {
         IUser user = defaultUserService.getCurrentLoginUser();
         sysResourceQueryVO.setUid(Long.valueOf(user.getUserId().toString()));
-        if (ObjectUtils.isEmpty(Long.valueOf(user.getUserId().toString()))){
+        if (ObjectUtils.isEmpty(Long.valueOf(user.getUserId().toString()))) {
             return CommonResult.getFaildResultData("请先登入系统！");
         }
 //        if (Objects.isNull(sysResourceQueryVO.getClientId())){
 //            log.info("入参客户端id为空");
 //            return CommonResult.getFaildResultData("入参客户端id为空");
 //        }
-        if (Objects.isNull(sysResourceQueryVO.getUid())){
+        if (Objects.isNull(sysResourceQueryVO.getUid())) {
             log.info("入参用户id为空");
             return CommonResult.getFaildResultData("入参用户id为空，请确认！");
         }
-        if (Objects.isNull(sysResourceQueryVO.getResourceUrl())){
+        if (Objects.isNull(sysResourceQueryVO.getResourceUrl())) {
             log.info("入参资源URL为空");
             return CommonResult.getFaildResultData("入参资源URL为空，请确认！");
         }
@@ -430,18 +435,18 @@ public class SysResourceServiceImpl implements SysResourceService {
         }
         // 校验用户信息
         if (Objects.nonNull(uemUser)) {
-            if (!CodeFinal.AUDIT_STATUS_ONE.equals(uemUser.getAuditStatus())){
+            if (!CodeFinal.AUDIT_STATUS_ONE.equals(uemUser.getAuditStatus())) {
                 log.info("用户{}未实名认证通过，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户未实名认证，请前往用户中心实名认证！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户未实名认证，请前往用户中心实名认证！");
             }
-            if (Objects.isNull(uemUser.getBlindCompanny())){
+            if (Objects.isNull(uemUser.getBlindCompanny())) {
                 log.info("用户{}未绑定企业，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户未绑定企业，请前往用户中心绑定企业！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户未绑定企业，请前往用户中心绑定企业！");
             }
             UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUser.getBlindCompanny());
-            if (Objects.isNull(uemCompany) || !CodeFinal.AUDIT_STATUS_ONE.equals(uemCompany.getAuditStatus())){
+            if (Objects.isNull(uemCompany) || !CodeFinal.AUDIT_STATUS_ONE.equals(uemCompany.getAuditStatus())) {
                 log.info("用户{}绑定的企业未审批通过，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302,"用户绑定的企业未审批通过！");
+                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户绑定的企业未审批通过！");
             }
         }
 
@@ -451,7 +456,7 @@ public class SysResourceServiceImpl implements SysResourceService {
             expression = QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.isValid.eq$(true))
                     .and(QUemUserRole.uemUserRole.chain(QSysApplication.isValid).eq$(true));
         } else {
-            expression =  QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.isValid.eq$(true))
+            expression = QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.isValid.eq$(true))
                     .and(QUemUserRole.sysRoleId.eq$(sysResourceQueryVO.getSysRoleId()))
                     .and(QUemUserRole.uemUserRole.chain(QSysApplication.isValid).eq$(true));
         }
@@ -460,10 +465,10 @@ public class SysResourceServiceImpl implements SysResourceService {
         List<UemUserRole> uemUserRoleList = QUemUserRole.uemUserRole.select(QUemUserRole.sysRoleId)
                 .where(expression)
                 .execute();
-        if (CollectionUtils.isEmpty(uemUserRoleList)){
+        if (CollectionUtils.isEmpty(uemUserRoleList)) {
             // 平台客服登录
             if (Objects.nonNull(sysPlatformUser)) {
-                UemUserRole uemUserRole  = new UemUserRole();
+                UemUserRole uemUserRole = new UemUserRole();
                 uemUserRole.setSysRoleId(0L);
                 uemUserRoleList.add(uemUserRole);
             }
@@ -474,7 +479,7 @@ public class SysResourceServiceImpl implements SysResourceService {
 //                uemUserRoleList.add(uemUserRole);
 //            }
             else {
-                log.info("该用户在该应用没有角色，clientId:" + sysResourceQueryVO.getClientId()+ "，用户id:" + sysResourceQueryVO.getUid());
+                log.info("该用户在该应用没有角色，clientId:" + sysResourceQueryVO.getClientId() + "，用户id:" + sysResourceQueryVO.getUid());
                 return CommonResult.getFaildResultData("该用户在该应用没有角色，请联系客服人员确认！");
             }
         }
@@ -482,17 +487,146 @@ public class SysResourceServiceImpl implements SysResourceService {
         List<Long> roleIdList = uemUserRoleList.stream().map(p -> p.getSysRoleId()).distinct().collect(Collectors.toList());
         // 根据应用id，启用状态，父级资源id，关联查询上面所查的该用户该应用启用的角色的角色资源表数据，查出所有资源
         List<QueryResourceDTO> queryResourceDTOList = QSysResource.sysResource.select(
-                QSysResource.sysApplicationId, QSysResource.sysResourceId,
-                QSysResource.resourceLogo, QSysResource.resourceTitle,
-                QSysResource.resourceUrl, QSysResource.resourceSort,
-                QSysResource.component, QSysResource.resourcePid, QSysResource.componentName
-        ).where(QSysResource.isValid.eq$(true)
-                .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).in$(roleIdList))
-                .and(QSysResource.resourceType.eq$(2))
-                .and(QSysResource.resourceUrl.eq$(sysResourceQueryVO.getResourceUrl())))
+                        QSysResource.sysApplicationId, QSysResource.sysResourceId,
+                        QSysResource.resourceLogo, QSysResource.resourceTitle,
+                        QSysResource.resourceUrl, QSysResource.resourceSort,
+                        QSysResource.component, QSysResource.resourcePid, QSysResource.componentName
+                ).where(QSysResource.isValid.eq$(true)
+                        .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).in$(roleIdList))
+                        .and(QSysResource.resourceType.eq$(2))
+                        .and(QSysResource.resourceUrl.eq$(sysResourceQueryVO.getResourceUrl())))
                 .mapperTo(QueryResourceDTO.class)
-                .sorting(QSysResource.resourceSort.asc(),QSysResource.sysResourceId.asc())
+                .sorting(QSysResource.resourceSort.asc(), QSysResource.sysResourceId.asc())
                 .execute();
         return CommonResult.getSuccessResultData(queryResourceDTOList);
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 新增菜单信息
+     * @Date: 2022/7/25
+     */
+    @Override
+    public ResultHelper<Object> saveResource(SysResourceDTO sysResourceDTO) {
+        SysResource sysResource = new SysResource();
+        String resourceTitle = sysResourceDTO.getResourceTitle();
+        String resourceUrl = sysResourceDTO.getResourceUrl();
+       // Long application = sysResourceDTO.getSysApplicationId();
+        Integer resourceSort = sysResourceDTO.getResourceSort();
+        String resourceRemark = sysResourceDTO.getResourceRemark();
+        //Long resourceId = sysResourceDTO.getSysResourceId();
+        sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        sysResource.setSysApplicationId(1L);
+        sysResource.setIsValid(true);
+        //sysResource.setResourcePid(resourceId);
+        sysResource.setResourceTitle(resourceTitle);
+        sysResource.setResourceUrl(resourceUrl);
+        sysResource.setResourceSort(resourceSort);
+        sysResource.setResourceRemark(resourceRemark);
+        QSysResource.sysResource.save(sysResource);
+        return CommonResult.getSuccessResultData("新增成功");
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 分页带条件查询菜单信息
+     * @Date: 2022/7/25
+     */
+    @Override
+    public Page<SysResourceDTO> queryResourceByPage(SysResourceDTO sysResourceDTO) {
+        Integer currentPage = sysResourceDTO.getCurrentPage();
+        Integer pageSize = sysResourceDTO.getPageSize();
+        return QSysResource.sysResource.select(
+                        QSysResource.resourceTitle,
+                        QSysResource.resourcePid,
+                        QSysResource.creatorName,
+                        QSysResource.resourceUrl,
+                        QSysResource.resourceSort,
+                        QSysResource.createTime,
+                        QSysResource.isValid).
+                where(QSysResource.resourceTitle._like$_(sysResourceDTO.getResourceTitle())
+                        .and(QSysResource.sysResourceId.notNull()))
+                .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class).execute(sysResourceDTO);
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 根据id查询菜单信息
+     * @Date: 2022/7/25
+     */
+    @Override
+    public List<SysResourceDTO> queryResourceById(Long sysResourceId) {
+        return QSysResource.sysResource.select(
+                        QSysResource.resourceTitle,
+                        QSysResource.resourcePid,
+                        QSysResource.resourceUrl,
+                        QSysResource.resourceSort,
+                        QSysResource.resourceRemark
+                ).where(
+                        QSysResource.sysResourceId.eq$(sysResourceId)
+                )
+                .mapperTo(SysResourceDTO.class)
+                .execute();
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 修改菜单信息
+     * @Date: 2022/7/25
+     */
+    @Override
+    public ResultHelper<Object> updateResource(SysResourceDTO sysResourceDTO) {
+        Long resourceId = sysResourceDTO.getSysResourceId();
+        String resourceTitle = sysResourceDTO.getResourceTitle();
+        String resourceUrl = sysResourceDTO.getResourceUrl();
+        Integer resourceSort = sysResourceDTO.getResourceSort();
+        String resourceRemark = sysResourceDTO.getResourceRemark();
+        SysResource sysResource = QSysResource.sysResource.selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
+        sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        sysResource.setSysResourceId(resourceId);
+        sysResource.setResourceTitle(resourceTitle);
+        sysResource.setResourceUrl(resourceUrl);
+        sysResource.setResourceSort(resourceSort);
+        sysResource.setResourceRemark(resourceRemark);
+        QSysResource.sysResource.save(sysResource);
+        return CommonResult.getSuccessResultData("修改成功");
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 菜单信息是否禁用状态
+     * @Date: 2022/7/26
+     */
+    @Override
+    public ResultHelper<Object> updateResourceStatus(SysResourceDTO sysResourceDTO) {
+        Long resourceId = sysResourceDTO.getSysResourceId();
+        //是否禁用（0禁用，1启用）
+        Boolean isValid = sysResourceDTO.getIsValid();
+
+        int updateCount = QSysResource.sysResource
+                .update(
+                        QSysResource.isValid,
+                        QSysResource.invalidTime
+                )
+                .where(QSysResource.sysResourceId.eq$(resourceId))
+                .execute(isValid, new Date(), resourceId);
+        if (updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+            return CommonResult.getSuccessResultData("禁用成功");
+        } else {
+            return CommonResult.getFaildResultData("禁用失败");
+        }
+    }
+
+    /**
+     * 逻辑删除菜单信息
+     *
+     * @author wzr
+     * @date 2022-07-26
+     */
+    @Override
+    public ResultHelper<Object> deleteResource(Long sysResourceId) {
+        int i = QSysResource.sysResource.deleteById(sysResourceId);
+        return CommonResult.getSuccessResultData("删除成功");
     }
 }
