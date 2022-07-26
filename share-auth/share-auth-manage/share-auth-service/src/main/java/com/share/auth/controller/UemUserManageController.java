@@ -139,7 +139,7 @@ public class UemUserManageController {
      * 管理员重置用户密码
      *
      * @param uemUserId 用户id
-     * @return com.share.support.result.ResultHelper<java.lang.String>
+     * @return com.share.support.result.ResultHelper<?>
      * @date 2022-07-25
      */
     @ApiOperation("管理员重置用户密码")
