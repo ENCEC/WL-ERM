@@ -97,9 +97,9 @@ spring:
   redis:
     database: 0 			# Redis数据库索引（默认为0）
     host: 172.16.0.28	# Redis服务器地址
-#    host: 127.0.0.1
+    #    host: 127.0.0.1
     port: 40070	 			# Redis服务器连接端口
-#    port: 6379
+    #    port: 6379
     #password: f53af7e5f0993f37
   servlet:
     multipart:
@@ -155,7 +155,7 @@ ec:
     #password: f53af7e5f0993f37
     ##redis地址(集群下多台使用,号隔开)
     hostAndPort: 172.16.0.28:40070
-#    hostAndPort: 127.0.0.1:6379
+  #    hostAndPort: 127.0.0.1:6379
   ####文件上传 以下配置项可配可不配 默认就是 false
   upload:
     enabled: false
@@ -187,7 +187,7 @@ redis:
   namespace: zj_dev
   # redis连接地址，集群时用逗号分隔
   hostAndPort: 172.16.0.28:40070
-#  hostAndPort: 127.0.0.1:6379
+  #  hostAndPort: 127.0.0.1:6379
   # 是否集群模式
   cluster: false
   # 重定向的最大数量，集群使用
@@ -303,11 +303,11 @@ dao-service:
   clientAutoAssemble:
     enabled: true
     # 项⽬唯⼀键
-    project-key: "share_auth_dev"
+    project-key: "zhwl_lip_auth_train_project"
     # 通常为 true, 为 false 使⽤HttpClient
     useEmbedEngine: true
     # 该数据源对应数据服务的数据源信息的名称
-    inside-dao-service-data-source-name: auth-mysql
+    inside-dao-service-data-source-name: zhwl_lip_share_auth
     # 该数据源对应数据服务的数据源所属 serviceCode 分组名称
     inside-dao-service-data-source-service-code: 'devmsaeg'
     # 该客户端所使⽤的数据源实例名称
