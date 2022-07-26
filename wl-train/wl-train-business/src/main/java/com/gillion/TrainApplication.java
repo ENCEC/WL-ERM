@@ -42,14 +42,14 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @Slf4j
 @EnableMQ("com.gillion")
-@EnableMQConfigServer
-@EnableMQDashboard
-public class Application {
+//@EnableMQConfigServer
+//@EnableMQDashboard
+public class TrainApplication {
 
 
     public static void main(String... args) {
         try {
-            ApplicationContext applicationContext = SpringApplication.run(Application.class, args);
+            ApplicationContext applicationContext = SpringApplication.run(TrainApplication.class, args);
             log.info("business start.");
         } catch (Exception e) {
             log.error("应用启动失败", e);
