@@ -55,7 +55,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public Page<UemUserDto> queryUemUser(UemUserDto uemUserDto) {
+    public ResultHelper<Page<UemUserDto>> queryUemUser(UemUserDto uemUserDto) {
 
         // 用户名
         String account = uemUserDto.getAccount();
@@ -74,20 +74,43 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         int pageNo = (uemUserDto.getPageNo() == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : uemUserDto.getPageNo();
         int pageSize = (uemUserDto.getPageSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : uemUserDto.getPageSize();
 
-        return QUemUser.uemUser.select(
+        Page<UemUserDto> uemUserDtoPage = QUemUser.uemUser.select(
                 QUemUser.uemUser.fieldContainer()
         ).where(
                 QUemUser.account.like(":account")
                         .and(QUemUser.name.like(":name"))
                         .and(QUemUser.isValid.eq(":isValid"))
+                        .and(QUemUser.isDeleted.eq$(false))
         ).paging(pageNo, pageSize)
         .sorting(QUemUser.createTime.desc())
         .mapperTo(UemUserDto.class)
         .execute(uemUserDto);
+
+        return CommonResult.getSuccessResultData(uemUserDtoPage);
     }
 
     /**
-     * 用户管理详情
+     * 查询用户信息实体类
+     *
+     * @param uemUserId 用户ID
+     * @return com.share.auth.model.entity.UemUser
+     * @date 2022-07-26
+     */
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public UemUser getUemUserById(Long uemUserId) {
+        List<UemUser> uemUserList = QUemUser.uemUser
+                .select(QUemUser.uemUser.fieldContainer())
+                .where(QUemUser.uemUserId.eq$(uemUserId).and(QUemUser.isDeleted.eq$(false)))
+                .execute();
+        if (uemUserList.size() == 1) {
+            return uemUserList.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 获取用户信息
      *
      * @param uemUserId 用户ID
      * @return List<UemUserDto>
@@ -95,16 +118,15 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public UemUserDto getUemUser(Long uemUserId) {
-
-        UemUser uemUser = QUemUser.uemUser
-                .selectOne()
-                .byId(uemUserId);
-
-        UemUserDto uemUserDto = new UemUserDto();
-        BeanUtils.copyProperties(uemUser, uemUserDto);
-
-        return uemUserDto;
+    public ResultHelper<UemUserDto> getUemUser(Long uemUserId) {
+        UemUser uemUser = this.getUemUserById(uemUserId);
+        if (Objects.isNull(uemUser)) {
+            return CommonResult.getFaildResultData("用户不存在");
+        } else {
+            UemUserDto uemUserDto = new UemUserDto();
+            BeanUtils.copyProperties(uemUser, uemUserDto);
+            return CommonResult.getSuccessResultData(uemUserDto);
+        }
     }
 
     /**
@@ -117,21 +139,25 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResultHelper<?> uemUserStartStop(UemUserDto uemUserDto) {
-
         //用户表ID
         Long uemUserId = uemUserDto.getUemUserId();
         //是否禁用(0禁用,1启用)
         Boolean isValid = uemUserDto.getIsValid();
-
+        // 检查用户是否存在
         if (Objects.isNull(uemUserId)) {
             return CommonResult.getFaildResultData("用户ID不能为空");
         }
-        UemUser uemUser = new UemUser();
+        UemUser uemUser = this.getUemUserById(uemUserId);
+        if (Objects.isNull(uemUser)) {
+            return CommonResult.getFaildResultData("用户不存在");
+        }
+        // 设置参数
         uemUser.setUemUserId(uemUserId);
         uemUser.setIsValid(isValid);
         uemUser.setInvalidTime(new Date());
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int updateCount = QUemUser.uemUser.selective(QUemUser.isValid, QUemUser.invalidTime).execute(uemUser);
+        // 检查更新是否成功
         if (updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
             return CommonResult.getSuccessResultData("启停成功");
         } else {
@@ -142,34 +168,34 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     /**
      * 修改用户信息
      *
-     * @param uemUserDto 用户信息
+     * @param uemUserEditDto 用户信息
      * @return com.share.support.result.ResultHelper<java.lang.Object>
      * @date 2022-07-25
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResultHelper<?> editUemUser(UemUserEditDTO uemUserDto) {
+    public ResultHelper<?> editUemUser(UemUserEditDTO uemUserEditDto) {
         // 根据主键查询用户信息
-        Long uemUserId = uemUserDto.getUemUserId();
+        Long uemUserId = uemUserEditDto.getUemUserId();
         if (Objects.isNull(uemUserId)) {
             return CommonResult.getFaildResultData("用户id不允许为空");
         }
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
+        UemUser uemUser = this.getUemUserById(uemUserId);
         if (Objects.isNull(uemUser)) {
-            return CommonResult.getFaildResultData("查询不到对应的用户信息");
+            return CommonResult.getFaildResultData("用户不存在");
         }
         // 检查手机号是否被占用
-        if (!uemUser.getMobile().equals(uemUserDto.getMobile())) {
+        if (!uemUser.getMobile().equals(uemUserEditDto.getMobile())) {
             List<UemUser> uemUserList = QUemUser.uemUser
                     .select(QUemUser.uemUser.fieldContainer())
-                    .where(QUemUser.mobile.eq$(uemUserDto.getMobile()))
+                    .where(QUemUser.mobile.eq$(uemUserEditDto.getMobile()))
                     .execute();
             if(CollectionUtils.isNotEmpty(uemUserList)) {
                 return CommonResult.getSuccessResultData("该手机号已经被占用！");
             }
         }
         // 更新用户信息
-        BeanUtils.copyProperties(uemUserDto, uemUser);
+        BeanUtils.copyProperties(uemUserEditDto, uemUser);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否更新成功
@@ -194,16 +220,15 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         if (Objects.isNull(uemUserId)) {
             return CommonResult.getFaildResultData("用户信息主键不能为空");
         }
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
+        UemUser uemUser = this.getUemUserById(uemUserId);
         if (Objects.isNull(uemUser)) {
             return CommonResult.getFaildResultData("用户不存在");
         }
         // 逻辑删除
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         uemUser.setIsDeleted(true);
-        int rowCount = QUemUser.uemUser
-                .selective(QUemUser.isDeleted)
-                .update(uemUser);
+        int rowCount = QUemUser.uemUser.save(uemUser);
+        System.err.println(rowCount);
         // 检查是否更新成功
         if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
             return CommonResult.getSuccessResultData("用户删除成功");
@@ -244,6 +269,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setIsValid(true);
         uemUser.setIsLocked(false);
         uemUser.setJobStatus(0L);
+        uemUser.setIsDeleted(false);
         // 设置密码
         String passwordText = RandomUtil.randomString(12);
         String password = MD5EnCodeUtils.MD5EnCode(passwordText);
@@ -275,7 +301,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         if (Objects.isNull(uemUserId)) {
             return CommonResult.getFaildResultData("用户名为空");
         }
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
+        UemUser uemUser = this.getUemUserById(uemUserId);
         if (Objects.isNull(uemUser)) {
             return CommonResult.getFaildResultData("用户不存在");
         }
@@ -285,7 +311,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         password = MD5EnCodeUtils.encryptionPassword(password);
         // 更新用户
         uemUser.setPassword(password);
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否更新成功,并异步发送邮件通知
         if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
@@ -307,7 +333,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Async
     public void sendEmailWithPassword(String account, String email, String passwordText, boolean isReset) {
-//        ThreadUtil.sleep(1000);
         // 设置模板参数
         Map<String, Object> params = new HashMap<>(10);
         params.put("account", account);
@@ -315,8 +340,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         // 设置邮件参数
         SendEmailVO sendEmailVO = new SendEmailVO();
         sendEmailVO.setToEmail(email);
-        sendEmailVO.setEmailTemplateCode(isReset ? "" : "");
-        sendEmailVO.setSystemId("");
+        sendEmailVO.setEmailTemplateCode(isReset ? "RESET_PASSWORD" : "NEW_ACCOUNT");
+        sendEmailVO.setSystemId("YYDM200013");
         sendEmailVO.setMarcoAndAttachParams(params);
         // 发送邮件
         log.debug("send email, " + account + ", " + passwordText);
