@@ -225,7 +225,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             return CommonResult.getFaildResultData("用户不存在");
         }
         // 逻辑删除
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_DELETED);
         uemUser.setIsDeleted(true);
         int rowCount = QUemUser.uemUser.save(uemUser);
         System.err.println(rowCount);
