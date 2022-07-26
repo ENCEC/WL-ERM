@@ -40,6 +40,7 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> idCard = uemUser.fieldOf("idCard", String.class);
     public static final FieldExpression<Date> invalidTime = uemUser.fieldOf("invalidTime", Date.class);
     public static final FieldExpression<Boolean> isAgreemeent = uemUser.fieldOf("isAgreemeent", Boolean.class);
+    public static final FieldExpression<Boolean> isDeleted = uemUser.fieldOf("isDeleted", Boolean.class);
     public static final FieldExpression<Boolean> isDisplayed = uemUser.fieldOf("isDisplayed", Boolean.class);
     public static final FieldExpression<Boolean> isLocked = uemUser.fieldOf("isLocked", Boolean.class);
     public static final FieldExpression<Boolean> isValid = uemUser.fieldOf("isValid", Boolean.class);

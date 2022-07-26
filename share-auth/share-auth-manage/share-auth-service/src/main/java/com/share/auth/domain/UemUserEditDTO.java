@@ -21,10 +21,9 @@ import java.util.Date;
 public class UemUserEditDTO {
 
     /**
-     * 主键id
+     * 主键id(新增时为空,修改时不为空)
      */
     @ApiModelProperty("主键id")
-    @NotNull(message = "主键id不能为空")
     private Long uemUserId;
 
     /**
@@ -66,7 +65,7 @@ public class UemUserEditDTO {
     /**
      * 在职状态（0：试用员工 1：正式员工 2：离职员工）
      */
-    @ApiModelProperty("在职状态")
+    @ApiModelProperty("在职状态（0：试用员工 1：正式员工 2：离职员工）")
     @Range(min = 0, max = 2, message = "在职状态错误")
     @NotNull(message = "在职状态不能为空")
     private Long jobStatus;

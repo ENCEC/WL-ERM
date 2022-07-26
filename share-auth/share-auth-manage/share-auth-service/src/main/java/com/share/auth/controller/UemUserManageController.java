@@ -110,7 +110,7 @@ public class UemUserManageController {
     @ApiOperation("删除用户信息")
     @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataType = "Long")
     @PostMapping("/deleteUemUser")
-    public ResultHelper<?> deleteUemUser(Long uemUserId) {
+    public ResultHelper<?> deleteUemUser(@RequestParam Long uemUserId) {
         return uemUserManageService.deleteUemUser(uemUserId);
     }
 
@@ -144,7 +144,7 @@ public class UemUserManageController {
      */
     @ApiOperation("管理员重置用户密码")
     @PostMapping(value = "/resetUemUserPassword")
-    public ResultHelper<?> resetUemUserPassword(Long uemUserId) {
+    public ResultHelper<?> resetUemUserPassword(@RequestParam Long uemUserId) {
         return uemUserManageService.resetUemUserPassword(uemUserId);
     }
 }
