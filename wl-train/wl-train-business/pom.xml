@@ -557,7 +557,7 @@
                 <version>2.2.5.RELEASE</version>
                 <!--使打包后的jar能直接运行-->
                 <configuration>
-                    <mainClass>com.gillion.Application</mainClass><!--这个要改成自己的入口类-->
+                    <mainClass>com.gillion.TrainApplication</mainClass><!--这个要改成自己的入口类-->
                 </configuration>
                 <executions>
                     <execution>
