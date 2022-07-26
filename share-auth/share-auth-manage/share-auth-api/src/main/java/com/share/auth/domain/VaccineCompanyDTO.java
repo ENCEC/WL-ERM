@@ -53,9 +53,6 @@ public class VaccineCompanyDTO implements Serializable {
     /**数据来源（0用户新增，2客服新增）*/
     private String dataSource;
 
-    /**国际货运代理人工商登记材料*/
-    private String internationalBusinessFileUrl;
-
     /**启/禁用时间*/
     private Date invalidTime;
 

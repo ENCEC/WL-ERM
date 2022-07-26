@@ -1,24 +1,19 @@
 package com.share.auth.model.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gillion.ds.entity.base.BaseModel;
+import com.gillion.ec.core.annotations.Generator;
+import com.gillion.ec.core.utils.Long2String;
+import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import com.gillion.ec.core.annotations.Generator;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gillion.ec.core.utils.Long2String;
-import com.gillion.ec.core.utils.String2Long;
-import com.gillion.ds.entity.base.BaseModel;
-import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Version;
-import java.lang.Boolean;
-import java.lang.Integer;
-import java.lang.Long;
-import java.lang.String;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -119,17 +114,13 @@ private static final long serialVersionUID=1;
     @Column(name = "creator_name")
     private String creatorName;
 
-    /**数据来源（0用户新增，2客服新增，3-国家综合交通运输信息平台）*/
+    /**数据来源（0用户新增，2客服新增）*/
     @Column(name = "data_source")
     private String dataSource;
 
     /**企业证书上传地址*/
     @Column(name = "file_url_id")
     private String fileUrlId;
-
-    /**国际货运代理人工商登记材料*/
-    @Column(name = "international_business_file_url")
-    private String internationalBusinessFileUrl;
 
     /**启/禁用时间*/
     @Column(name = "invalid_time")
@@ -231,7 +222,6 @@ private static final long serialVersionUID=1;
 
     /**版本号*/
     @Column(name = "record_version")
-    @Version
     private Integer recordVersion;
 
     /**企业评分*/

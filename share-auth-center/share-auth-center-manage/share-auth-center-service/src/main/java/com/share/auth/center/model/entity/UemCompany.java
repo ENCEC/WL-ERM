@@ -127,10 +127,6 @@ private static final long serialVersionUID=1;
     @Column(name = "file_url_id")
     private String fileUrlId;
 
-    /**国际货运代理人工商登记材料*/
-    @Column(name = "international_business_file_url")
-    private String internationalBusinessFileUrl;
-
     /**启/禁用时间*/
     @Column(name = "invalid_time")
     private Date invalidTime;

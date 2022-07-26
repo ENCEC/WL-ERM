@@ -1,5 +1,4 @@
 package com.share.auth.model.querymodels;
-
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;

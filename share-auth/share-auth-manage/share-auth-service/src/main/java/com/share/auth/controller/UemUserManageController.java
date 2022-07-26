@@ -5,100 +5,94 @@ import com.share.auth.center.api.AuthCenterInterface;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.service.UemUserManageService;
-import com.share.support.model.User;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Objects;
 
 /**
- * @author xrp
- * @date 2020/11/3 0003
+ * 用户管理接口
+ *
+ * @author xuzt <xuzt@gillion.com.cn>
+ * @date 2022-07-25
  */
-@Api("用户管理控制器")
-@Controller
-@RequestMapping("uemUserManage")
+@Api("用户管理")
+@RestController
+@RequestMapping("/uemUserManage")
 public class UemUserManageController {
 
     @Autowired
     private UemUserManageService uemUserManageService;
+
     @Autowired
     private AuthCenterInterface authCenterInterface;
 
     /**
-     * 用户管理
+     * 根据用户名、姓名或启禁用状态查询用户信息
      *
-     * @param uemUserDto 用户表封装类
-     * @return Page<UemUserDto>
-     * @author xrp
+     * @param uemUserDto 用户信息封装类
+     * @return ResultHelper<Page<UemUserDto>>
+     * @date 2022-07-25
      */
-    @ApiOperation("用户管理")
-    @ApiImplicitParam(name = "uemUserDto", value = "用户信息封装类", required = true, dataType = "UemUserDto", paramType = "queryUemUser")
+    @ApiOperation("根据用户名、姓名或启禁用状态查询用户信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "account", value = "用户名", dataTypeClass = String.class, paramType = "body"),
+            @ApiImplicitParam(name = "name", value = "真实姓名", dataTypeClass = String.class, paramType = "body"),
+            @ApiImplicitParam(name = "isValid", value = "启用/禁用状态", dataTypeClass = Boolean.class, paramType = "body")
+    })
     @PostMapping("/queryUemUser")
-    @ResponseBody
     public ResultHelper<Page<UemUserDto>> queryUemUser(@RequestBody UemUserDto uemUserDto) {
-        //HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
-        User user = authCenterInterface.getUserInfo();
-        if(Objects.isNull(user) || !"SYSADMIN".equals(user.getRoleCode())){
-            return CommonResult.getFaildResultData("访问受限，用户没有接口访问权限！");
-        }
-        Page<UemUserDto> page = uemUserManageService.queryUemUser(uemUserDto);
-        return CommonResult.getSuccessResultData(page);
+        return uemUserManageService.queryUemUser(uemUserDto);
     }
 
     /**
-     * 用户管理详情
+     * 获取用户信息
      *
-     * @param uemUserId 用户ID
-     * @return List<UemUserDto>
-     * @author xrp
+     * @date 2022-07-25
      */
-    @ApiOperation("用户管理详情")
-    @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataType = "String", paramType = "getUemUser")
+    @ApiOperation("获取用户信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataTypeClass = Long.class, paramType = "body")
+    })
     @GetMapping("/getUemUser")
-    @ResponseBody
-    public ResultHelper<List<UemUserDto>> getUemUser(@RequestParam String uemUserId) {
-        List<UemUserDto> uemUserDtoList = uemUserManageService.getUemUser(uemUserId);
-        return CommonResult.getSuccessResultData(uemUserDtoList);
+    public ResultHelper<UemUserDto> getUemUser(@RequestParam Long uemUserId) {
+        return uemUserManageService.getUemUser(uemUserId);
     }
 
     /**
-     * 用户管理 启停
+     * 启用/禁用用户
      *
      * @param uemUserDto 用户表封装类
-     * @return Map<String, Object>
-     * @author xrp
+     * @return com.share.support.result.ResultHelper<?>
+     * @date 2022-07-25
      */
-    @ApiOperation("用户管理 启停")
-    @ApiImplicitParam(name = "uemUserDto", value = "用户信息封装类", required = true, dataType = "UemUserDto", paramType = "uemUserStartStop")
+    @ApiOperation("启用/禁用用户")
+    @ApiImplicitParam(name = "uemUserDto", value = "用户信息封装类", required = true, dataType = "UemUserDto")
     @PostMapping("/uemUserStartStop")
-    @ResponseBody
-    public ResultHelper<Object> uemUserStartStop(@RequestBody UemUserDto uemUserDto) {
+    public ResultHelper<?> uemUserStartStop(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.uemUserStartStop(uemUserDto);
     }
-
 
     /**
      * 修改用户信息
      *
-     * @param uemUserDto
-     * @return
-     * @throws
-     * @author tujx
+     * @param uemUserEditDTO 用户信息新增修改接口入参
+     * @return com.share.support.result.ResultHelper<?>
+     * @date 2022-07-25
      */
     @ApiOperation("修改用户信息")
     @PostMapping("/editUemUser")
-    @ResponseBody
-    public ResultHelper<Object> editUemUser(@RequestBody @Valid UemUserEditDTO uemUserDto, BindingResult results) {
+    @ApiImplicitParam(name = "uemUserEditDTO", value = "用户信息新增修改接口入参", required = true, dataType = "UemUserEditDTO")
+    public ResultHelper<?> editUemUser(@RequestBody @Valid UemUserEditDTO uemUserEditDTO, BindingResult results) {
         if (results.hasErrors()) {
             //数据校验不通过
             FieldError fieldError = results.getFieldError();
@@ -106,47 +100,55 @@ public class UemUserManageController {
                 return CommonResult.getFaildResultData(fieldError.getDefaultMessage());
             }
         }
-        return uemUserManageService.editUemUser(uemUserDto);
+        return uemUserManageService.editUemUser(uemUserEditDTO);
     }
-
 
     /**
      * 删除用户信息
      *
-     * @param uemUserId
-     * @return
-     * @throws
-     * @author tujx
+     * @date 2022-07-25
      */
     @ApiOperation("删除用户信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataTypeClass = Long.class, paramType = "body")
+    })
     @PostMapping("/deleteUemUser")
-    @ResponseBody
-    public ResultHelper<Object> deleteUemUser(Long uemUserId) {
-        return uemUserManageService.deleteUemUser(uemUserId);
+    public ResultHelper<?> deleteUemUser(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.deleteUemUser(uemUserDto.getUemUserId());
     }
 
     /**
-     * 平台客服新增用户
-     * @param uemUserDto 用户信息
-     * @return 新增结果
+     * 管理员新增用户
+     *
+     * @param uemUserEditDTO 用户信息新增修改接口入参
+     * @return com.share.support.result.ResultHelper<?>
+     * @date 2022-07-25
      */
-    @ApiOperation("平台客服新增用户")
-    @ResponseBody
+    @ApiOperation("管理员新增用户")
+    @ApiImplicitParam(name = "uemUserEditDTO", value = "用户信息新增修改接口入参", required = true, dataType = "UemUserEditDTO")
     @PostMapping(value = "/saveUemUser")
-    public ResultHelper<String> saveUemUser(@RequestBody UemUserDto uemUserDto) {
-        return uemUserManageService.saveUemUser(uemUserDto);
+    public ResultHelper<?> saveUemUser(@RequestBody @Valid UemUserEditDTO uemUserEditDTO, BindingResult results) {
+        if (results.hasErrors()) {
+            //数据校验不通过
+            FieldError fieldError = results.getFieldError();
+            if (Objects.nonNull(fieldError)) {
+                return CommonResult.getFaildResultData(fieldError.getDefaultMessage());
+            }
+        }
+        return uemUserManageService.saveUemUser(uemUserEditDTO);
     }
 
     /**
-     * 平台客服重置用户密码
-     * @param uemUserId 用户id
-     * @return 重置结果
+     * 管理员重置用户密码
+     *
+     * @date 2022-07-25
      */
-    @ApiOperation("平台客服重置用户密码")
-    @ResponseBody
-    @GetMapping(value = "/resetUemUserPassword")
-    public ResultHelper<String> resetUemUserPassword(Long uemUserId) {
-        return uemUserManageService.resetUemUserPassword(uemUserId);
+    @ApiOperation("管理员重置用户密码")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataTypeClass = Long.class, paramType = "body")
+    })
+    @PostMapping(value = "/resetUemUserPassword")
+    public ResultHelper<?> resetUemUserPassword(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.resetUemUserPassword(uemUserDto.getUemUserId());
     }
-
 }

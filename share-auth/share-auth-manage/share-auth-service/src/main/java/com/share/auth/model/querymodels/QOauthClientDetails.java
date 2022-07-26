@@ -4,7 +4,7 @@ import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.OauthClientDetails;
-import com.share.auth.model.entity.SysApplication;
+
 
 /**
 * @author daoServiceGenerator
@@ -27,7 +27,6 @@ public class QOauthClientDetails extends BaseModelExpression<OauthClientDetails,
     public static final FieldExpression<Long> sysApplicationId = oauthClientDetails.fieldOf("sysApplicationId", Long.class);
     public static final FieldExpression<String> webServerRedirectUri = oauthClientDetails.fieldOf("webServerRedirectUri", String.class);
 
-    public static final BaseModelExpression<SysApplication, Long> sysApplication = new QSysApplication(oauthClientDetails, "sysApplication");
 
     public QOauthClientDetails() {
         super("OauthClientDetails", OauthClientDetails.class);

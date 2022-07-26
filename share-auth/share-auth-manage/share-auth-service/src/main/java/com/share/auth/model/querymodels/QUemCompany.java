@@ -5,13 +5,8 @@ import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.UemCompany;
 
-import java.lang.Boolean;
-import java.lang.Integer;
-import java.lang.Long;
-import java.lang.String;
 import java.util.Date;
 
-import com.share.auth.model.entity.SysPlatformUser;
 
 /**
 * @author daoServiceGenerator
@@ -41,7 +36,6 @@ public class QUemCompany extends BaseModelExpression<UemCompany, Long> {
     public static final FieldExpression<String> creatorName = uemCompany.fieldOf("creatorName", String.class);
     public static final FieldExpression<String> dataSource = uemCompany.fieldOf("dataSource", String.class);
     public static final FieldExpression<String> fileUrlId = uemCompany.fieldOf("fileUrlId", String.class);
-    public static final FieldExpression<String> internationalBusinessFileUrl = uemCompany.fieldOf("internationalBusinessFileUrl", String.class);
     public static final FieldExpression<Date> invalidTime = uemCompany.fieldOf("invalidTime", Date.class);
     public static final FieldExpression<Boolean> isFocusCompany = uemCompany.fieldOf("isFocusCompany", Boolean.class);
     public static final FieldExpression<Boolean> isSuperior = uemCompany.fieldOf("isSuperior", Boolean.class);
@@ -72,7 +66,6 @@ public class QUemCompany extends BaseModelExpression<UemCompany, Long> {
     public static final FieldExpression<Long> uemCompanyHistoryId = uemCompany.fieldOf("uemCompanyHistoryId", Long.class);
     public static final FieldExpression<Long> uemCompanyId = uemCompany.fieldOf("uemCompanyId", Long.class);
 
-    public static final BaseModelExpression<SysPlatformUser, Long> sysPlatformUser = new QSysPlatformUser(uemCompany, "sysPlatformUser");
 
     public QUemCompany() {
         super("UemCompany", UemCompany.class);
