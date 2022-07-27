@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -45,6 +46,7 @@ public class UemUserEditDTO {
      */
     @ApiModelProperty("手机号")
     @NotBlank(message = "手机号不能为空")
+    @Pattern(regexp = "1[0-9]{10}", message = "手机号格式错误")
     private String mobile;
 
     /**
@@ -82,6 +84,8 @@ public class UemUserEditDTO {
      */
     @ApiModelProperty("入职时间")
     @NotNull(message = "入职时间不能为空")
+//    @JsonSerialize(using = Date2StringSerializer.class)
+//    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date entryDate;
 
     /**

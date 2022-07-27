@@ -1,6 +1,7 @@
 package com.share.auth.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.share.auth.constants.CodeFinal;
@@ -280,7 +281,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否新增成功,并异步发送邮件通知
         if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
-            sendEmailWithPassword(uemUser.getAccount(), uemUser.getEmail(), passwordText, false);
+            UemUserManageService service = SpringUtil.getBean(UemUserManageService.class);
+            service.sendEmailWithPassword(uemUser.getAccount(), uemUser.getEmail(), passwordText, false);
             return CommonResult.getSuccessResultData("用户新增成功");
         } else {
             return CommonResult.getFaildResultData("用户新增失败");
@@ -315,7 +317,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否更新成功,并异步发送邮件通知
         if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
-            sendEmailWithPassword(uemUser.getAccount(), uemUser.getEmail(), passwordText, true);
+            UemUserManageService service = SpringUtil.getBean(UemUserManageService.class);
+            service.sendEmailWithPassword(uemUser.getAccount(), uemUser.getEmail(), passwordText, true);
             return CommonResult.getSuccessResultData("重置密码成功");
         } else {
             return CommonResult.getFaildResultData("重置密码失败");
@@ -332,11 +335,14 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @date 2022-07-25
      */
     @Async
+    @Override
     public void sendEmailWithPassword(String account, String email, String passwordText, boolean isReset) {
         // 设置模板参数
         Map<String, Object> params = new HashMap<>(10);
-        params.put("account", account);
-        params.put("password", passwordText);
+        Map<String, String> contentParams = new HashMap<>(10);
+        contentParams.put("account", account);
+        contentParams.put("password", passwordText);
+        params.put("content", contentParams);
         // 设置邮件参数
         SendEmailVO sendEmailVO = new SendEmailVO();
         sendEmailVO.setToEmail(email);
@@ -344,7 +350,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         sendEmailVO.setSystemId("YYDM200013");
         sendEmailVO.setMarcoAndAttachParams(params);
         // 发送邮件
-        log.debug("send email, " + account + ", " + passwordText);
+        log.warn("send email, " + account + ", " + passwordText);
         emailTemplateService.sendEmail(sendEmailVO);
     }
 }
