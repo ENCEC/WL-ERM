@@ -107,10 +107,14 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**入职时间*/
     @ApiModelProperty("入职时间")
+//    @JsonSerialize(using = Date2StringSerializer.class)
+//    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date entryDate;
 
     /**毕业时间*/
     @ApiModelProperty("毕业时间")
+//    @JsonSerialize(using = Date2StringSerializer.class)
+//    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date graduateDate;
 
     /**毕业学校*/
@@ -149,6 +153,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**离职时间*/
     @ApiModelProperty("离职时间")
+//    @JsonSerialize(using = Date2StringSerializer.class)
+//    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date leaveDate;
 
     /**离职原因*/
@@ -185,6 +191,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     /**转正时间*/
     @ApiModelProperty("转正时间")
+//    @JsonSerialize(using = Date2StringSerializer.class)
+//    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date offerDate;
 
     /**转正原因*/
@@ -197,9 +205,9 @@ public class UemUserDto extends BaseModel implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long oriApplication;
 
-    /**密码*/
-    @ApiModelProperty("密码")
-    private String password;
+//    /**密码*/
+//    @ApiModelProperty("密码")
+//    private String password;
 
     /**所属项目ID*/
     @ApiModelProperty("所属项目ID")
