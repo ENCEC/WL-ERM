@@ -2,7 +2,6 @@ package com.share.auth.service;
 
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.share.auth.model.entity.SysPost;
 import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
 
@@ -17,20 +16,17 @@ import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
 public interface SysTechnicalTitleService {
     /**
      * 分页查询全部岗位职称
-     * @param currentPage 第几页
-     * @param pageSize  每页的数据条数
+     * @param sysTechnicalTitleAndPostVO
      * @return
      */
-    Page<SysTechnicalTitleAndPostVO> queryByPageAll(Integer currentPage,Integer pageSize);
+    Page<SysTechnicalTitleAndPostVO> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
 
     /**
      * 通过条件分页查询岗位职称
-     * @param currentPage
-     * @param pageSize
-     * @param name
+     * @param sysTechnicalTitleAndPostVO
      * @return
      */
-    Page<SysTechnicalTitleAndPostVO> queryByTechnicalTitleName(Integer currentPage,Integer pageSize,String name);
+    Page<SysTechnicalTitleAndPostVO> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
 
     /**
      * 新增职称
@@ -41,9 +37,10 @@ public interface SysTechnicalTitleService {
 
     /**
      * 编辑职称
-     * @param sysTechnicalTitle
+     * @param sysTechnicalTitleAndPostVO
+     * @return
      */
-    void updateSysTechnicalTitle(SysTechnicalTitle sysTechnicalTitle);
+    void updateSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
 
     /**
      * 删除职称
@@ -52,7 +49,7 @@ public interface SysTechnicalTitleService {
     void deleteSysTechnicalTitle(String technicalName);
 
     /**
-     * 禁用
+     * 启动/禁用
      * @param sysTechnicalTitle
      */
     void updateStatus(SysTechnicalTitle sysTechnicalTitle);
