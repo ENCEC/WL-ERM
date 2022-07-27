@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * @ClassName SysTechnicalTitleAndPostVO
- * @Description TODO
+ * @Description 岗位职称的封装类
  * @Author weiq
  * @Date 2022/7/25 15:41
  * @Version 1.0
@@ -49,8 +49,10 @@ public class SysTechnicalTitleAndPostVO implements Serializable {
 
     /**岗位名称*/
     private String postName;
+
    /**分页页数*/
     private Integer currentPage;
+
    /**分页条数*/
     private Integer pageSize;
 }

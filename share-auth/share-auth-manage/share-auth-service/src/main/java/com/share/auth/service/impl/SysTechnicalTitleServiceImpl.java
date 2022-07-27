@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @ClassName SysTechnicalTitleServiceImpl
- * @Description TODO
+ * @Description 岗位职称Service的实现类
  * @Author weiq
  * @Date 2022/7/25 15:29
  * @Version 1.0
@@ -32,7 +32,7 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
      */
     @Override
     public Page<SysTechnicalTitleAndPostVO> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
-        Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName, QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
+        Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
                 .where(QSysTechnicalTitle.technicalTitleId.goe$(1L))
                 .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
                 .mapperTo(SysTechnicalTitleAndPostVO.class)
@@ -49,14 +49,21 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
     @Override
     public Page<SysTechnicalTitleAndPostVO> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
         if (!sysTechnicalTitleAndPostVO.getStatus().isEmpty() && !sysTechnicalTitleAndPostVO.getTechnicalName().isEmpty() && !sysTechnicalTitleAndPostVO.getPostName().isEmpty()) {
-            Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName, QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
+            Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
                     .where(QSysTechnicalTitle.technicalName._like$_(sysTechnicalTitleAndPostVO.getTechnicalName()).and(QSysTechnicalTitle.sysPost.chain(QSysPost.postName).eq$(sysTechnicalTitleAndPostVO.getPostName())).and(QSysTechnicalTitle.status.eq$(sysTechnicalTitleAndPostVO.getStatus())))
                     .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
                     .mapperTo(SysTechnicalTitleAndPostVO.class)
                     .execute();
             return pages;
+        } else if (sysTechnicalTitleAndPostVO.getStatus().isEmpty() && sysTechnicalTitleAndPostVO.getTechnicalName().isEmpty() && sysTechnicalTitleAndPostVO.getPostName().isEmpty()) {
+            Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
+                    .where(QSysTechnicalTitle.technicalTitleId.goe$(1L))
+                    .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
+                    .mapperTo(SysTechnicalTitleAndPostVO.class)
+                    .execute();
+            return pages;
         } else {
-            Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName, QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
+            Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
                     .where(QSysTechnicalTitle.technicalName._like$_(sysTechnicalTitleAndPostVO.getTechnicalName()).or(QSysTechnicalTitle.sysPost.chain(QSysPost.postName).eq$(sysTechnicalTitleAndPostVO.getPostName())).or(QSysTechnicalTitle.status.eq$(sysTechnicalTitleAndPostVO.getStatus())))
                     .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
                     .mapperTo(SysTechnicalTitleAndPostVO.class)
@@ -110,11 +117,11 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
 
     /**
      * 删除职称
-     * @param technicalName
+     * @param technicalTitleId
      */
     @Override
-    public void deleteSysTechnicalTitle(String technicalName) {
-        QSysTechnicalTitle.sysTechnicalTitle.delete().where(QSysTechnicalTitle.technicalName.eq$(technicalName)).execute();
+    public void deleteSysTechnicalTitle(Long technicalTitleId) {
+        QSysTechnicalTitle.sysTechnicalTitle.delete().where(QSysTechnicalTitle.technicalTitleId.eq$(technicalTitleId)).execute();
 
     }
 
@@ -124,16 +131,10 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
      */
     @Override
     public void updateStatus(SysTechnicalTitle sysTechnicalTitle) {
-        if (sysTechnicalTitle.getStatus().equals("0")) {
-            QSysTechnicalTitle.sysTechnicalTitle.update(QSysTechnicalTitle.status)
-                    .where(QSysTechnicalTitle.technicalName.eq$(sysTechnicalTitle.getTechnicalName()))
-                    .execute(ImmutableMap.of("status","1"));
-        } else {
-            QSysTechnicalTitle.sysTechnicalTitle.update(QSysTechnicalTitle.status)
-                    .where(QSysTechnicalTitle.technicalName.eq$(sysTechnicalTitle.getTechnicalName()))
-                    .execute(ImmutableMap.of("status", "0"));
-        }
-
+        int status = ("0".equals(sysTechnicalTitle.getStatus())) ? 1 : 0;
+        QSysTechnicalTitle.sysTechnicalTitle.update(QSysTechnicalTitle.status)
+                .where(QSysTechnicalTitle.technicalTitleId.eq$(sysTechnicalTitle.getTechnicalTitleId()))
+                .execute(ImmutableMap.of("status", status));
 
     }
 }

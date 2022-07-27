@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * @ClassName SySTechnicalTitleController
- * @Description TODO
+ * @Description 岗位职称Controller层
  * @Author weiq
  * @Date 2022/7/25 16:38
  * @Version 1.0
@@ -93,7 +93,7 @@ public class SysTechnicalTitleController {
 
     /**
      * 删除职称
-     * @param technicalName
+     * @param technicalTitleId
      * @return
      */
     @ApiOperation("删除职称信息")
@@ -101,8 +101,8 @@ public class SysTechnicalTitleController {
             @ApiImplicitParam(name = "technicalName", value = "职称名称", required = true, dataTypeClass = String.class, paramType = "body")
     })
     @DeleteMapping("/deleteSysTechnicalTitle")
-    public Map<String,Object> deleteSysTechnicalTitle(String technicalName) {
-        sysTechnicalTitleService.deleteSysTechnicalTitle(technicalName);
+    public Map<String,Object> deleteSysTechnicalTitle(Long technicalTitleId) {
+        sysTechnicalTitleService.deleteSysTechnicalTitle(technicalTitleId);
         return ResultUtils.getSuccessResultData(true);
     }
 

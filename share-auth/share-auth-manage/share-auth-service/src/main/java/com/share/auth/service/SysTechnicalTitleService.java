@@ -8,7 +8,7 @@ import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
 
 /**
  * @ClassName SysTechnicalTitleService
- * @Description TODO
+ * @Description 岗位职称Service层
  * @Author weiq
  * @Date 2022/7/25 15:28
  * @Version 1.0
@@ -44,9 +44,9 @@ public interface SysTechnicalTitleService {
 
     /**
      * 删除职称
-     * @param technicalName
+     * @param technicalTitleId
      */
-    void deleteSysTechnicalTitle(String technicalName);
+    void deleteSysTechnicalTitle(Long technicalTitleId);
 
     /**
      * 启动/禁用
