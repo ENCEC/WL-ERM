@@ -94,7 +94,7 @@ public interface SysResourceService {
      *
      * @param sysResourceId
      */
-    List<SysResourceDTO> queryResourceById(Long sysResourceId);
+    SysResourceDTO queryResourceById(Long sysResourceId);
 
     /**
      * 修改菜单信息
@@ -109,11 +109,16 @@ public interface SysResourceService {
      * @param sysResourceDTO
      */
     ResultHelper<Object> updateResourceStatus(SysResourceDTO sysResourceDTO);
-    /**
-     * 逻辑删除菜单信息
-     *
-     * @param sysResourceId
-     */
+/**
+ * 逻辑删除菜单信息
+ *
+ * @param sysResourceId
+ */
     ResultHelper<Object> deleteResource(Long sysResourceId);
+
+    /**
+     * 查询父级菜单
+     */
+    List<SysResourceDTO> queryParentResource();
 }
 
