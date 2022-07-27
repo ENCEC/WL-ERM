@@ -1,36 +1,68 @@
 package com.share.auth.service;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.share.auth.domain.SysPostDTO;
 import com.share.auth.model.entity.SysPost;
-import com.share.auth.model.vo.SysPostVO;
+import com.share.support.result.ResultHelper;
 
 /**
  * @author tanjp
  * @Date 2022/7/26 9:27
  */
 public interface SysPostService {
-    /*
+    /**
      * 新增岗位
      */
     void addSysPost(SysPost sysPost);
 
-    //分页查询   page:当前页     size:每页显示的条数
-    Page<SysPost> findPage(int page, int size);
 
-    //分页查询条件   page:当前页     size:每页显示的条数  sysPost 条件
-    Page<SysPost> findPage(SysPost sysPost,int page, int size);
+    /**
+     * 查询岗位信息
+     *
+     * @param sysPostDTO 岗位信息封装类
+     * @return Page<SysPostDTO>
+     * @author tanjp
+     * @date 2022/7/27
+     */
+    ResultHelper<Page<SysPostDTO>> querySysPost(SysPostDTO sysPostDTO);
 
-    //分页查询条件   page:当前页     size:每页显示的条数  sysPost 条件
-    Page<SysPost> findPage(SysPost sysPost,int page, int size,String status);
+    /**
+     * 岗位详细
+     *
+     * @param sysPostId 岗位ID
+     * @return SysPostDTO
+     * @author tanjp
+     * @date 2022/7/27
+     */
+    ResultHelper<SysPostDTO> getSysPost(Long sysPostId);
 
-    //编辑
-    void updateSysPost(SysPost sysPost);
+    /**
+     * 启动禁止
+     *
+     * @param sysPostDTO 岗位信息封装类
+     * @return ResultHelper<?>
+     * @author tanjp
+     * @date 2022/7/27
+     */
+    ResultHelper<?> sysPostStartStop(SysPostDTO sysPostDTO);
 
-    //禁用
-    void Prohibit(SysPost sysPost);
+    /**
+     *修改
+     *
+     * @param sysPostDTO 岗位信息封装类
+     * @return ResultHelper<?>
+     * @author tanjp
+     * @date 2022/7/27
+     */
+    ResultHelper<?> updatePostStartStop(SysPostDTO sysPostDTO);
 
-    //删除
-    void deleteEmployeeId(Long id);
-
-    //获取选中的
+    /**
+     *删除
+     *
+     * @param sysPostId 岗位信息封装类
+     * @return ResultHelper<?>
+     * @author tanjp
+     * @date 2022/7/27
+     */
+    ResultHelper<?> deletePostById(Long sysPostId);
 }
