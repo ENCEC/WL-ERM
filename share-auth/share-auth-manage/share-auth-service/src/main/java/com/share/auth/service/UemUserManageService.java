@@ -77,4 +77,15 @@ public interface UemUserManageService {
      * @return 重置结果
      */
     ResultHelper<?> resetUemUserPassword(Long uemUserId);
+
+    /**
+     * 新增用户时异步发送短信提醒给新用户
+     *
+     * @param account 用户名
+     * @param email 邮件地址
+     * @param passwordText 新密码
+     * @param isReset true:发送重置密码邮件; false:发送新增用户邮件
+     * @date 2022-07-25
+     */
+    void sendEmailWithPassword(String account, String email, String passwordText, boolean isReset);
 }
