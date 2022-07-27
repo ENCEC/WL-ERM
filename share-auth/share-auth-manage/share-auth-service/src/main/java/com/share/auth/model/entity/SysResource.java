@@ -1,4 +1,6 @@
 package com.share.auth.model.entity;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ds.entity.base.BaseModel;
@@ -41,6 +43,7 @@ public class SysResource extends BaseModel implements Serializable {
      * 创建时间
      */
     @Column(name = "create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss ", timezone = "GMT+8")
     private Date createTime;
 
     /**
@@ -127,6 +130,10 @@ public class SysResource extends BaseModel implements Serializable {
      */
     @Column(name = "resource_title")
     private String resourceTitle;
+
+    /*@Column(name = "resource_title")
+    private String parentName;*/
+
 
     /**
      * 资源类型（1：模块/页面，2按钮，3接口）

@@ -1,5 +1,6 @@
 package com.share.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ec.core.utils.Long2String;
@@ -26,6 +27,7 @@ public class SysResourceDTO implements Serializable {
     private String component;
 
     /**创建时间*/
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss ", timezone = "GMT+8")
     private Date createTime;
 
     /**创建人id*/
@@ -77,6 +79,9 @@ public class SysResourceDTO implements Serializable {
 
     /**菜单标题*/
     private String resourceTitle;
+
+    /**父级菜单标题*/
+    private String parentName;
 
     /**资源类型（1：模块/页面，2按钮，3接口）*/
     private Integer resourceType;

@@ -1,5 +1,6 @@
 package com.share.auth.service.impl;
 
+import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.expressions.Expression;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
@@ -7,17 +8,13 @@ import com.gillion.ec.core.security.IUser;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.share.auth.constants.CodeFinal;
-import com.share.auth.domain.PageDto;
 import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysResourceDTO;
+import com.share.auth.domain.SysResourceQueryVO;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
-import com.share.auth.domain.SysResourceQueryVO;
-import com.share.auth.model.vo.SysResourceVO;
 import com.share.auth.service.SysResourceService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
-import com.share.auth.util.OauthClientUtils;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -511,14 +508,16 @@ public class SysResourceServiceImpl implements SysResourceService {
         SysResource sysResource = new SysResource();
         String resourceTitle = sysResourceDTO.getResourceTitle();
         String resourceUrl = sysResourceDTO.getResourceUrl();
-       // Long application = sysResourceDTO.getSysApplicationId();
+        // Long application = sysResourceDTO.getSysApplicationId();
         Integer resourceSort = sysResourceDTO.getResourceSort();
         String resourceRemark = sysResourceDTO.getResourceRemark();
-        //Long resourceId = sysResourceDTO.getSysResourceId();
+        Long sysResourceId = sysResourceDTO.getSysResourceId();
+        Long resourcePid = sysResource.getResourcePid();
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         sysResource.setSysApplicationId(1L);
         sysResource.setIsValid(true);
-        //sysResource.setResourcePid(resourceId);
+        sysResource.setSysResourceId(sysResourceId);
+        sysResource.setResourcePid(resourcePid);
         sysResource.setResourceTitle(resourceTitle);
         sysResource.setResourceUrl(resourceUrl);
         sysResource.setResourceSort(resourceSort);
@@ -537,6 +536,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         Integer currentPage = sysResourceDTO.getCurrentPage();
         Integer pageSize = sysResourceDTO.getPageSize();
         return QSysResource.sysResource.select(
+                        QSysResource.sysResourceId,
                         QSysResource.resourceTitle,
                         QSysResource.resourcePid,
                         QSysResource.creatorName,
@@ -545,7 +545,7 @@ public class SysResourceServiceImpl implements SysResourceService {
                         QSysResource.createTime,
                         QSysResource.isValid).
                 where(QSysResource.resourceTitle._like$_(sysResourceDTO.getResourceTitle())
-                        .and(QSysResource.sysResourceId.notNull()))
+                        .and(QSysResource.isValid.eq(":isValid")))
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
                         ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class).execute(sysResourceDTO);
     }
@@ -556,8 +556,10 @@ public class SysResourceServiceImpl implements SysResourceService {
      * @Date: 2022/7/25
      */
     @Override
-    public List<SysResourceDTO> queryResourceById(Long sysResourceId) {
-        return QSysResource.sysResource.select(
+    public SysResourceDTO queryResourceById(Long sysResourceId) {
+        return QSysResource.sysResource.selectOne(
+                        //QSysResource.resourcePid,
+                        QSysResource.sysResourceId,
                         QSysResource.resourceTitle,
                         QSysResource.resourcePid,
                         QSysResource.resourceUrl,
@@ -578,6 +580,7 @@ public class SysResourceServiceImpl implements SysResourceService {
     @Override
     public ResultHelper<Object> updateResource(SysResourceDTO sysResourceDTO) {
         Long resourceId = sysResourceDTO.getSysResourceId();
+        Boolean isValid = sysResourceDTO.getIsValid();
         String resourceTitle = sysResourceDTO.getResourceTitle();
         String resourceUrl = sysResourceDTO.getResourceUrl();
         Integer resourceSort = sysResourceDTO.getResourceSort();
@@ -585,6 +588,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         SysResource sysResource = QSysResource.sysResource.selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         sysResource.setSysResourceId(resourceId);
+        sysResource.setIsValid(isValid);
         sysResource.setResourceTitle(resourceTitle);
         sysResource.setResourceUrl(resourceUrl);
         sysResource.setResourceSort(resourceSort);
@@ -628,5 +632,12 @@ public class SysResourceServiceImpl implements SysResourceService {
     public ResultHelper<Object> deleteResource(Long sysResourceId) {
         int i = QSysResource.sysResource.deleteById(sysResourceId);
         return CommonResult.getSuccessResultData("删除成功");
+    }
+
+    @Override
+    public List<SysResourceDTO> queryParentResource() {
+        return DSContext.customization("WL-ERM_queryResourceTitle").select()
+                .mapperTo(SysResourceDTO.class)
+                .execute();
     }
 }

@@ -75,7 +75,7 @@ public class SysResourceController {
      * @author wzr
      * @date 2022-07-25
      */
-    @PostMapping("/sysResource/saveResource")
+    @PostMapping("/saveResource")
     @ApiOperation(value = "新增菜单")
     public ResultHelper<Object> saveResource(@RequestBody SysResourceDTO sysResourceDTO) {
         return sysResourceService.saveResource(sysResourceDTO);
@@ -87,7 +87,7 @@ public class SysResourceController {
      * @author wzr
      * @date 2022-07-25
      */
-    @GetMapping("/sysResource/queryResourceByPage")
+    @PostMapping("/queryResourceByPage")
     @ApiOperation(value = "带条件分页查询菜单信息")
     public ResultHelper<Page<SysResourceDTO>> queryResourceByPage(@RequestBody SysResourceDTO sysResourceDTO, PageDto pageDto) {
         Page<SysResourceDTO> sysResourceDTOPage = sysResourceService.queryResourceByPage(sysResourceDTO);
@@ -102,7 +102,7 @@ public class SysResourceController {
      */
     @GetMapping("/queryResourceById")
     @ApiOperation(value = "根据id查询菜单信息")
-    public List<SysResourceDTO> queryResourceById(@RequestParam Long sysResourceId) {
+    public SysResourceDTO queryResourceById(@RequestParam Long sysResourceId) {
         return sysResourceService.queryResourceById(sysResourceId);
     }
 
@@ -130,6 +130,7 @@ public class SysResourceController {
     public ResultHelper<Object> updateDictCodeStatus(@RequestBody SysResourceDTO sysResourceDTO) {
         return sysResourceService.updateResourceStatus(sysResourceDTO);
     }
+
     /**
      * 逻辑删除菜单信息
      *
@@ -140,5 +141,11 @@ public class SysResourceController {
     @GetMapping("/deleteResourceById")
     public ResultHelper<Object> deleteResourceById(@RequestParam Long sysResourceId) {
         return sysResourceService.deleteResource(sysResourceId);
+    }
+
+    @ApiOperation("查询父级菜单信息")
+    @PostMapping("/queryParentResource")
+    public List<SysResourceDTO> queryParentResource() {
+        return sysResourceService.queryParentResource();
     }
 }
