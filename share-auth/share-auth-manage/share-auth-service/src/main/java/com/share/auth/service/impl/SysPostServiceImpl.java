@@ -3,22 +3,29 @@ package com.share.auth.service.impl;
 import cn.hutool.core.date.DateTime;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
+import com.share.auth.constants.CodeFinal;
+import com.share.auth.domain.SysPostDTO;
 import com.share.auth.model.entity.SysPost;
 import com.share.auth.model.querymodels.QSysPost;
-import com.share.auth.model.vo.SysPostVO;
 import com.share.auth.service.SysPostService;
-
+import com.share.support.result.CommonResult;
+import com.share.support.result.ResultHelper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
 
 /**
  * @author tanjp
  * @Date 2022/7/26 9:27
  */
 @Service("SysPostService")
+@Slf4j
 public class SysPostServiceImpl implements SysPostService {
 
     @Override
@@ -30,59 +37,166 @@ public class SysPostServiceImpl implements SysPostService {
         QSysPost.sysPost.save(sysPost);
     }
 
+
+
+    /**
+     * 查询岗位信息
+     *
+     * @param sysPostDTO 岗位信息封装类
+     * @return Page<SysPostDTO>
+     * @author tanjp
+     * @date 2022/7/27
+     */
     @Override
-    public Page<SysPost> findPage(int page, int size) {
-        return QSysPost.sysPost
-                .select(QSysPost.postId,QSysPost.postName,QSysPost.postCode,QSysPost.createBy,QSysPost.createTime,QSysPost.status)
-                .where(QSysPost.postId.goe$(1L))
-                .mapperTo(SysPost.class)
-                .paging(page, size)
-                .execute();
+    public ResultHelper<Page<SysPostDTO>> querySysPost(SysPostDTO sysPostDTO) {
+        //岗位名称
+        String postName = sysPostDTO.getPostName();
+        if (!StringUtils.isEmpty(postName)) {
+            sysPostDTO.setPostName("%" + postName + "%");
+        }
+        //page:当前页     size:每页显示的条数
+        int page = (sysPostDTO.getPage() == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : sysPostDTO.getPage();
+        int size = (sysPostDTO.getSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : sysPostDTO.getSize();
+
+        Page<SysPostDTO> sysPostDTOPage = QSysPost.sysPost.select(QSysPost.sysPost.fieldContainer())
+                .where(
+                        QSysPost.postName.like(":postName")
+                                .and(QSysPost.status.eq(":status"))
+                ).paging(page,size)
+                .sorting(QSysPost.createTime.desc())
+                .mapperTo(SysPostDTO.class)
+                .execute(sysPostDTO);
+
+        return CommonResult.getSuccessResultData(sysPostDTOPage);
     }
 
-    @Override
-    public Page<SysPost> findPage(SysPost sysPost, int page, int size) {
-        return QSysPost.sysPost
-                .select(QSysPost.postId,QSysPost.postName,QSysPost.postCode,QSysPost.createBy,QSysPost.createTime,QSysPost.status)
-                .where(QSysPost.postName.eq$(sysPost.getPostName()))
-                .mapperTo(SysPost.class)
-                .paging(page, size)
+
+    public SysPost getSystemPostById(Long sysPostId) {
+        List<SysPost> sysPostList = QSysPost.sysPost
+                .select(QSysPost.sysPost.fieldContainer())
+                .where(QSysPost.postId.eq$(sysPostId))
                 .execute();
+        if (sysPostList.size() == 1) {
+            return sysPostList.get(0);
+        }else {
+            return null;
+        }
     }
 
+    /**
+     * 岗位详细
+     *
+     * @param sysPostId 岗位ID
+     * @return SysPostDTO
+     * @author tanjp
+     * @date 2022/7/27
+     */
     @Override
-    public Page<SysPost> findPage(SysPost sysPost, int page, int size, String status) {
-        return QSysPost.sysPost
-                .select(QSysPost.postId,QSysPost.postName,QSysPost.postCode,QSysPost.createBy,QSysPost.createTime,QSysPost.status)
-                .where(QSysPost.postName.eq$(sysPost.getPostName()).and(QSysPost.status.eq$(status)))
-                .mapperTo(SysPost.class)
-                .paging(page, size)
-                .execute();
+    public ResultHelper<SysPostDTO> getSysPost(Long sysPostId) {
+        SysPost sysPost = this.getSystemPostById(sysPostId);
+        if (Objects.isNull(sysPost)) {
+            return CommonResult.getFaildResultData("用户不存在");
+        } else {
+            SysPostDTO sysPostDTO = new SysPostDTO();
+            BeanUtils.copyProperties(sysPost, sysPostDTO);
+            return CommonResult.getSuccessResultData(sysPostDTO);
+        }
     }
 
+    /**
+     * 启动禁止
+     *
+     * @param sysPostDTO 岗位信息封装类
+     * @return ResultHelper<?>
+     * @author tanjp
+     * @date 2022/7/27
+     */
     @Override
-    public void updateSysPost(SysPost sysPost) {
-        sysPost.setUpdateTime(new DateTime());
+    public ResultHelper<?> sysPostStartStop(SysPostDTO sysPostDTO) {
+        //岗位表id
+        Long sysPostId = sysPostDTO.getPostId();
+        //(0禁用,1启)
+        String status = sysPostDTO.getStatus();
+        //检查岗位是否存在
+        if (Objects.isNull(sysPostId)) {
+            return CommonResult.getFaildResultData("岗位ID不能为空");
+        }
+        SysPost sysPost = this.getSystemPostById(sysPostId);
+        if (Objects.isNull(sysPost)) {
+            return CommonResult.getFaildResultData("岗位信息不存在");
+        }
+        sysPost.setPostId(sysPostId);
+        sysPost.setStatus(status);
         sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        QSysPost.sysPost
-                .selective(QSysPost.postName)
-                .update(sysPost);
+        int updateStatus = QSysPost.sysPost.selective(QSysPost.status).execute(sysPost);
 
+        //判断是否成功
+        if (updateStatus > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+            return CommonResult.getSuccessResultData("启停成功");
+        } else {
+            return CommonResult.getFaildResultData("启停失败");
+        }
     }
 
+    /**
+     *修改
+     *
+     * @param sysPostDTO 岗位信息封装类
+     * @return ResultHelper<?>
+     * @author tanjp
+     * @date 2022/7/27
+     */
     @Override
-    public void Prohibit(SysPost sysPost) {
-        //QSysPost.sysPost.save(QSysPost.status.eq$("1"));
+    public ResultHelper<?> updatePostStartStop(SysPostDTO sysPostDTO) {
+        //根据主键查询岗位信息
+        Long sysPostID = sysPostDTO.getPostId();
+        if (Objects.isNull(sysPostID)) {
+            return CommonResult.getFaildResultData("id不允许为空");
+        }
+        SysPost sysPost = this.getSystemPostById(sysPostID);
+        if (Objects.isNull(sysPost)) {
+            return CommonResult.getFaildResultData("不存在");
+        }
+        //更新信息
+        BeanUtils.copyProperties(sysPostDTO, sysPost);
         sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        QSysPost.sysPost
-                .selective(QSysPost.status)
-                .update(sysPost);
+        sysPost.setUpdateTime(new Date());//更新时间
+        int row = QSysPost.sysPost.save(sysPost);
 
-
+        if (row > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+            return CommonResult.getSuccessResultData("用户修改成功");
+        } else {
+            return CommonResult.getFaildResultData("用户修改失败");
+        }
     }
 
+    /**
+     *删除
+     *
+     * @param sysPostId 岗位信息封装类
+     * @return ResultHelper<?>
+     * @author tanjp
+     * @date 2022/7/27
+     */
     @Override
-    public void deleteEmployeeId(Long id) {
-        QSysPost.sysPost.deleteById(id);
+    public ResultHelper<?> deletePostById(Long sysPostId) {
+        //获取用户
+        if (Objects.isNull(sysPostId)) {
+            return CommonResult.getFaildResultData("信息主键不能为空");
+        }
+        SysPost sysPost = this.getSystemPostById(sysPostId);
+        if (Objects.isNull(sysPost)) {
+            return CommonResult.getFaildResultData("岗位信息不存在");
+        }
+        //删除
+        sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_DELETED);
+        int row = QSysPost.sysPost.deleteById(sysPostId);
+
+        if (row > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+            return CommonResult.getSuccessResultData("删除成功");
+        } else {
+            return CommonResult.getFaildResultData("删除失败");
+        }
     }
+
 }
