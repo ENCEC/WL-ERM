@@ -49,4 +49,8 @@ public class SysTechnicalTitleAndPostVO implements Serializable {
 
     /**岗位名称*/
     private String postName;
+   /**分页页数*/
+    private Integer currentPage;
+   /**分页条数*/
+    private Integer pageSize;
 }
