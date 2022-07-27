@@ -1,5 +1,15 @@
 package com.share.auth.model.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import com.gillion.ec.core.annotations.Generator;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gillion.ec.core.utils.Long2String;
+import com.gillion.ec.core.utils.String2Long;
+import com.gillion.ds.entity.base.BaseModel;
+import java.io.Serializable;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ds.entity.base.BaseModel;

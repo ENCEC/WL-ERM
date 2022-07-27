@@ -19,7 +19,6 @@ import com.share.auth.service.UemUserService;
 import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.auth.util.MessageUtil;
-import com.share.auth.util.PasswordUtils;
 import com.share.message.api.EmailTemplateService;
 import com.share.message.api.MsgApiService;
 import com.share.message.domain.MsgSmsApiVO;
@@ -30,7 +29,6 @@ import com.share.support.model.Role;
 import com.share.support.model.User;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
-import com.share.support.util.AES128Util;
 import com.share.support.util.MD5EnCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -43,7 +41,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author xrp
@@ -368,102 +365,102 @@ public class UemUserServiceImpl implements UemUserService {
      * */
     @Override
     public ResultHelper<Object> register(UemUserDto uemUserDto){
-        //用户名
-        String account = uemUserDto.getAccount();
-        // 岗位代码
-        String staffDutyCode = uemUserDto.getStaffDutyCode();
-        //手机号
-        String mobile = uemUserDto.getMobile();
-        //密码
-        String password = uemUserDto.getPassword();
-        //验证码
-        String authCode = uemUserDto.getAuthCode();
-        //是否同意协议(0不同意，1同意)
-        Boolean isAgreemeent = uemUserDto.getIsAgreemeent();
-
-        //判断用户是否使用过
-        List<UemUser> uemUserList = QUemUser.uemUser
-                .select(QUemUser.uemUser.fieldContainer())
-                .where(QUemUser.account.eq(":account").or(QUemUser.mobile.eq$(mobile)))
-                .execute(ImmutableMap.of("account", account));
-        //客服表
-        List<SysPlatformUser> sysPlatformUserList = QSysPlatformUser.sysPlatformUser
-                .select(QSysPlatformUser.sysPlatformUser.fieldContainer())
-                .where(QSysPlatformUser.account.eq(":account").or(QSysPlatformUser.tel.eq$(mobile)))
-                .execute(ImmutableMap.of("account", account));
-        AtomicReference<Boolean> hadAccount = new AtomicReference<>(false);
-        AtomicReference<Boolean> hadMobile = new AtomicReference<>(false);
-        uemUserList.forEach(uemUser -> {
-            if (account.equals(uemUser.getAccount())){
-                hadAccount.set(true);
-            }
-            if (mobile.equals(uemUser.getMobile())){
-                hadMobile.set(true);
-            }
-        });
-        sysPlatformUserList.forEach(sysPlatformUser -> {
-            if (account.equals(sysPlatformUser.getAccount())) {
-                hadAccount.set(true);
-            }
-            if (mobile.equals(sysPlatformUser.getTel())) {
-                hadMobile.set(true);
-            }
-        });
-
-        if (Boolean.TRUE.equals(hadMobile.get())) {
-            return CommonResult.getFaildResultData("该手机号已经被注册！");
-        }
-        if (Boolean.TRUE.equals(hadAccount.get())) {
-            return CommonResult.getFaildResultData("该用户名已存在，请重新输入！");
-        }
-        if (StringUtils.isEmpty(authCode)) {
-            return CommonResult.getFaildResultData("请输入验证码");
-        }
-        //对比验证码是否失效或者错误验证码
-        String redisAuthCode = sassRedisInterface.get(redisKeyPrefixAuthCode+mobile + 1);
-        if (!uemUserDto.getAuthCodeFlag()) {
-            return CommonResult.getFaildResultData("请先获取验证码");
-        }
-        if(StringUtils.isEmpty(redisAuthCode)){
-            return CommonResult.getFaildResultData("验证码已过期，请重新获取");
-        }
-        if(!authCode.equals(redisAuthCode)){
-            return CommonResult.getFaildResultData("验证码输入错误，请重新获取");
-        }
-        try {
-            String decPassword = AES128Util.decrypt(password, aesSecretKey);
-            if (!PasswordUtils.matchersPassword(decPassword)) {
-                return CommonResult.getFaildResultData(NOT_SECURITY_PROMPT);
-            }
-            password = MD5EnCodeUtils.MD5EnCode(decPassword).substring(8, 24);
-        } catch (Exception e) {
-//            e.printStackTrace();
-            return CommonResult.getFaildResultData(DECODE_FAIL_PROMPT);
-        }
-        UemUser uemUser = new UemUser();
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        uemUser.setStaffDutyCode(staffDutyCode);
-        uemUser.setAccount(account);
-        uemUser.setMobile(mobile);
-        // 密码二次加密
-        password = MD5EnCodeUtils.MD5EnCode(password);
-        uemUser.setPassword(password);
-        uemUser.setSource(GlobalEnum.UserSource.REGISTER.getCode());
-        uemUser.setUserType(CodeFinal.USER_TYPE_ZERO);
-        uemUser.setIsValid(true);
-        uemUser.setInvalidTime(new Date());
-        uemUser.setIsAgreemeent(isAgreemeent);
-        // 获取来源应用
-        Long oriApplicationId = MessageUtil.getOriApplicationId();
-        // 来源应用不存在时，获取账号系统应id
-        if (Objects.isNull(oriApplicationId)) {
-            oriApplicationId = MessageUtil.getApplicationId();
-        }
-        uemUser.setOriApplication(oriApplicationId);
-        QUemUser.uemUser.save(uemUser);
-        sassRedisInterface.del(redisKeyPrefixAuthCode+mobile + 1);
-        //发送短信通知
-        msgSendService.registeSuccessSendMsg(uemUser.getAccount(),uemUser.getMobile());
+//        //用户名
+//        String account = uemUserDto.getAccount();
+//        // 岗位代码
+//        String staffDutyCode = uemUserDto.getStaffDutyCode();
+//        //手机号
+//        String mobile = uemUserDto.getMobile();
+//        //密码
+//        String password = uemUserDto.getPassword();
+//        //验证码
+//        String authCode = uemUserDto.getAuthCode();
+//        //是否同意协议(0不同意，1同意)
+//        Boolean isAgreemeent = uemUserDto.getIsAgreemeent();
+//
+//        //判断用户是否使用过
+//        List<UemUser> uemUserList = QUemUser.uemUser
+//                .select(QUemUser.uemUser.fieldContainer())
+//                .where(QUemUser.account.eq(":account").or(QUemUser.mobile.eq$(mobile)))
+//                .execute(ImmutableMap.of("account", account));
+//        //客服表
+//        List<SysPlatformUser> sysPlatformUserList = QSysPlatformUser.sysPlatformUser
+//                .select(QSysPlatformUser.sysPlatformUser.fieldContainer())
+//                .where(QSysPlatformUser.account.eq(":account").or(QSysPlatformUser.tel.eq$(mobile)))
+//                .execute(ImmutableMap.of("account", account));
+//        AtomicReference<Boolean> hadAccount = new AtomicReference<>(false);
+//        AtomicReference<Boolean> hadMobile = new AtomicReference<>(false);
+//        uemUserList.forEach(uemUser -> {
+//            if (account.equals(uemUser.getAccount())){
+//                hadAccount.set(true);
+//            }
+//            if (mobile.equals(uemUser.getMobile())){
+//                hadMobile.set(true);
+//            }
+//        });
+//        sysPlatformUserList.forEach(sysPlatformUser -> {
+//            if (account.equals(sysPlatformUser.getAccount())) {
+//                hadAccount.set(true);
+//            }
+//            if (mobile.equals(sysPlatformUser.getTel())) {
+//                hadMobile.set(true);
+//            }
+//        });
+//
+//        if (Boolean.TRUE.equals(hadMobile.get())) {
+//            return CommonResult.getFaildResultData("该手机号已经被注册！");
+//        }
+//        if (Boolean.TRUE.equals(hadAccount.get())) {
+//            return CommonResult.getFaildResultData("该用户名已存在，请重新输入！");
+//        }
+//        if (StringUtils.isEmpty(authCode)) {
+//            return CommonResult.getFaildResultData("请输入验证码");
+//        }
+//        //对比验证码是否失效或者错误验证码
+//        String redisAuthCode = sassRedisInterface.get(redisKeyPrefixAuthCode+mobile + 1);
+//        if (!uemUserDto.getAuthCodeFlag()) {
+//            return CommonResult.getFaildResultData("请先获取验证码");
+//        }
+//        if(StringUtils.isEmpty(redisAuthCode)){
+//            return CommonResult.getFaildResultData("验证码已过期，请重新获取");
+//        }
+//        if(!authCode.equals(redisAuthCode)){
+//            return CommonResult.getFaildResultData("验证码输入错误，请重新获取");
+//        }
+//        try {
+//            String decPassword = AES128Util.decrypt(password, aesSecretKey);
+//            if (!PasswordUtils.matchersPassword(decPassword)) {
+//                return CommonResult.getFaildResultData(NOT_SECURITY_PROMPT);
+//            }
+//            password = MD5EnCodeUtils.MD5EnCode(decPassword).substring(8, 24);
+//        } catch (Exception e) {
+////            e.printStackTrace();
+//            return CommonResult.getFaildResultData(DECODE_FAIL_PROMPT);
+//        }
+//        UemUser uemUser = new UemUser();
+//        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+//        uemUser.setStaffDutyCode(staffDutyCode);
+//        uemUser.setAccount(account);
+//        uemUser.setMobile(mobile);
+//        // 密码二次加密
+//        password = MD5EnCodeUtils.MD5EnCode(password);
+//        uemUser.setPassword(password);
+//        uemUser.setSource(GlobalEnum.UserSource.REGISTER.getCode());
+//        uemUser.setUserType(CodeFinal.USER_TYPE_ZERO);
+//        uemUser.setIsValid(true);
+//        uemUser.setInvalidTime(new Date());
+//        uemUser.setIsAgreemeent(isAgreemeent);
+//        // 获取来源应用
+//        Long oriApplicationId = MessageUtil.getOriApplicationId();
+//        // 来源应用不存在时，获取账号系统应id
+//        if (Objects.isNull(oriApplicationId)) {
+//            oriApplicationId = MessageUtil.getApplicationId();
+//        }
+//        uemUser.setOriApplication(oriApplicationId);
+//        QUemUser.uemUser.save(uemUser);
+//        sassRedisInterface.del(redisKeyPrefixAuthCode+mobile + 1);
+//        //发送短信通知
+//        msgSendService.registeSuccessSendMsg(uemUser.getAccount(),uemUser.getMobile());
         return CommonResult.getSuccessResultData("注册成功");
     }
 
@@ -796,24 +793,24 @@ public class UemUserServiceImpl implements UemUserService {
      * @date 2021/5/7 上午10:19
      */
     private String passwordValidate(UemUserDto uemUserDto, UemUser uemUser) {
-        if (uemUserDto.getPassword() != null) {
-            String password = uemUserDto.getPassword();
-            try {
-                String decPassword = AES128Util.decrypt(password, aesSecretKey);
-                if (!PasswordUtils.matchersPassword(decPassword)) {
-                    return NOT_SECURITY_PROMPT;
-                }
-                password = MD5EnCodeUtils.MD5EnCode(decPassword).substring(8, 24);
-            } catch (Exception e) {
-                return DECODE_FAIL_PROMPT;
-            }
-            // 二次加密
-            password = MD5EnCodeUtils.MD5EnCode(password);
-            if (password.equals(uemUser.getPassword())) {
-                return "新密码与原密码一致，修改失败";
-            }
-            uemUser.setPassword(password);
-        }
+//        if (uemUserDto.getPassword() != null) {
+//            String password = uemUserDto.getPassword();
+//            try {
+//                String decPassword = AES128Util.decrypt(password, aesSecretKey);
+//                if (!PasswordUtils.matchersPassword(decPassword)) {
+//                    return NOT_SECURITY_PROMPT;
+//                }
+//                password = MD5EnCodeUtils.MD5EnCode(decPassword).substring(8, 24);
+//            } catch (Exception e) {
+//                return DECODE_FAIL_PROMPT;
+//            }
+//            // 二次加密
+//            password = MD5EnCodeUtils.MD5EnCode(password);
+//            if (password.equals(uemUser.getPassword())) {
+//                return "新密码与原密码一致，修改失败";
+//            }
+//            uemUser.setPassword(password);
+//        }
         return null;
     }
 
