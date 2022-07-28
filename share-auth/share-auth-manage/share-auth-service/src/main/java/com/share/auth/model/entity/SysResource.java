@@ -131,9 +131,9 @@ public class SysResource extends BaseModel implements Serializable {
     @Column(name = "resource_title")
     private String resourceTitle;
 
-    /*@Column(name = "resource_title")
-    private String parentName;*/
-
+ /*   @Column(name = "parent_name")
+    private String parentName;
+*/
 
     /**
      * 资源类型（1：模块/页面，2按钮，3接口）

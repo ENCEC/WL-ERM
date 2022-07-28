@@ -81,7 +81,7 @@ public class SysResourceDTO implements Serializable {
     private String resourceTitle;
 
     /**父级菜单标题*/
-    private String parentName;
+    private String parentResourceTitle;
 
     /**资源类型（1：模块/页面，2按钮，3接口）*/
     private Integer resourceType;

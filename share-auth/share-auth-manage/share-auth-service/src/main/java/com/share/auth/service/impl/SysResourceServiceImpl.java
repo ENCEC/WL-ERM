@@ -508,11 +508,10 @@ public class SysResourceServiceImpl implements SysResourceService {
         SysResource sysResource = new SysResource();
         String resourceTitle = sysResourceDTO.getResourceTitle();
         String resourceUrl = sysResourceDTO.getResourceUrl();
-        // Long application = sysResourceDTO.getSysApplicationId();
         Integer resourceSort = sysResourceDTO.getResourceSort();
         String resourceRemark = sysResourceDTO.getResourceRemark();
         Long sysResourceId = sysResourceDTO.getSysResourceId();
-        Long resourcePid = sysResource.getResourcePid();
+        Long resourcePid = sysResourceDTO.getResourcePid();
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         sysResource.setSysApplicationId(1L);
         sysResource.setIsValid(true);
@@ -522,6 +521,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         sysResource.setResourceUrl(resourceUrl);
         sysResource.setResourceSort(resourceSort);
         sysResource.setResourceRemark(resourceRemark);
+        sysResource.setResourcePid(resourcePid);
         QSysResource.sysResource.save(sysResource);
         return CommonResult.getSuccessResultData("新增成功");
     }
@@ -535,8 +535,14 @@ public class SysResourceServiceImpl implements SysResourceService {
     public Page<SysResourceDTO> queryResourceByPage(SysResourceDTO sysResourceDTO) {
         Integer currentPage = sysResourceDTO.getCurrentPage();
         Integer pageSize = sysResourceDTO.getPageSize();
-        return QSysResource.sysResource.select(
+        return DSContext.customization("WL-ERM_queryResourceByPage").select()
+                .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class)
+                .sorting()
+                .execute(sysResourceDTO);
+      /*  return QSysResource.sysResource.select(
                         QSysResource.sysResourceId,
+                        QSysResource.sysResource.chain(QSysResource.resourceTitle).as("parentName"),
                         QSysResource.resourceTitle,
                         QSysResource.resourcePid,
                         QSysResource.creatorName,
@@ -547,7 +553,8 @@ public class SysResourceServiceImpl implements SysResourceService {
                 where(QSysResource.resourceTitle._like$_(sysResourceDTO.getResourceTitle())
                         .and(QSysResource.isValid.eq(":isValid")))
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
-                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class).execute(sysResourceDTO);
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class)
+                .sorting(QSysResource.resourceSort.asc()).execute(sysResourceDTO);*/
     }
 
     /**
@@ -580,7 +587,7 @@ public class SysResourceServiceImpl implements SysResourceService {
     @Override
     public ResultHelper<Object> updateResource(SysResourceDTO sysResourceDTO) {
         Long resourceId = sysResourceDTO.getSysResourceId();
-        Boolean isValid = sysResourceDTO.getIsValid();
+        // Boolean isValid = sysResourceDTO.getIsValid();
         String resourceTitle = sysResourceDTO.getResourceTitle();
         String resourceUrl = sysResourceDTO.getResourceUrl();
         Integer resourceSort = sysResourceDTO.getResourceSort();
@@ -588,7 +595,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         SysResource sysResource = QSysResource.sysResource.selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         sysResource.setSysResourceId(resourceId);
-        sysResource.setIsValid(isValid);
+        // sysResource.setIsValid(isValid);
         sysResource.setResourceTitle(resourceTitle);
         sysResource.setResourceUrl(resourceUrl);
         sysResource.setResourceSort(resourceSort);
