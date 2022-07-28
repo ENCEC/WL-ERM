@@ -33,27 +33,13 @@ public class SysTechnicalTitleController {
     @Autowired
     private SysTechnicalTitleService sysTechnicalTitleService;
 
-    /**
-     * 分页查询全部岗位职称
-     * @param sysTechnicalTitleAndPostVO
-     * @return
-     */
-    @ApiOperation("获取全部的岗位职称")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "currentPage", value = "分页页数", dataTypeClass = Integer.class, paramType = "body"),
-            @ApiImplicitParam(name = "pageSize", value = "分页条数", dataTypeClass = Integer.class, paramType = "body"),
-    })
-    @GetMapping ("/queryByPageAll")
-    public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
-       return sysTechnicalTitleService.queryByPageAll(sysTechnicalTitleAndPostVO);
-    }
 
     /**
-     * 通过条件分页查询岗位职称
+     * 查询岗位职称
      * @param sysTechnicalTitleAndPostVO
      * @return
      */
-    @ApiOperation("根据职称名称、所属岗位或启禁用状态查询岗位职称")
+    @ApiOperation("根据职称名称、所属岗位或启禁用状态查询岗位职称或者全部查询")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "currentPage", value = "分页页数", dataTypeClass = Integer.class, paramType = "body"),
             @ApiImplicitParam(name = "pageSize", value = "分页条数", dataTypeClass = Integer.class, paramType = "body"),
