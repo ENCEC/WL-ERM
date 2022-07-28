@@ -2,6 +2,10 @@ package com.share.auth.model.vo;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gillion.ec.core.utils.Long2String;
+import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -20,6 +24,9 @@ import java.util.List;
 @Data
 public class SysTechnicalTitleAndPostVO implements Serializable {
     /**岗位职称ID*/
+
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long technicalTitleId;
 
     /**创建者*/
@@ -32,6 +39,8 @@ public class SysTechnicalTitleAndPostVO implements Serializable {
     private Date createTime;
 
     /**岗位ID*/
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long postId;
 
     /**备注*/
