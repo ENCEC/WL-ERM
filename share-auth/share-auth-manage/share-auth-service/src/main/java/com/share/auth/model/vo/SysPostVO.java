@@ -2,12 +2,11 @@ package com.share.auth.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gillion.ds.entity.base.BaseModel;
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
-import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
-import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -17,13 +16,12 @@ import java.util.Date;
  */
 
 @Data
-public class SysPostVO implements Serializable {
+public class SysPostVO extends BaseModel implements Serializable {
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long postId;
 
     /**创建者*/
-    @Column(name = "create_by")
     private String createBy;
 
     /**创建时间*/
