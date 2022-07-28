@@ -2,7 +2,6 @@ package com.share.auth.service;
 
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
 import com.share.support.result.ResultHelper;
 
@@ -16,14 +15,7 @@ import com.share.support.result.ResultHelper;
  **/
 public interface SysTechnicalTitleService {
     /**
-     * 分页查询全部岗位职称
-     * @param sysTechnicalTitleAndPostVO
-     * @return
-     */
-    ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
-
-    /**
-     * 通过条件分页查询岗位职称
+     * 查询岗位职称
      * @param sysTechnicalTitleAndPostVO
      * @return
      */
