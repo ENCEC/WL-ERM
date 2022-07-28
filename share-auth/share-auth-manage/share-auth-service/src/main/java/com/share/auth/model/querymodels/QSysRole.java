@@ -5,16 +5,8 @@ import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.SysRole;
 
-import java.lang.Boolean;
-import java.lang.Integer;
-import java.lang.Long;
-import java.lang.String;
 import java.util.Date;
 
-import com.share.auth.model.entity.SysApplication;
-import com.share.auth.model.entity.UemCompanyRole;
-import com.share.auth.model.querymodels.QSysApplication;
-import com.share.auth.model.querymodels.QUemCompanyRole;
 
 /**
 * @author daoServiceGenerator
@@ -27,6 +19,8 @@ public class QSysRole extends BaseModelExpression<SysRole, Long> {
     public static final FieldExpression<Date> createTime = sysRole.fieldOf("createTime", Date.class);
     public static final FieldExpression<Long> creatorId = sysRole.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = sysRole.fieldOf("creatorName", String.class);
+    public static final FieldExpression<String> deptCode = sysRole.fieldOf("deptCode", String.class);
+    public static final FieldExpression<String> deptName = sysRole.fieldOf("deptName", String.class);
     public static final FieldExpression<Date> invalidTime = sysRole.fieldOf("invalidTime", Date.class);
     public static final FieldExpression<Boolean> isDefault = sysRole.fieldOf("isDefault", Boolean.class);
     public static final FieldExpression<Boolean> isValid = sysRole.fieldOf("isValid", Boolean.class);
@@ -42,9 +36,8 @@ public class QSysRole extends BaseModelExpression<SysRole, Long> {
     public static final FieldExpression<Long> sysApplicationId = sysRole.fieldOf("sysApplicationId", Long.class);
     public static final FieldExpression<Long> sysRoleId = sysRole.fieldOf("sysRoleId", Long.class);
     public static final FieldExpression<Long> topRoleId = sysRole.fieldOf("topRoleId", Long.class);
+    public static final FieldExpression<Long> uemDeptId = sysRole.fieldOf("uemDeptId", Long.class);
 
-    public static final BaseModelExpression<UemCompanyRole, Long> uemCompanyRole = new QUemCompanyRole(sysRole, "uemCompanyRole");
-    public static final BaseModelExpression<SysApplication, Long> sysApplication = new QSysApplication(sysRole, "sysApplication");
 
     public QSysRole() {
         super("SysRole", SysRole.class);

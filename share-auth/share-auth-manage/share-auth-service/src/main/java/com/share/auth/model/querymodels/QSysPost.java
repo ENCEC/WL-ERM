@@ -15,7 +15,6 @@ import java.util.Date;
 * @author daoServiceGenerator
 * @version 1.0.0.0
 */
-@SuppressWarnings({"AlibabaConstantFieldShouldBeUpperCase", "unused", "AlibabaClassNamingShouldBeCamel"})
 public class QSysPost extends BaseModelExpression<SysPost, Long> {
 
     public static final BaseModelExpression<SysPost, Long> sysPost = new QSysPost();

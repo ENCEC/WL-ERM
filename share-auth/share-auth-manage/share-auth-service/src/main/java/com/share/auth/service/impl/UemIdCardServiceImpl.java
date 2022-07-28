@@ -13,7 +13,10 @@ import com.share.auth.domain.QueryUserIdCardDTO;
 import com.share.auth.domain.UemCompanyDto;
 import com.share.auth.domain.UemIdCardDto;
 import com.share.auth.enums.GlobalEnum;
-import com.share.auth.model.entity.*;
+import com.share.auth.model.entity.SysPlatformUser;
+import com.share.auth.model.entity.UemCompany;
+import com.share.auth.model.entity.UemIdCard;
+import com.share.auth.model.entity.UemUser;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.model.vo.UserIdCardQueryVO;
 import com.share.auth.service.MsgSendService;
@@ -33,7 +36,6 @@ import com.share.message.domain.UserVO;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,49 +117,50 @@ public class UemIdCardServiceImpl implements UemIdCardService {
     @Override
     public ResultHelper<Object> saveUemIdCard(UemIdCardDto uemIdCardDto) {
 
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
-        if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
-            return CommonResult.getFaildResultData("无法获取当前登录信息，请重新登录");
-        }
-        //名字
-        String name = uemIdCardDto.getName();
-        Boolean sex = uemIdCardDto.getSex();
-        //身份证
-        String idCard = uemIdCardDto.getIdCard();
-        //用户Id
-        Long uemUserId = userInfoModel.getUemUserId();
-        //身份证正面
-        String cardPositiveUrlId = uemIdCardDto.getCardPositiveUrlId();
-        //身份证反面
-        String cardBackUrlId = uemIdCardDto.getCardBackUrlId();
-        UemIdCard uemIdCard = new UemIdCard();
-        uemIdCard.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        uemIdCard.setUemUserId(uemUserId);
-        uemIdCard.setName(name);
-        uemIdCard.setSex(sex);
-        uemIdCard.setIdCard(idCard);
-        uemIdCard.setAuditStatus(CodeFinal.AUDIT_STATUS_ZERO);
-        if (!StringUtils.isEmpty(cardPositiveUrlId)) {
-            uemIdCard.setCardPositiveUrlId(cardPositiveUrlId);
-        }
-        if (!StringUtils.isEmpty(cardBackUrlId)) {
-            uemIdCard.setCardBackUrlId(cardBackUrlId);
-        }
-
-        int saveCount = QUemIdCard.uemIdCard.save(uemIdCard);
-        log.info("uemIdCardId" + uemIdCard.getUemIdCardId());
-
-        int updateCount = QUemUser.uemUser.update(QUemUser.name, QUemUser.sex, QUemUser.idCard, QUemUser.auditStatus, QUemUser.uemIdCardId, QUemUser.cardPositiveUrlId, QUemUser.cardBackUrlId)
-                .where(QUemUser.uemUserId.eq(":uemUserId"))
-                .execute(name, sex, idCard, CodeFinal.AUDIT_STATUS_ZERO, uemIdCard.getUemIdCardId(), cardPositiveUrlId, cardBackUrlId, uemUserId);
-
-        if (saveCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM && updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
-            //短信通知平台客服
-            msgSendService.notifyAuditRealNameAuth();
-            return CommonResult.getSuccessResultData("实名认证审核中...");
-        } else {
-            return CommonResult.getFaildResultData("实名认证失败");
-        }
+//        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+//        if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
+//            return CommonResult.getFaildResultData("无法获取当前登录信息，请重新登录");
+//        }
+//        //名字
+//        String name = uemIdCardDto.getName();
+//        Boolean sex = uemIdCardDto.getSex();
+//        //身份证
+//        String idCard = uemIdCardDto.getIdCard();
+//        //用户Id
+//        Long uemUserId = userInfoModel.getUemUserId();
+//        //身份证正面
+//        String cardPositiveUrlId = uemIdCardDto.getCardPositiveUrlId();
+//        //身份证反面
+//        String cardBackUrlId = uemIdCardDto.getCardBackUrlId();
+//        UemIdCard uemIdCard = new UemIdCard();
+//        uemIdCard.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+//        uemIdCard.setUemUserId(uemUserId);
+//        uemIdCard.setName(name);
+//        uemIdCard.setSex(sex);
+//        uemIdCard.setIdCard(idCard);
+//        uemIdCard.setAuditStatus(CodeFinal.AUDIT_STATUS_ZERO);
+//        if (!StringUtils.isEmpty(cardPositiveUrlId)) {
+//            uemIdCard.setCardPositiveUrlId(cardPositiveUrlId);
+//        }
+//        if (!StringUtils.isEmpty(cardBackUrlId)) {
+//            uemIdCard.setCardBackUrlId(cardBackUrlId);
+//        }
+//
+//        int saveCount = QUemIdCard.uemIdCard.save(uemIdCard);
+//        log.info("uemIdCardId" + uemIdCard.getUemIdCardId());
+//
+//        int updateCount = QUemUser.uemUser.update(QUemUser.name, QUemUser.sex, QUemUser.idCard, QUemUser.auditStatus, QUemUser.uemIdCardId, QUemUser.cardPositiveUrlId, QUemUser.cardBackUrlId)
+//                .where(QUemUser.uemUserId.eq(":uemUserId"))
+//                .execute(name, sex, idCard, CodeFinal.AUDIT_STATUS_ZERO, uemIdCard.getUemIdCardId(), cardPositiveUrlId, cardBackUrlId, uemUserId);
+//
+//        if (saveCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM && updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+//            //短信通知平台客服
+//            msgSendService.notifyAuditRealNameAuth();
+//            return CommonResult.getSuccessResultData("实名认证审核中...");
+//        } else {
+//            return CommonResult.getFaildResultData("实名认证失败");
+//        }
+        return null;
     }
 
 
@@ -170,35 +173,35 @@ public class UemIdCardServiceImpl implements UemIdCardService {
      */
     @Override
     public ResultHelper<Map<String, Object>> saveUemCompany(UemCompanyDto uemCompanyDto) {
-        //获取当前用户信息
-        AuthUserInfoModel user = (AuthUserInfoModel) userService.getCurrentLoginUser();
-        // 绑定的企业
-        Long blindCompannyBefore = user.getBlindCompanny();
-        //用户表ID
-        Long uemUserId = user.getUemUserId();
-        //企业中文名称
-        String companyNameCn = uemCompanyDto.getCompanyNameCn();
-        if (StringUtils.isEmpty(uemCompanyDto.getFileUrlId())) {
-            return CommonResult.getFaildResultData("企业证书不能为空");
-        }
-        if (Objects.isNull(uemUserId)) {
-            return CommonResult.getFaildResultData("用户表ID不能为空");
-        }
-        // 保存公司
-        UemCompany uemCompany = this.setUemCompanyInfo(uemCompanyDto);
-        uemCompany.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        int savedUemCompany = QUemCompany.uemCompany.save(uemCompany);
-        log.info(uemCompany.getUemCompanyId().toString());
-        QUemCompany.uemCompany.selective(QUemCompany.uemCompanyHistoryId).execute(uemCompany);
-
-        // 绑定公司
-        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
-
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUser.setBlindCompanny(uemCompany.getUemCompanyId());
-        uemUser.setBlindCompannyTime(new Date());
-        uemUser.setUemUserId(uemUserId);
-        QUemUser.uemUser.save(uemUser);
+//        //获取当前用户信息
+//        AuthUserInfoModel user = (AuthUserInfoModel) userService.getCurrentLoginUser();
+//        // 绑定的企业
+//        Long blindCompannyBefore = user.getBlindCompanny();
+//        //用户表ID
+//        Long uemUserId = user.getUemUserId();
+//        //企业中文名称
+//        String companyNameCn = uemCompanyDto.getCompanyNameCn();
+//        if (StringUtils.isEmpty(uemCompanyDto.getFileUrlId())) {
+//            return CommonResult.getFaildResultData("企业证书不能为空");
+//        }
+//        if (Objects.isNull(uemUserId)) {
+//            return CommonResult.getFaildResultData("用户表ID不能为空");
+//        }
+//        // 保存公司
+//        UemCompany uemCompany = this.setUemCompanyInfo(uemCompanyDto);
+//        uemCompany.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+//        int savedUemCompany = QUemCompany.uemCompany.save(uemCompany);
+//        log.info(uemCompany.getUemCompanyId().toString());
+//        QUemCompany.uemCompany.selective(QUemCompany.uemCompanyHistoryId).execute(uemCompany);
+//
+//        // 绑定公司
+//        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
+//
+//        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+//        uemUser.setBlindCompanny(uemCompany.getUemCompanyId());
+//        uemUser.setBlindCompannyTime(new Date());
+//        uemUser.setUemUserId(uemUserId);
+//        QUemUser.uemUser.save(uemUser);
 
         return CommonResult.getFaildResultData("提交企业失败");
     }
@@ -668,7 +671,7 @@ public class UemIdCardServiceImpl implements UemIdCardService {
         uemUser.setAuditTime(date);
         uemUser.setAuditor(user.getUemUserId());
         uemUser.setAuditStatus(queryUserIdCardDTO.getAuditStatus());
-        uemUser.setUemIdCardId(uemIdCard.getUemIdCardId());
+//        uemUser.setUemIdCardId(uemIdCard.getUemIdCardId());
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         // 短信发送vo
         MsgSmsApiVO msgSmsApiVO = new MsgSmsApiVO();
@@ -685,7 +688,7 @@ public class UemIdCardServiceImpl implements UemIdCardService {
             }
             msgSmsApiVO.setSmsTemplateCode(reviewSuccessMsgTemplate);
         } else {
-            uemUser.setUemIdCardId(null);
+//            uemUser.setUemIdCardId(null);
             uemUser.setName(null);
             uemUser.setIdCard(null);
             uemUser.setIsDisplayed(null);

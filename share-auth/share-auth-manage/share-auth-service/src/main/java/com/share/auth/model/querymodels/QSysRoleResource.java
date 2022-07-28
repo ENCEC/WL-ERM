@@ -3,10 +3,10 @@ package com.share.auth.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
-import com.share.auth.model.entity.SysResource;
 import com.share.auth.model.entity.SysRoleResource;
 
 import java.util.Date;
+
 
 /**
 * @author daoServiceGenerator
@@ -27,7 +27,6 @@ public class QSysRoleResource extends BaseModelExpression<SysRoleResource, Long>
     public static final FieldExpression<Long> sysRoleId = sysRoleResource.fieldOf("sysRoleId", Long.class);
     public static final FieldExpression<Long> sysRoleResourceId = sysRoleResource.fieldOf("sysRoleResourceId", Long.class);
 
-    public static final BaseModelExpression<SysResource, Long> sysResource = new QSysResource(sysRoleResource, "sysResource");
 
     public QSysRoleResource() {
         super("SysRoleResource", SysRoleResource.class);

@@ -9,7 +9,10 @@ import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -35,6 +38,10 @@ private static final long serialVersionUID=1;
 
     @Column(name = "component")
     private String component;
+
+    /**组件名称*/
+    @Column(name = "component_name")
+    private String componentName;
 
     /**创建时间*/
     @Column(name = "create_time")
@@ -74,7 +81,6 @@ private static final long serialVersionUID=1;
 
     /**版本号*/
     @Column(name = "record_version")
-    @Version
     private Integer recordVersion;
 
     /**菜单图标*/
@@ -112,11 +118,5 @@ private static final long serialVersionUID=1;
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long sysApplicationId;
-
-    /**
-     * 组件名称
-     */
-    @Column(name = "component_name")
-    private String componentName;
 
 }

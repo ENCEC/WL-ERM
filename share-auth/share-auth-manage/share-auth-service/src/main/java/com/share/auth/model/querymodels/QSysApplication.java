@@ -7,6 +7,7 @@ import com.share.auth.model.entity.SysApplication;
 
 import java.util.Date;
 
+
 /**
 * @author daoServiceGenerator
 * @version 1.0.0.0
@@ -34,6 +35,7 @@ public class QSysApplication extends BaseModelExpression<SysApplication, Long> {
     public static final FieldExpression<Integer> recordVersion = sysApplication.fieldOf("recordVersion", Integer.class);
     public static final FieldExpression<String> relatedEnterprise = sysApplication.fieldOf("relatedEnterprise", String.class);
     public static final FieldExpression<Long> sysApplicationId = sysApplication.fieldOf("sysApplicationId", Long.class);
+
 
     public QSysApplication() {
         super("SysApplication", SysApplication.class);

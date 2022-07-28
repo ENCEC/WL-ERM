@@ -3,10 +3,7 @@ package com.share.auth.controller;
 import com.gillion.saas.redis.SassRedisInterface;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.UemUserDto;
-import com.share.auth.model.entity.UemCompany;
 import com.share.auth.model.entity.UemUser;
-import com.share.auth.model.vo.UserAndCompanyVo;
-import com.share.support.model.User;
 import com.share.auth.service.UemUserService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -39,10 +36,13 @@ public class UemUserController {
 
     @Autowired
     private UemUserService uemUserService;
+
     @Value("${web_domain}")
     private String webDomain;
+
     @Autowired
     private SassRedisInterface redisInterface;
+
     /**忘记密码键**/
     public static final String FORGET_KEY = "forget_random";
 
@@ -61,7 +61,7 @@ public class UemUserController {
     })
     @GetMapping("/getAuthCode")
     @ResponseBody
-    public ResultHelper<Object> getAuthCode(@RequestParam(required = true) String telephone, @RequestParam(required = true) String sign, @RequestParam(required = true) String code) {
+    public ResultHelper<?> getAuthCode(@RequestParam(required = true) String telephone, @RequestParam(required = true) String sign, @RequestParam(required = true) String code) {
         if (Objects.isNull(code)) {
             return CommonResult.getFaildResultData();
         }
@@ -134,24 +134,6 @@ public class UemUserController {
         return uemUserService.findPasswordByMail(email);
     }
 
-
-    /**
-     * 根据企业Id获取在调度系统有角色的用户信息
-     *
-     * @param companyId 企业ID
-     * @return List<UemUser>
-     * @author xrp
-     */
-//    @ApiOperation("根据企业Id获取用户信息")
-//    @ApiImplicitParam(name = "companyId", value = "企业ID", required = true, dataType = "String[]", paramType = "queryUemUserByCompanyId")
-//    @PostMapping("/queryUemUserByCompanyId")
-//    @ResponseBody
-//    public ResultHelper<List<UemUser>> queryUemUserByCompanyId(@RequestParam String[] companyId) {
-//        List<UemUser> uemUserDtoList = uemUserService.queryUemUserByCompanyId(companyId);
-//        return CommonResult.getSuccessResultData(uemUserDtoList);
-//    }
-
-
     /**
      * 根据用户Id获取用户信息
      *
@@ -166,41 +148,6 @@ public class UemUserController {
     public ResultHelper<UemUser> queryUemUserByUserId(@RequestParam String uemUserId) {
         List<UemUser> uemUserDtoList = uemUserService.queryUemUserByUserId(uemUserId);
         return CommonResult.getSuccessResultData(uemUserDtoList);
-    }
-
-    /**
-     * @Author:chenxf
-     * @Description: Feign接口, 根据用户id获取用户信息接口，根据用户id和clientId获取用户角色信息
-     * @Date: 15:55 2020/12/10
-     * @Param: [uemUserId, clientId]
-     * @Return:com.share.auth.domain.User
-     */
-    @ApiOperation("根据用户id获取用户信息接口，根据用户id和clientId获取用户角色信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "uid", value = "用户id", required = true, dataType = "Long", paramType = "getUserAllInfo"),
-            @ApiImplicitParam(name = "clientId", value = "应用clientId", required = false, dataType = "String", paramType = "getUserAllInfo")
-    })
-    @GetMapping(value = "/getUserAllInfo")
-    @ResponseBody
-    public User getUserAllInfo(@RequestParam(value = "uid") Long uid, @RequestParam(value = "clientId", required = false) String clientId) {
-        return uemUserService.getUserAllInfo(uid, clientId);
-    }
-
-
-    /**
-     * 根据物流交换代码返回公司信息
-     *
-     * @param companyCode 物流交换代码
-     * @return List<UemCompany>
-     * @author xrp
-     */
-    @ApiOperation("根据物流交换代码返回公司信息")
-    @ApiImplicitParam(name = "companyCode", value = "物流交换代码", required = true, dataType = "String", paramType = "queryUemUserCompany")
-    @GetMapping("/queryUemUserCompany")
-    @ResponseBody
-    public ResultHelper<List<UemCompany>> queryUemUserCompany(@RequestParam(value = "companyCode") String companyCode) {
-        List<UemCompany> uemCompanyList = uemUserService.queryUemUserCompany(companyCode);
-        return CommonResult.getSuccessResultData(uemCompanyList);
     }
 
     /**
@@ -284,53 +231,5 @@ public class UemUserController {
         }
         return userDtoResultHelper;
     }
-
-    /**
-     * @Author:chenxf
-     * @Description: 根据调度系统角色code查询用户
-     * @Date: 16:13 2021/2/3
-     * @Param: [roleCode]
-     * @Return:java.util.List<com.share.support.model.User>
-     */
-//    @ApiOperation("根据调度系统角色code查询用户")
-//    @ApiImplicitParam(name = "roleCode", value = "角色编码", required = true, dataType = "String", paramType = "queryUserByRoleCode")
-//    @GetMapping(value = "/queryUserByRoleCode")
-//    @ResponseBody
-//    public List<User> queryUserByRoleCode(@RequestParam(value = "roleCode") String roleCode) {
-//        return uemUserService.queryUserByRoleCode(roleCode);
-//    }
-
-    /**
-     * 根据承运商ID集合返回用户和承运商信息（一般调度）
-     *
-     * @param uemCompanyIdList 企业ID集合
-     * @return List<UserAndCompanyVo>
-     * @author cxq
-     */
-//    @ApiOperation("根据承运商ID集合返回用户和承运商信息（一般调度）")
-//    @ApiImplicitParam(name = "uemCompanyIdList", value = "企业ID", required = true, dataType = "List<Long>", paramType = "queryUemUserCompanyById")
-//    @GetMapping("/queryUemUserCompanyById")
-//    @ResponseBody
-//    public ResultHelper<List<UserAndCompanyVo>> queryUemUserCompanyById(@RequestParam(value = "uemCompanyIdList") List<Long> uemCompanyIdList) {
-//        List<UserAndCompanyVo> uemCompanyList = uemUserService.queryUemUserCompanyById(uemCompanyIdList);
-//        return CommonResult.getSuccessResultData(uemCompanyList);
-//    }
-
-    /**
-     * 根据用户ID集合返回用户和公司信息
-     *
-     * @param userIdList 用户ID集合
-     * @return List<UserAndCompanyVo>
-     * @author cxq
-     */
-    @ApiOperation("根据用户ID集合返回用户和公司信息")
-    @ApiImplicitParam(name = "userIdList", value = "用户ID集合", required = true, dataType = "List<Long>", paramType = "query")
-    @GetMapping("/queryUemUserCompanyByUserId")
-    @ResponseBody
-    public ResultHelper<List<UserAndCompanyVo>> queryUemUserCompanyByUserId(@RequestParam(value = "userIdList") List<Long> userIdList) {
-        List<UserAndCompanyVo> uemCompanyList = uemUserService.queryUemUserCompanyByUserId(userIdList);
-        return CommonResult.getSuccessResultData(uemCompanyList);
-    }
-
 
 }
