@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.google.common.collect.ImmutableMap;
+import com.share.auth.domain.SysPostDTO;
 import com.share.auth.model.entity.SysPost;
 import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.querymodels.QSysPost;
@@ -26,54 +27,24 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
-    /**
-     * 分页查询全部岗位职称
-     * @param sysTechnicalTitleAndPostVO
-     * @return
-     */
-    @Override
-    public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
-        Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
-                .where(QSysTechnicalTitle.technicalTitleId.goe$(1L))
-                .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
-                .sorting(QSysTechnicalTitle.createTime.desc())
-                .mapperTo(SysTechnicalTitleAndPostVO.class)
-                .execute();
-        return CommonResult.getSuccessResultData(pages);
-    }
 
     /**
      *
-     * 通过条件分页查询岗位职称
+     * 查询岗位职称
      * @param sysTechnicalTitleAndPostVO
      * @return
      */
     @Override
     public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
-        if (!sysTechnicalTitleAndPostVO.getStatus().isEmpty() && !sysTechnicalTitleAndPostVO.getTechnicalName().isEmpty() && !sysTechnicalTitleAndPostVO.getPostName().isEmpty()) {
-            Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
-                    .where(QSysTechnicalTitle.technicalName._like$_(sysTechnicalTitleAndPostVO.getTechnicalName()).and(QSysTechnicalTitle.sysPost.chain(QSysPost.postName).eq$(sysTechnicalTitleAndPostVO.getPostName())).and(QSysTechnicalTitle.status.eq$(sysTechnicalTitleAndPostVO.getStatus())))
-                    .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
-                    .mapperTo(SysTechnicalTitleAndPostVO.class)
-                    .execute();
-            return CommonResult.getSuccessResultData(pages);
-        } else if (sysTechnicalTitleAndPostVO.getStatus().isEmpty() && sysTechnicalTitleAndPostVO.getTechnicalName().isEmpty() && sysTechnicalTitleAndPostVO.getPostName().isEmpty()) {
-            Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
-                    .where(QSysTechnicalTitle.technicalTitleId.goe$(1L))
-                    .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
-                    .sorting(QSysTechnicalTitle.createTime.desc())
-                    .mapperTo(SysTechnicalTitleAndPostVO.class)
-                    .execute();
-            return CommonResult.getSuccessResultData(pages);
-        } else {
-            Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
-                    .where(QSysTechnicalTitle.technicalName._like$_(sysTechnicalTitleAndPostVO.getTechnicalName()).or(QSysTechnicalTitle.sysPost.chain(QSysPost.postName).eq$(sysTechnicalTitleAndPostVO.getPostName())).or(QSysTechnicalTitle.status.eq$(sysTechnicalTitleAndPostVO.getStatus())))
-                    .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
-                    .sorting(QSysTechnicalTitle.createTime.desc())
-                    .mapperTo(SysTechnicalTitleAndPostVO.class)
-                    .execute();
-            return CommonResult.getSuccessResultData(pages);
-        }
+        Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
+                .where(
+                        QSysTechnicalTitle.technicalTitleId.goe$(1L).and(QSysTechnicalTitle.technicalName._like$_(sysTechnicalTitleAndPostVO.getTechnicalName())).and(QSysTechnicalTitle.sysPost.chain(QSysPost.postName).eq$(sysTechnicalTitleAndPostVO.getPostName())).and(QSysTechnicalTitle.status.eq$(sysTechnicalTitleAndPostVO.getStatus())))
+                .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
+                .sorting(QSysTechnicalTitle.createTime.desc())
+                .mapperTo(SysTechnicalTitleAndPostVO.class)
+                .execute();
+
+        return CommonResult.getSuccessResultData(pages);
     }
 
     /**
