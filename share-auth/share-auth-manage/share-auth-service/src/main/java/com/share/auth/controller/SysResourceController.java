@@ -3,7 +3,6 @@ package com.share.auth.controller;
 import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysResourceQueryVO;
-import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.service.SysResourceService;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
@@ -75,7 +74,7 @@ public class SysResourceController {
 
     /**
      * 根据角色ID获取资源列表
-     * @param sysRoleDTO -
+     * @param sysRoleIdList 角色ID列表
      * @return ResultHelper<List<Long>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
@@ -83,8 +82,8 @@ public class SysResourceController {
     @PostMapping("/sysResource/queryResourceByRole")
     @ApiOperation(value = "根据角色ID获取资源列表")
     @ApiImplicitParam(name = "sysRoleId", value = "角色ID", dataTypeClass = Long.class, required = true, paramType = "body")
-    public ResultHelper<List<SysResourceDTO>> queryResourceByRole(@RequestBody SysRoleDTO sysRoleDTO) {
-        return sysResourceService.queryResourceByRole(sysRoleDTO);
+    public ResultHelper<List<SysResourceDTO>> queryResourceByRole(@RequestBody List<Long> sysRoleIdList) {
+        return sysResourceService.queryResourceByRole(sysRoleIdList);
     }
 
     /**
@@ -95,7 +94,7 @@ public class SysResourceController {
      */
     @GetMapping("/sysResource/queryAllValidResource")
     @ApiOperation(value = "获取所有未禁用菜单")
-    public ResultHelper<List<SysResourceDTO>> queryAllValidResource() {
+    public ResultHelper<List<QueryResourceDTO>> queryAllValidResource() {
         return sysResourceService.queryAllValidResource();
     }
 }
