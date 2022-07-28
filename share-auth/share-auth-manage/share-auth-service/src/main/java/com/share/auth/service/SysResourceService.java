@@ -3,7 +3,6 @@ package com.share.auth.service;
 import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysResourceQueryVO;
-import com.share.auth.domain.SysRoleDTO;
 import com.share.support.result.ResultHelper;
 
 import java.util.List;
@@ -57,11 +56,11 @@ public interface SysResourceService {
     /**
      * 根据角色ID获取资源列表
      *
-     * @param sysRoleDTO 角色ID
+     * @param sysRoleIdList 角色ID列表
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
-    ResultHelper<List<SysResourceDTO>> queryResourceByRole(SysRoleDTO sysRoleDTO);
+    ResultHelper<List<SysResourceDTO>> queryResourceByRole(List<Long> sysRoleIdList);
 
     /**
      * 获取所有未禁用角色
@@ -69,5 +68,5 @@ public interface SysResourceService {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
-    ResultHelper<List<SysResourceDTO>> queryAllValidResource();
+    ResultHelper<List<QueryResourceDTO>> queryAllValidResource();
 }
