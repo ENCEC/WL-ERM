@@ -63,9 +63,9 @@ public class SysPostDTO implements Serializable {
 
     /** 分页页数 */
     @ApiModelProperty("分页页数")
-    private Integer page;
+    private Integer currentPage;
 
     /** 分页显示条数 */
     @ApiModelProperty("分页显示条数")
-    private Integer size;
+    private Integer pageSize;
 }
