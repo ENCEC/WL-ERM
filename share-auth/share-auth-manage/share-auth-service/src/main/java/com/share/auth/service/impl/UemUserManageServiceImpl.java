@@ -2,13 +2,18 @@ package com.share.auth.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.share.auth.constants.CodeFinal;
+import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
+import com.share.auth.domain.UemUserRoleDto;
 import com.share.auth.model.entity.UemUser;
+import com.share.auth.model.entity.UemUserRole;
 import com.share.auth.model.querymodels.QUemUser;
+import com.share.auth.model.querymodels.QUemUserRole;
 import com.share.auth.service.UemUserManageService;
 import com.share.auth.service.UemUserService;
 import com.share.auth.user.DefaultUserService;
@@ -24,6 +29,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -55,7 +61,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @date 2022-07-25
      */
     @Override
-    @Transactional(readOnly = true, rollbackFor = Exception.class)
     public ResultHelper<Page<UemUserDto>> queryUemUser(UemUserDto uemUserDto) {
 
         // 用户名
@@ -97,7 +102,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @return com.share.auth.model.entity.UemUser
      * @date 2022-07-26
      */
-    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public UemUser getUemUserById(Long uemUserId) {
         List<UemUser> uemUserList = QUemUser.uemUser
                 .select(QUemUser.uemUser.fieldContainer())
@@ -118,7 +123,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @date 2022-07-25
      */
     @Override
-    @Transactional(readOnly = true, rollbackFor = Exception.class)
     public ResultHelper<UemUserDto> getUemUser(Long uemUserId) {
         UemUser uemUser = this.getUemUserById(uemUserId);
         if (Objects.isNull(uemUser)) {
@@ -159,7 +163,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int updateCount = QUemUser.uemUser.selective(QUemUser.isValid, QUemUser.invalidTime).execute(uemUser);
         // 检查更新是否成功
-        if (updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+        if (updateCount == 1) {
             return CommonResult.getSuccessResultData("启停成功");
         } else {
             return CommonResult.getFaildResultData("启停失败");
@@ -200,7 +204,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否更新成功
-        if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+        if (rowCount == 1) {
             return CommonResult.getSuccessResultData("用户修改成功");
         } else {
             return CommonResult.getFaildResultData("用户修改失败");
@@ -231,7 +235,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         int rowCount = QUemUser.uemUser.save(uemUser);
         System.err.println(rowCount);
         // 检查是否更新成功
-        if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+        if (rowCount == 1) {
             return CommonResult.getSuccessResultData("用户删除成功");
         } else {
             return CommonResult.getFaildResultData("用户删除失败");
@@ -280,7 +284,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否新增成功,并异步发送邮件通知
-        if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+        if (rowCount == 1) {
             UemUserManageService service = SpringUtil.getBean(UemUserManageService.class);
             service.sendEmailWithPassword(uemUser.getAccount(), uemUser.getEmail(), passwordText, false);
             return CommonResult.getSuccessResultData("用户新增成功");
@@ -316,7 +320,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否更新成功,并异步发送邮件通知
-        if (rowCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+        if (rowCount == 1) {
             UemUserManageService service = SpringUtil.getBean(UemUserManageService.class);
             service.sendEmailWithPassword(uemUser.getAccount(), uemUser.getEmail(), passwordText, true);
             return CommonResult.getSuccessResultData("重置密码成功");
@@ -352,5 +356,84 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         // 发送邮件
         log.warn("send email, " + account + ", " + passwordText);
         emailTemplateService.sendEmail(sendEmailVO);
+    }
+
+    /**
+     * 根据用户ID获取角色列表
+     *
+     * @param uemUserDto 用户信息
+     * @return ResultHelper<List<SysRoleDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @Override
+    public ResultHelper<List<SysRoleDTO>> queryRoleListByUser(UemUserDto uemUserDto) {
+        if (Objects.isNull(uemUserDto) || Objects.isNull(uemUserDto.getUemUserId())) {
+            CommonResult.getFaildResultData("用户ID不能为空");
+        }
+        List<SysRoleDTO> sysRoleDTOList = DSContext
+                .customization("WL-ERM_queryRoleListByUser")
+                .select()
+                .mapperTo(SysRoleDTO.class)
+                .execute(uemUserDto);
+        return CommonResult.getSuccessResultData(sysRoleDTOList);
+    }
+
+    /**
+     * 赋予用户角色
+     *
+     * @param uemUserRoleDtoList 获取uemUserId和sysRoleId
+     * @return com.share.support.result.ResultHelper<?>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResultHelper<?> bindUserAndRole(List<UemUserRoleDto> uemUserRoleDtoList) {
+        List<UemUserRole> uemUserRoles = new LinkedList<>();
+        for (UemUserRoleDto uemUserRoleDto : uemUserRoleDtoList) {
+            if (Objects.isNull(uemUserRoleDto.getUemUserId())) {
+                return CommonResult.getFaildResultData("用户ID不能为空");
+            }
+            if (Objects.isNull(uemUserRoleDto.getSysRoleId())) {
+                return CommonResult.getFaildResultData("角色ID不能为空");
+            }
+            Long uemUserId = Long.parseLong(uemUserRoleDto.getUemUserId());
+            Long sysRoleId = Long.parseLong(uemUserRoleDto.getSysRoleId());
+            UemUserRole uemUserRole = new UemUserRole();
+            uemUserRole.setUemUserId(uemUserId);
+            uemUserRole.setSysRoleId(sysRoleId);
+            uemUserRole.setIsValid(true);
+            uemUserRole.setSysApplicationId(1L);
+            uemUserRole.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+            uemUserRoles.add(uemUserRole);
+        }
+        int rowCount = QUemUserRole.uemUserRole.save(uemUserRoles);
+        if (rowCount == uemUserRoleDtoList.size()) {
+            return CommonResult.getSuccessResultData("绑定成功");
+        } else {
+            return CommonResult.getFaildResultData("绑定失败");
+        }
+    }
+
+    /**
+     * 清除一个用户的所有角色
+     *
+     * @param uemUserId 用户ID
+     * @return com.share.support.result.ResultHelper<?>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResultHelper<?> unbindAllRoleOfUser(Long uemUserId) {
+        if (Objects.isNull(uemUserId)) {
+            return CommonResult.getFaildResultData("用户ID不能为空");
+        }
+        QUemUserRole.uemUserRole
+                .delete()
+                .where(QUemUserRole.uemUserId.eq$(uemUserId))
+                .execute();
+        return CommonResult.getSuccessResultData("删除成功");
     }
 }
