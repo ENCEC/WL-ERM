@@ -1,9 +1,13 @@
 package com.share.auth.service;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
+import com.share.auth.domain.UemUserRoleDto;
 import com.share.support.result.ResultHelper;
+
+import java.util.List;
 
 /**
  * 用户管理模块
@@ -88,4 +92,31 @@ public interface UemUserManageService {
      * @date 2022-07-25
      */
     void sendEmailWithPassword(String account, String email, String passwordText, boolean isReset);
+
+    /**
+     * 根据用户ID获取角色列表
+     * @param uemUserDto 用户信息
+     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysRoleDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<List<SysRoleDTO>> queryRoleListByUser(UemUserDto uemUserDto);
+
+    /**
+     * 赋予用户角色
+     * @param uemUserRoleDtoList 获取uemUserId和sysRoleId
+     * @return com.share.support.result.ResultHelper<?>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<?> bindUserAndRole(List<UemUserRoleDto> uemUserRoleDtoList);
+
+    /**
+     * 清除一个用户的所有角色
+     * @param uemUserId 用户ID
+     * @return com.share.support.result.ResultHelper<?>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<?> unbindAllRoleOfUser(Long uemUserId);
 }

@@ -1,18 +1,19 @@
 package com.share.auth.service.impl;
 
+import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.expressions.Expression;
 import com.gillion.ec.core.security.IUser;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.QueryResourceDTO;
+import com.share.auth.domain.SysResourceDTO;
+import com.share.auth.domain.SysResourceQueryVO;
+import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
-import com.share.auth.domain.SysResourceQueryVO;
 import com.share.auth.service.SysResourceService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
-import com.share.auth.util.OauthClientUtils;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -494,5 +495,25 @@ public class SysResourceServiceImpl implements SysResourceService {
                 .sorting(QSysResource.resourceSort.asc(),QSysResource.sysResourceId.asc())
                 .execute();
         return CommonResult.getSuccessResultData(queryResourceDTOList);
+    }
+
+    /**
+     * 根据角色ID获取资源列表
+     *
+     * @param sysRoleDTO 角色ID
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @Override
+    public ResultHelper<List<SysResourceDTO>> queryResourceByRole(SysRoleDTO sysRoleDTO) {
+        if (Objects.isNull(sysRoleDTO.getSysRoleId())) {
+            return CommonResult.getFaildResultData("角色ID不能为空");
+        }
+        List<SysResourceDTO> sysResourceDTOList = DSContext
+                .customization("WL-ERM_queryResourceByRole")
+                .select()
+                .mapperTo(SysResourceDTO.class)
+                .execute(sysRoleDTO);
+        return CommonResult.getSuccessResultData(sysResourceDTOList);
     }
 }
