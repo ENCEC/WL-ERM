@@ -7,7 +7,6 @@ import com.share.auth.model.workflow.RoleVO;
 import com.share.support.result.ResultHelper;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author chenxf
@@ -76,4 +75,12 @@ public interface SysRoleService {
      * @return 用户列表
      */
     List<RoleVO> getRoleByRoleCode(String roleCode);
+
+    /**
+     * 获取所有未禁用角色
+     * @return com.share.support.result.ResultHelper<java.util.List<com.share.support.model.Role>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<List<SysRoleDTO>> queryAllValidRole();
 }

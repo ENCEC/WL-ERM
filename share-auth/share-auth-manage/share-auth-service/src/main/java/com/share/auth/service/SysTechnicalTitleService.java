@@ -2,8 +2,8 @@ package com.share.auth.service;
 
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
+import com.share.support.result.ResultHelper;
 
 
 /**
@@ -15,18 +15,11 @@ import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
  **/
 public interface SysTechnicalTitleService {
     /**
-     * 分页查询全部岗位职称
+     * 查询岗位职称
      * @param sysTechnicalTitleAndPostVO
      * @return
      */
-    Page<SysTechnicalTitleAndPostVO> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
-
-    /**
-     * 通过条件分页查询岗位职称
-     * @param sysTechnicalTitleAndPostVO
-     * @return
-     */
-    Page<SysTechnicalTitleAndPostVO> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
+    ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
 
     /**
      * 新增职称
@@ -50,7 +43,7 @@ public interface SysTechnicalTitleService {
 
     /**
      * 启动/禁用
-     * @param sysTechnicalTitle
+     * @param sysTechnicalTitleAndPostVO
      */
-    void updateStatus(SysTechnicalTitle sysTechnicalTitle);
+    void updateStatus(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
 }

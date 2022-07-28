@@ -61,6 +61,10 @@ private static final long serialVersionUID=1;
     @Column(name = "invalid_time")
     private Date invalidTime;
 
+    /**逻辑删除标识（0-未删除，1-已删除），默认0*/
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     /**是否禁用(0禁用,1启用)*/
     @Column(name = "is_valid")
     private Boolean isValid;

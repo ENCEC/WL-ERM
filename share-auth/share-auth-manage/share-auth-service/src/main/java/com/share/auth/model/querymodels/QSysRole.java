@@ -23,6 +23,7 @@ public class QSysRole extends BaseModelExpression<SysRole, Long> {
     public static final FieldExpression<String> deptName = sysRole.fieldOf("deptName", String.class);
     public static final FieldExpression<Date> invalidTime = sysRole.fieldOf("invalidTime", Date.class);
     public static final FieldExpression<Boolean> isDefault = sysRole.fieldOf("isDefault", Boolean.class);
+    public static final FieldExpression<Boolean> isDeleted = sysRole.fieldOf("isDeleted", Boolean.class);
     public static final FieldExpression<Boolean> isValid = sysRole.fieldOf("isValid", Boolean.class);
     public static final FieldExpression<Long> modifierId = sysRole.fieldOf("modifierId", Long.class);
     public static final FieldExpression<String> modifierName = sysRole.fieldOf("modifierName", String.class);
