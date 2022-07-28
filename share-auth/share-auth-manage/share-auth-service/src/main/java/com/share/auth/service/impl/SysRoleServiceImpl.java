@@ -332,4 +332,21 @@ public class SysRoleServiceImpl implements SysRoleService {
         }
         return list;
     }
+
+    /**
+     * 获取所有未禁用角色
+     *
+     * @return com.share.support.result.ResultHelper<java.util.List < com.share.support.model.Role>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @Override
+    public ResultHelper<List<SysRoleDTO>> queryAllValidRole() {
+        List<SysRoleDTO> sysRoleDTOList = QSysRole.sysRole
+                .select(QSysRole.sysRole.fieldContainer())
+                .where(QSysRole.isValid.eq$(true).and(QSysRole.isValid.eq$(true)))
+                .mapperTo(SysRoleDTO.class)
+                .execute();
+        return CommonResult.getSuccessResultData(sysRoleDTOList);
+    }
 }
