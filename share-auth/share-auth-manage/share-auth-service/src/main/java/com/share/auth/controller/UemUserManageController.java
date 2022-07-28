@@ -2,8 +2,10 @@ package com.share.auth.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.share.auth.center.api.AuthCenterInterface;
+import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
+import com.share.auth.domain.UemUserRoleDto;
 import com.share.auth.service.UemUserManageService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -17,6 +19,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -150,5 +153,48 @@ public class UemUserManageController {
     @PostMapping(value = "/resetUemUserPassword")
     public ResultHelper<?> resetUemUserPassword(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.resetUemUserPassword(uemUserDto.getUemUserId());
+    }
+
+    /**
+     * 根据用户ID获取角色列表
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @PostMapping("/queryRoleListByUser")
+    @ApiOperation("根据用户ID获取角色列表")
+    @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataTypeClass = Long.class, paramType = "body")
+    public ResultHelper<List<SysRoleDTO>> queryRoleListByUser(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.queryRoleListByUser(uemUserDto);
+    }
+
+    /**
+     * 赋予用户角色
+     * @param uemUserRoleDtoList 获取uemUserId和sysRoleId
+     * @return com.share.support.result.ResultHelper<?>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @PostMapping("/bindUserAndRole")
+    @ApiOperation("赋予用户角色")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataType = "Long", paramType = "body"),
+            @ApiImplicitParam(name = "sysRoleId", value = "角色ID", required = true, dataType = "Long", paramType = "body")
+    })
+    public ResultHelper<?> bindUserAndRole(@RequestBody List<UemUserRoleDto> uemUserRoleDtoList) {
+        return uemUserManageService.bindUserAndRole(uemUserRoleDtoList);
+    }
+
+    /**
+     * 清除一个用户的所有角色
+     * @param uemUserDto 用户信息
+     * @return com.share.support.result.ResultHelper<?>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @PostMapping("/unbindAllRoleOfUser")
+    @ApiOperation("清除一个用户的所有角色")
+    @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataType = "Long", paramType = "body")
+    public ResultHelper<?> unbindAllRoleOfUser(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.unbindAllRoleOfUser(uemUserDto.getUemUserId());
     }
 }
