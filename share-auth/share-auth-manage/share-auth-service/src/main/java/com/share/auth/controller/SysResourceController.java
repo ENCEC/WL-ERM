@@ -97,4 +97,16 @@ public class SysResourceController {
     public ResultHelper<List<QueryResourceDTO>> queryAllValidResource() {
         return sysResourceService.queryAllValidResource();
     }
+
+    /**
+     * 获取所有未禁用菜单
+     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysResourceDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @GetMapping("/sysResource/queryAllValidResource")
+    @ApiOperation(value = "获取所有未禁用菜单")
+    public ResultHelper<List<SysResourceDTO>> queryAllValidResource() {
+        return sysResourceService.queryAllValidResource();
+    }
 }
