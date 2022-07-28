@@ -31,7 +31,7 @@ public class SysPostServiceImpl implements SysPostService {
      * 新增岗位信息
      *
      * @param sysPostDTO 岗位信息封装类
-     * @return Page<SysPostDTO>
+     * @return ResultHelper<?>
      * @author tanjp
      * @date 2022/7/27
      */
@@ -86,6 +86,7 @@ public class SysPostServiceImpl implements SysPostService {
                 .where(
                         QSysPost.postName.like(":postName")
                                 .and(QSysPost.status.eq(":status"))
+                                .and(QSysPost.postId.goe$(1L))
                 ).paging(currentPage,pageSize)
                 .sorting(QSysPost.createTime.desc())
                 .mapperTo(SysPostDTO.class)
