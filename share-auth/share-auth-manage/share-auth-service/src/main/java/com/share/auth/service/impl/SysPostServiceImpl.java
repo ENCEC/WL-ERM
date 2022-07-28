@@ -11,11 +11,10 @@ import com.share.auth.service.SysPostService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,15 +27,40 @@ import java.util.Objects;
 @Slf4j
 public class SysPostServiceImpl implements SysPostService {
 
+    /**
+     * 新增岗位信息
+     *
+     * @param sysPostDTO 岗位信息封装类
+     * @return Page<SysPostDTO>
+     * @author tanjp
+     * @date 2022/7/27
+     */
     @Override
-    public void addSysPost(SysPost sysPost) {
+    public ResultHelper<?> saveSysPost(SysPostDTO sysPostDTO) {
+
+        //岗位名
+        List<SysPost> sysPostList = QSysPost.sysPost
+                .select(QSysPost.sysPost.fieldContainer())
+                .where(QSysPost.postName.eq$(sysPostDTO.getPostName()))
+                .execute();
+        if (CollectionUtils.isNotEmpty(sysPostList)) {
+            return CommonResult.getSuccessResultData("该岗位名已注册过！");
+        }
+
+        SysPost sysPost = new SysPost();
+        BeanUtils.copyProperties(sysPostDTO,sysPost);
         sysPost.setStatus("0");
-        sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         sysPost.setCreateBy("系统管理员");
         sysPost.setCreateTime(new DateTime());
-        QSysPost.sysPost.save(sysPost);
-    }
+        sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        int row = QSysPost.sysPost.save(sysPost);
 
+        if (row > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+            return CommonResult.getSuccessResultData("新增成功");
+        } else {
+            return CommonResult.getFaildResultData("新增失败");
+        }
+    }
 
 
     /**
@@ -55,14 +79,14 @@ public class SysPostServiceImpl implements SysPostService {
             sysPostDTO.setPostName("%" + postName + "%");
         }
         //page:当前页     size:每页显示的条数
-        int page = (sysPostDTO.getPage() == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : sysPostDTO.getPage();
-        int size = (sysPostDTO.getSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : sysPostDTO.getSize();
+        int currentPage = (sysPostDTO.getCurrentPage() == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : sysPostDTO.getCurrentPage();
+        int pageSize = (sysPostDTO.getPageSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : sysPostDTO.getPageSize();
 
         Page<SysPostDTO> sysPostDTOPage = QSysPost.sysPost.select(QSysPost.sysPost.fieldContainer())
                 .where(
                         QSysPost.postName.like(":postName")
                                 .and(QSysPost.status.eq(":status"))
-                ).paging(page,size)
+                ).paging(currentPage,pageSize)
                 .sorting(QSysPost.createTime.desc())
                 .mapperTo(SysPostDTO.class)
                 .execute(sysPostDTO);
@@ -160,7 +184,7 @@ public class SysPostServiceImpl implements SysPostService {
         //更新信息
         BeanUtils.copyProperties(sysPostDTO, sysPost);
         sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        sysPost.setUpdateTime(new Date());//更新时间
+        sysPost.setUpdateTime(new DateTime());//更新时间
         int row = QSysPost.sysPost.save(sysPost);
 
         if (row > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {

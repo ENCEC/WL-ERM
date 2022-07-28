@@ -2,7 +2,6 @@ package com.share.auth.service;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.share.auth.domain.SysPostDTO;
-import com.share.auth.model.entity.SysPost;
 import com.share.support.result.ResultHelper;
 
 /**
@@ -10,10 +9,16 @@ import com.share.support.result.ResultHelper;
  * @Date 2022/7/26 9:27
  */
 public interface SysPostService {
+
     /**
-     * 新增岗位
+     * 查询岗位信息
+     *
+     * @param sysPostDTO 岗位信息封装类
+     * @return Page<SysPostDTO>
+     * @author tanjp
+     * @date 2022/7/27
      */
-    void addSysPost(SysPost sysPost);
+    ResultHelper<?> saveSysPost(SysPostDTO sysPostDTO);
 
 
     /**
