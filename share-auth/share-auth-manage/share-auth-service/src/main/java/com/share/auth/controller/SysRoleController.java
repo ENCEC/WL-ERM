@@ -1,35 +1,24 @@
 package com.share.auth.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.gillion.exception.BusinessRuntimeException;
-import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.model.vo.SysRoleQueryVO;
 import com.share.auth.service.SysResourceService;
 import com.share.auth.service.SysRoleService;
-import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 /**
- * @Author:chenxf
- * @Description: 角色管理控制器
- * @Date: 14:18 2020/11/16
- * @Param:
- * @Return:
- *
+ * 部门角色管理
+ * @author xuzt <xuzt@gillion.com.cn>
+ * @date 2022-07-22
  */
-@Api("角色管理控制器")
-@Controller
+@Api("部门角色管理")
+@RestController
 @RequestMapping("/sysRole")
 public class SysRoleController {
 
@@ -40,108 +29,93 @@ public class SysRoleController {
     private SysResourceService sysResourceService;
 
     /**
-     * @Author:chenxf
-     * @Description: 角色管理查询树形表格角色数据接口
-     * @Date: 17:53 2020/11/28
-     * @Param: [sysRoleQueryVo]
-     * @Return:java.util.Map<java.lang.String,java.lang.Object>
+     * 根据部门ID获取角色列表
      *
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-22
      */
-    @PostMapping("/queryRoleTreeTable")
-    @ResponseBody
-    @ApiOperation(value = "角色管理查询树形表格角色数据", notes = "角色管理查询树形表格角色数据")
-    @ApiImplicitParam(name = "sysRoleQueryVo", value = "角色管理查询树形表格角色数据入参", required = true, dataType = "SysRoleQueryVO", paramType = "queryRoleTreeTable")
-    public ResultHelper<Page<SysRoleDTO>> queryRoleTreeTable(@RequestBody SysRoleQueryVO sysRoleQueryVo) {
-        if (sysRoleQueryVo.getPageSize() == 0 || sysRoleQueryVo.getCurrentPage() == 0) {
-            return CommonResult.getFaildResultData("列表接口需传入当前页数、每页限制行数参数");
-        }
-        if (Objects.isNull(sysRoleQueryVo.getSysApplicationId())) {
-            return CommonResult.getFaildResultData("应用id为空，请确认！");
-        }
-        Page<SysRoleDTO> sysRolePage = sysRoleService.queryByPage(sysRoleQueryVo);
-        return CommonResult.getSuccessResultData(sysRolePage);
-    }
-
-
-    /**
-     * @Author:chenxf
-     * @Description: 角色管理查询树形表格资源数据接口
-     * @Date: 17:53 2020/11/28
-     * @Param: [sysApplicationId]
-     * @Return:java.util.Map<java.lang.String,java.lang.Object>
-     *
-     */
-    @GetMapping("/queryApplicationResourceTree")
-    @ResponseBody
-    @ApiOperation(value = "角色管理查询树形表格资源数据", notes = "角色管理查询树形表格资源数据")
-    @ApiImplicitParam(name = "sysApplicationId", value = "角色管理查询树形表格资源数据入参", required = true, dataType = "Long", paramType = "queryApplicationResourceTree")
-    public ResultHelper<List<QueryResourceDTO>> queryApplicationResourceTree(@RequestParam(value = "sysApplicationId") Long sysApplicationId) {
-        return sysResourceService.queryApplicationResourceTree(sysApplicationId);
+    @PostMapping("/getRoleListByDeptId")
+    @ApiOperation("根据部门ID获取角色列表")
+    @ApiImplicitParam(name = "deptId", value = "部门ID", required = true, dataType = "Long")
+    public ResultHelper<Page<SysRoleDTO>> getRoleListByDeptId(@RequestParam(name = "deptId") Long deptId) {
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * @Author:chenxf
-     * @Description: 角色管理保存角色接口
-     * @Date: 18:01 2020/11/28
-     * @Param: [sysRoleDTO]
-     * @Return:java.util.Map<java.lang.String,java.lang.Object>
+     * 根据部门ID获取角色列表
      *
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-22
+     */
+    @PostMapping("/queryRoleList")
+    @ApiOperation("根据部门ID获取角色列表")
+    @ApiImplicitParam(name = "sysRoleQueryVo", value = "角色管理查询接口入参", required = true, dataType = "SysRoleQueryVO")
+    public ResultHelper<Page<SysRoleDTO>> queryRoleList(@RequestBody SysRoleQueryVO sysRoleQueryVo) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 添加角色
+     *
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-22
      */
     @PostMapping("/saveSysRole")
-    @ResponseBody
-    @ApiOperation(value = "角色管理保存角色", notes = "角色管理保存角色")
-    @ApiImplicitParam(name = "sysRoleDTO", value = "角色管理保存角色入参", required = true, dataType = "SysRoleDTO", paramType = "saveSysRole")
+    @ApiOperation("添加角色")
+    @ApiImplicitParam(name = "sysRoleDTO", value = "添加角色接口入参", required = true, dataType = "SysRoleDTO")
     public ResultHelper<Object> saveSysRole(@RequestBody SysRoleDTO sysRoleDTO) {
-        return sysRoleService.saveSysRole(sysRoleDTO);
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * @Author:chenxf
-     * @Description: 角色管理修改角色接口
-     * @Date: 18:01 2020/11/28
-     * @Param: [sysRoleDTO]
-     * @Return:java.util.Map<java.lang.String,java.lang.Object>
+     * 根据角色ID获取角色信息
      *
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-22
+     */
+    @PostMapping("/getSysRoleById")
+    @ApiOperation("根据角色ID获取角色信息")
+    @ApiImplicitParam(name = "sysRoleId", value = "角色ID", required = true, dataType = "Long")
+    public ResultHelper<SysRoleDTO> getSysRoleById(@RequestParam(name = "sysRoleId") Long sysRoleId) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 修改角色
+     *
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-22
      */
     @PostMapping("/updateSysRole")
-    @ResponseBody
-    @ApiOperation(value = "角色管理修改角色", notes = "角色管理修改角色")
-    @ApiImplicitParam(name = "sysRoleDTO", value = "角色管理修改角色入参", required = true, dataType = "SysRoleDTO", paramType = "saveSysRole")
+    @ApiOperation("修改角色")
+    @ApiImplicitParam(name = "sysRoleDTO", value = "修改角色接口入参", required = true, dataType = "SysRoleDTO")
     public ResultHelper<Object> updateSysRole(@RequestBody SysRoleDTO sysRoleDTO) {
-        return sysRoleService.updateSysRole(sysRoleDTO);
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * @Author:chenxf
-     * @Description: 权限分配角色联想控件查询接口
-     * @Date: 16:03 2021/1/29
-     * @Param: [sysRoleQueryVo]
-     * @Return:com.share.support.result.ResultHelper
+     * 启用/禁用角色
      *
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-22
      */
-    @PostMapping("/querySysRoleByAppAndCompany")
-    @ResponseBody
-    @ApiOperation(value = "权限分配角色下拉框查询接口", notes = "权限分配角色下拉框查询接口")
-    @ApiImplicitParam(name = "sysRoleQueryVo", value = "权限分配角色下拉框查询接口入参", required = true, dataType = "SysRoleQueryVO", paramType = "querySysRoleByAppAndCompany")
-    public ResultHelper<List<SysRoleDTO>> querySysRoleByAppAndCompany(@RequestBody SysRoleQueryVO sysRoleQueryVo) {
-        List<SysRoleDTO> sysRoleDTOList = sysRoleService.querySysRoleByAppAndCompany(sysRoleQueryVo);
-        return CommonResult.getSuccessResultData(sysRoleDTOList);
+    @PostMapping("/updateValid")
+    @ApiOperation("启用/禁用角色")
+    @ApiImplicitParam(name = "sysRoleDTO", value = "启用/禁用角色接口入参", required = true, dataType = "SysRoleDTO")
+    public ResultHelper<Object> updateValid(@RequestBody SysRoleDTO sysRoleDTO) {
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * @Author: cjh
-     * @Description: 权限分配角色联想控件查询接口-用户管理
-     * @Date: 19:03 2021/11/30
-     * @Param: [sysRoleQueryVo]
-     * @Return:com.share.support.result.ResultHelper
+     * 删除角色
      *
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-22
      */
-    @PostMapping("/querySysRoleByAppAndCompanyByUser")
-    @ResponseBody
-    @ApiOperation(value = "权限分配角色下拉框查询接口-用户管理", notes = "权限分配角色下拉框查询接口-用户管理")
-    @ApiImplicitParam(name = "sysRoleQueryVo", value = "权限分配角色下拉框查询接口入参", required = true, dataType = "SysRoleQueryVO", paramType = "querySysRoleByAppAndCompanyByUser")
-    public ResultHelper<List<SysRoleDTO>> querySysRoleByAppAndCompanyByUser(@RequestBody SysRoleQueryVO sysRoleQueryVo) {
-        List<SysRoleDTO> sysRoleDTOList = sysRoleService.querySysRoleByAppAndCompanyByUser(sysRoleQueryVo);
-        return CommonResult.getSuccessResultData(sysRoleDTOList);
+    @PostMapping("/deleteSysRole")
+    @ApiOperation("删除角色")
+    @ApiImplicitParam(name = "sysRoleId", value = "删除角色接口入参", required = true, dataType = "Long")
+    public ResultHelper<Object> deleteSysRole(@RequestParam(name = "sysRoleId") Long sysRoleId) {
+        throw new UnsupportedOperationException();
     }
 }

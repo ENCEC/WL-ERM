@@ -5,16 +5,8 @@ import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.UemCompanyRole;
 
-import java.lang.Boolean;
-import java.lang.Integer;
-import java.lang.Long;
-import java.lang.String;
 import java.util.Date;
 
-import com.share.auth.model.entity.SysApplication;
-import com.share.auth.model.entity.SysRole;
-import com.share.auth.model.querymodels.QSysApplication;
-import com.share.auth.model.querymodels.QSysRole;
 
 /**
 * @author daoServiceGenerator
@@ -37,8 +29,6 @@ public class QUemCompanyRole extends BaseModelExpression<UemCompanyRole, Long> {
     public static final FieldExpression<Long> uemCompanyId = uemCompanyRole.fieldOf("uemCompanyId", Long.class);
     public static final FieldExpression<Long> uemCompanyRoleId = uemCompanyRole.fieldOf("uemCompanyRoleId", Long.class);
 
-    public static final BaseModelExpression<SysApplication, Long> sysApplication = new QSysApplication(uemCompanyRole, "sysApplication");
-    public static final BaseModelExpression<SysRole, Long> sysRole = new QSysRole(uemCompanyRole, "sysRole");
 
     public QUemCompanyRole() {
         super("UemCompanyRole", UemCompanyRole.class);

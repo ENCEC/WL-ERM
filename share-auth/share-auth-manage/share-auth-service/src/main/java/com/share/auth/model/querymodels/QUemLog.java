@@ -4,9 +4,9 @@ import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.UemLog;
-import com.share.auth.model.entity.UemUser;
 
 import java.util.Date;
+
 
 /**
 * @author daoServiceGenerator
@@ -36,7 +36,6 @@ public class QUemLog extends BaseModelExpression<UemLog, Long> {
     public static final FieldExpression<Long> uemUserId = uemLog.fieldOf("uemUserId", Long.class);
     public static final FieldExpression<String> way = uemLog.fieldOf("way", String.class);
 
-    public static final BaseModelExpression<UemUser, Long> uemUser = new QUemUser(uemLog, "uemUser");
 
     public QUemLog() {
         super("UemLog", UemLog.class);

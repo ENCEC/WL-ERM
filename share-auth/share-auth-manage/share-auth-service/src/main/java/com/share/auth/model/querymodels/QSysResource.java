@@ -4,9 +4,9 @@ import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.SysResource;
-import com.share.auth.model.entity.SysRoleResource;
 
 import java.util.Date;
+
 
 /**
 * @author daoServiceGenerator
@@ -17,10 +17,10 @@ public class QSysResource extends BaseModelExpression<SysResource, Long> {
 
     public static final BaseModelExpression<SysResource, Long> sysResource = new QSysResource();
     public static final FieldExpression<String> component = sysResource.fieldOf("component", String.class);
+    public static final FieldExpression<String> componentName = sysResource.fieldOf("componentName", String.class);
     public static final FieldExpression<Date> createTime = sysResource.fieldOf("createTime", Date.class);
     public static final FieldExpression<Long> creatorId = sysResource.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = sysResource.fieldOf("creatorName", String.class);
-    public static final FieldExpression<String> componentName = sysResource.fieldOf("componentName", String.class);
     public static final FieldExpression<Date> invalidTime = sysResource.fieldOf("invalidTime", Date.class);
     public static final FieldExpression<Boolean> isValid = sysResource.fieldOf("isValid", Boolean.class);
     public static final FieldExpression<Long> modifierId = sysResource.fieldOf("modifierId", Long.class);
@@ -37,7 +37,6 @@ public class QSysResource extends BaseModelExpression<SysResource, Long> {
     public static final FieldExpression<Long> sysApplicationId = sysResource.fieldOf("sysApplicationId", Long.class);
     public static final FieldExpression<Long> sysResourceId = sysResource.fieldOf("sysResourceId", Long.class);
 
-    public static final BaseModelExpression<SysRoleResource, Long> sysRoleResource = new QSysRoleResource(sysResource, "sysRoleResource");
 
     public QSysResource() {
         super("SysResource", SysResource.class);
