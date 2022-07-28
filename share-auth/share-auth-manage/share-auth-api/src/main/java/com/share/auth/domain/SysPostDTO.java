@@ -1,5 +1,6 @@
 package com.share.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ec.core.utils.Long2String;
@@ -7,6 +8,7 @@ import com.gillion.ec.core.utils.String2Long;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
 import java.io.Serializable;
@@ -31,6 +33,8 @@ public class SysPostDTO implements Serializable {
 
     /**创建时间*/
     @ApiModelProperty("创建时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**岗位编码*/
@@ -59,6 +63,8 @@ public class SysPostDTO implements Serializable {
 
     /**更新时间*/
     @ApiModelProperty("更新时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     /** 分页页数 */
