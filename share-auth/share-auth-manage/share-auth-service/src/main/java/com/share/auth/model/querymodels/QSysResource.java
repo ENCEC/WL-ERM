@@ -7,7 +7,6 @@ import com.share.auth.model.entity.SysResource;
 
 import java.util.Date;
 
-
 /**
 * @author daoServiceGenerator
 * @version 1.0.0.0
@@ -22,6 +21,7 @@ public class QSysResource extends BaseModelExpression<SysResource, Long> {
     public static final FieldExpression<Long> creatorId = sysResource.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = sysResource.fieldOf("creatorName", String.class);
     public static final FieldExpression<Date> invalidTime = sysResource.fieldOf("invalidTime", Date.class);
+    public static final FieldExpression<Boolean> isDeleted = sysResource.fieldOf("isDeleted", Boolean.class);
     public static final FieldExpression<Boolean> isValid = sysResource.fieldOf("isValid", Boolean.class);
     public static final FieldExpression<Long> modifierId = sysResource.fieldOf("modifierId", Long.class);
     public static final FieldExpression<String> modifierName = sysResource.fieldOf("modifierName", String.class);

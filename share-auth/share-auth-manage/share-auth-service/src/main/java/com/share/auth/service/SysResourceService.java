@@ -1,6 +1,7 @@
 package com.share.auth.service;
 
 import com.share.auth.domain.QueryResourceDTO;
+import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysResourceQueryVO;
 import com.share.support.result.ResultHelper;
 
@@ -51,4 +52,21 @@ public interface SysResourceService {
      * @return 页面中允许的按钮列表
      */
     ResultHelper<List<QueryResourceDTO>> queryButtonInPage(SysResourceQueryVO sysResourceQueryVO);
+
+    /**
+     * 根据角色ID获取资源列表
+     *
+     * @param sysRoleIdList 角色ID列表
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<List<SysResourceDTO>> queryResourceByRole(List<Long> sysRoleIdList);
+
+    /**
+     * 获取所有未禁用角色
+     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysResourceDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<List<QueryResourceDTO>> queryAllValidResource();
 }
