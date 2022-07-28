@@ -66,6 +66,10 @@ private static final long serialVersionUID=1;
     @Column(name = "is_default")
     private Boolean isDefault;
 
+    /**逻辑删除flag*/
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     /**是否禁用(0禁用,1启用)*/
     @Column(name = "is_valid")
     private Boolean isValid;

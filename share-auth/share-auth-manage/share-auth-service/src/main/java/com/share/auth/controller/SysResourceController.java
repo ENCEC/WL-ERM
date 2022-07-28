@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -84,5 +85,17 @@ public class SysResourceController {
     @ApiImplicitParam(name = "sysRoleId", value = "角色ID", dataTypeClass = Long.class, required = true, paramType = "body")
     public ResultHelper<List<SysResourceDTO>> queryResourceByRole(@RequestBody SysRoleDTO sysRoleDTO) {
         return sysResourceService.queryResourceByRole(sysRoleDTO);
+    }
+
+    /**
+     * 获取所有未禁用菜单
+     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysResourceDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @GetMapping("/sysResource/queryAllValidResource")
+    @ApiOperation(value = "获取所有未禁用菜单")
+    public ResultHelper<List<SysResourceDTO>> queryAllValidResource() {
+        return sysResourceService.queryAllValidResource();
     }
 }
