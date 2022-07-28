@@ -3,6 +3,7 @@ package com.share.auth.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gillion.ds.entity.base.BaseModel;
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
 import io.swagger.annotations.ApiModel;
@@ -18,9 +19,9 @@ import java.util.Date;
  * @author tanjp
  * @Date 2022/7/26 9:23
  */
-@ApiModel("SysPostVO 岗位信息")
+@ApiModel("SysPostDTO 岗位信息")
 @Data
-public class SysPostDTO implements Serializable {
+public class SysPostDTO extends BaseModel implements Serializable {
     @ApiModelProperty("id")
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
