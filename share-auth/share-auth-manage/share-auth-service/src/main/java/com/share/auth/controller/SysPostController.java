@@ -42,8 +42,6 @@ public class SysPostController {
         return sysPostService.saveSysPost(sysPostDTO);
     }
 
-
-
     /**
      * 查询岗位信息
      *
@@ -119,7 +117,7 @@ public class SysPostController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "sysPostId", value = "ID", required = true, dataTypeClass = Long.class, paramType = "body")
     })
-    @GetMapping("/deleteSysPost")
+    @PostMapping("/deleteSysPost")
     public ResultHelper<?> deletePostById(@RequestParam Long sysPostId) {
         return sysPostService.deletePostById(sysPostId);
     }
