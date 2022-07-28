@@ -118,7 +118,7 @@ public class SysResourceController {
      */
     @PostMapping("/queryResourceByPage")
     @ApiOperation(value = "带条件分页查询菜单信息")
-    public ResultHelper<Page<SysResourceDTO>> queryResourceByPage(@RequestBody SysResourceDTO sysResourceDTO, PageDto pageDto) {
+    public ResultHelper<Page<SysResourceDTO>> queryResourceByPage(@RequestBody SysResourceDTO sysResourceDTO) {
         Page<SysResourceDTO> sysResourceDTOPage = sysResourceService.queryResourceByPage(sysResourceDTO);
         return CommonResult.getSuccessResultData(sysResourceDTOPage);
     }
