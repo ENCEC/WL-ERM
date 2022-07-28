@@ -516,4 +516,21 @@ public class SysResourceServiceImpl implements SysResourceService {
                 .execute(sysRoleDTO);
         return CommonResult.getSuccessResultData(sysResourceDTOList);
     }
+
+    /**
+     * 获取所有未禁用角色
+     *
+     * @return com.share.support.result.ResultHelper<java.util.List < com.share.auth.domain.SysResourceDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @Override
+    public ResultHelper<List<SysResourceDTO>> queryAllValidResource() {
+        List<SysResourceDTO> sysResourceDTOList = QSysResource.sysResource
+                .select(QSysResource.sysResource.fieldContainer())
+                .where(QSysResource.isValid.eq$(true).and(QSysResource.isValid.eq$(true)))
+                .mapperTo(SysResourceDTO.class)
+                .execute();
+        return CommonResult.getSuccessResultData(sysResourceDTOList);
+    }
 }

@@ -62,4 +62,12 @@ public interface SysResourceService {
      * @date 2022-07-28
      */
     ResultHelper<List<SysResourceDTO>> queryResourceByRole(SysRoleDTO sysRoleDTO);
+
+    /**
+     * 获取所有未禁用角色
+     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysResourceDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<List<SysResourceDTO>> queryAllValidResource();
 }
