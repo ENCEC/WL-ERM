@@ -9,7 +9,6 @@ import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysResourceQueryVO;
-import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.service.SysResourceService;
@@ -500,20 +499,22 @@ public class SysResourceServiceImpl implements SysResourceService {
     /**
      * 根据角色ID获取资源列表
      *
-     * @param sysRoleDTO 角色ID
+     * @param sysRoleIdList 角色ID列表
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
     @Override
-    public ResultHelper<List<SysResourceDTO>> queryResourceByRole(SysRoleDTO sysRoleDTO) {
-        if (Objects.isNull(sysRoleDTO.getSysRoleId())) {
+    public ResultHelper<List<SysResourceDTO>> queryResourceByRole(List<Long> sysRoleIdList) {
+        if (sysRoleIdList.isEmpty()) {
             return CommonResult.getFaildResultData("角色ID不能为空");
         }
+        Map<String, Object> namedParams = new HashMap<>();
+        namedParams.put("sysRoleIdList", sysRoleIdList);
         List<SysResourceDTO> sysResourceDTOList = DSContext
                 .customization("WL-ERM_queryResourceByRole")
                 .select()
                 .mapperTo(SysResourceDTO.class)
-                .execute(sysRoleDTO);
+                .execute(namedParams);
         return CommonResult.getSuccessResultData(sysResourceDTOList);
     }
 
@@ -525,12 +526,13 @@ public class SysResourceServiceImpl implements SysResourceService {
      * @date 2022-07-28
      */
     @Override
-    public ResultHelper<List<SysResourceDTO>> queryAllValidResource() {
-        List<SysResourceDTO> sysResourceDTOList = QSysResource.sysResource
+    public ResultHelper<List<QueryResourceDTO>> queryAllValidResource() {
+        List<QueryResourceDTO> queryResourceDTOList = QSysResource.sysResource
                 .select(QSysResource.sysResource.fieldContainer())
                 .where(QSysResource.isValid.eq$(true).and(QSysResource.isValid.eq$(true)))
-                .mapperTo(SysResourceDTO.class)
+                .mapperTo(QueryResourceDTO.class)
                 .execute();
-        return CommonResult.getSuccessResultData(sysResourceDTOList);
+        queryResourceDTOList = dealWithResource(queryResourceDTOList, false);
+        return CommonResult.getSuccessResultData(queryResourceDTOList);
     }
 }
