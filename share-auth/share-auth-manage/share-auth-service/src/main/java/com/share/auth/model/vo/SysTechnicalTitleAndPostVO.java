@@ -1,11 +1,14 @@
 package com.share.auth.model.vo;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @ClassName SysTechnicalTitleAndPostVO
@@ -24,6 +27,8 @@ public class SysTechnicalTitleAndPostVO implements Serializable {
     private String createBy;
 
     /**创建时间*/
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**岗位ID*/
@@ -45,6 +50,8 @@ public class SysTechnicalTitleAndPostVO implements Serializable {
     private String updateBy;
 
     /**更新时间*/
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     /**岗位名称*/

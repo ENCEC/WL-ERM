@@ -11,6 +11,7 @@ import com.share.auth.model.querymodels.QSysTechnicalTitle;
 import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
 import com.share.auth.service.SysTechnicalTitleService;
 import com.share.support.result.CommonResult;
+import com.share.support.result.ResultHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +32,14 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
      * @return
      */
     @Override
-    public Page<SysTechnicalTitleAndPostVO> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+    public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
         Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
                 .where(QSysTechnicalTitle.technicalTitleId.goe$(1L))
                 .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
+                .sorting(QSysTechnicalTitle.createTime.desc())
                 .mapperTo(SysTechnicalTitleAndPostVO.class)
                 .execute();
-        return pages;
+        return CommonResult.getSuccessResultData(pages);
     }
 
     /**
@@ -47,28 +49,30 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
      * @return
      */
     @Override
-    public Page<SysTechnicalTitleAndPostVO> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+    public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
         if (!sysTechnicalTitleAndPostVO.getStatus().isEmpty() && !sysTechnicalTitleAndPostVO.getTechnicalName().isEmpty() && !sysTechnicalTitleAndPostVO.getPostName().isEmpty()) {
             Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
                     .where(QSysTechnicalTitle.technicalName._like$_(sysTechnicalTitleAndPostVO.getTechnicalName()).and(QSysTechnicalTitle.sysPost.chain(QSysPost.postName).eq$(sysTechnicalTitleAndPostVO.getPostName())).and(QSysTechnicalTitle.status.eq$(sysTechnicalTitleAndPostVO.getStatus())))
                     .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
                     .mapperTo(SysTechnicalTitleAndPostVO.class)
                     .execute();
-            return pages;
+            return CommonResult.getSuccessResultData(pages);
         } else if (sysTechnicalTitleAndPostVO.getStatus().isEmpty() && sysTechnicalTitleAndPostVO.getTechnicalName().isEmpty() && sysTechnicalTitleAndPostVO.getPostName().isEmpty()) {
             Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
                     .where(QSysTechnicalTitle.technicalTitleId.goe$(1L))
                     .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
+                    .sorting(QSysTechnicalTitle.createTime.desc())
                     .mapperTo(SysTechnicalTitleAndPostVO.class)
                     .execute();
-            return pages;
+            return CommonResult.getSuccessResultData(pages);
         } else {
             Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
                     .where(QSysTechnicalTitle.technicalName._like$_(sysTechnicalTitleAndPostVO.getTechnicalName()).or(QSysTechnicalTitle.sysPost.chain(QSysPost.postName).eq$(sysTechnicalTitleAndPostVO.getPostName())).or(QSysTechnicalTitle.status.eq$(sysTechnicalTitleAndPostVO.getStatus())))
                     .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
+                    .sorting(QSysTechnicalTitle.createTime.desc())
                     .mapperTo(SysTechnicalTitleAndPostVO.class)
                     .execute();
-            return pages;
+            return CommonResult.getSuccessResultData(pages);
         }
     }
 
@@ -127,14 +131,13 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
 
     /**
      * 启动/禁用
-     * @param sysTechnicalTitle
+     * @param sysTechnicalTitleAndPostVO
      */
     @Override
-    public void updateStatus(SysTechnicalTitle sysTechnicalTitle) {
-        int status = ("0".equals(sysTechnicalTitle.getStatus())) ? 1 : 0;
+    public void updateStatus(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
         QSysTechnicalTitle.sysTechnicalTitle.update(QSysTechnicalTitle.status)
-                .where(QSysTechnicalTitle.technicalTitleId.eq$(sysTechnicalTitle.getTechnicalTitleId()))
-                .execute(ImmutableMap.of("status", status));
+                .where(QSysTechnicalTitle.technicalTitleId.eq$(sysTechnicalTitleAndPostVO.getTechnicalTitleId()))
+                .execute(ImmutableMap.of("status", sysTechnicalTitleAndPostVO.getStatus()));
 
     }
 }

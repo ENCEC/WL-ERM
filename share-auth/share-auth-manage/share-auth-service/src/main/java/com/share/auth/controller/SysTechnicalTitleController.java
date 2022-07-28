@@ -6,6 +6,7 @@ import com.gillion.ec.core.utils.ResultUtils;
 import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
 import com.share.auth.service.SysTechnicalTitleService;
+import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -43,7 +44,7 @@ public class SysTechnicalTitleController {
             @ApiImplicitParam(name = "pageSize", value = "分页条数", dataTypeClass = Integer.class, paramType = "body"),
     })
     @GetMapping ("/queryByPageAll")
-    public Page<SysTechnicalTitleAndPostVO> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+    public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByPageAll(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
        return sysTechnicalTitleService.queryByPageAll(sysTechnicalTitleAndPostVO);
     }
 
@@ -61,7 +62,7 @@ public class SysTechnicalTitleController {
             @ApiImplicitParam(name = "technicalName", value = "职称名称", dataTypeClass = String.class, paramType = "body"),
     })
     @GetMapping ("/queryByTechnicalTitleName")
-    public Page<SysTechnicalTitleAndPostVO> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+    public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
         return sysTechnicalTitleService.queryByTechnicalTitleName(sysTechnicalTitleAndPostVO);
     }
 
@@ -98,7 +99,7 @@ public class SysTechnicalTitleController {
      */
     @ApiOperation("删除职称信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "technicalName", value = "职称名称", required = true, dataTypeClass = String.class, paramType = "body")
+            @ApiImplicitParam(name = "technicalTitleId", value = "职称Id", required = true, dataTypeClass = Long.class, paramType = "body")
     })
     @DeleteMapping("/deleteSysTechnicalTitle")
     public Map<String,Object> deleteSysTechnicalTitle(Long technicalTitleId) {
@@ -108,14 +109,14 @@ public class SysTechnicalTitleController {
 
     /**
      * 启用/禁用岗位职称
-     * @param sysTechnicalTitle
+     * @param sysTechnicalTitleAndPostVO
      * @return
      */
     @ApiOperation("启用/禁用岗位职称")
     @ApiImplicitParam(name = "sysTechnicalTitle", value = "岗位职称类", required = true, dataType = "SysTechnicalTitle")
     @GetMapping("/updateStatus")
-    public Map<String,Object> updateStatus(SysTechnicalTitle sysTechnicalTitle) {
-        sysTechnicalTitleService.updateStatus(sysTechnicalTitle);
+    public Map<String,Object> updateStatus(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+        sysTechnicalTitleService.updateStatus(sysTechnicalTitleAndPostVO);
         return ResultUtils.getSuccessResultData(true);
     }
 
