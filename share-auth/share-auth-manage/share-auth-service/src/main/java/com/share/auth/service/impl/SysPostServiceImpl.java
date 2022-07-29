@@ -185,7 +185,8 @@ public class SysPostServiceImpl implements SysPostService {
         //更新信息
         BeanUtils.copyProperties(sysPostDTO, sysPost);
         sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        sysPost.setUpdateTime(new DateTime());//更新时间
+        //更新时间
+        sysPost.setUpdateTime(new DateTime());
         int row = QSysPost.sysPost.save(sysPost);
 
         if (row > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
