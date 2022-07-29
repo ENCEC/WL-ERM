@@ -13,8 +13,6 @@ import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysResourceQueryVO;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
-import com.share.auth.domain.SysResourceQueryVO;
-import com.share.auth.model.vo.SysResourceVO;
 import com.share.auth.service.SysResourceService;
 import com.share.auth.user.DefaultUserService;
 import com.share.support.result.CommonResult;
@@ -534,7 +532,7 @@ public class SysResourceServiceImpl implements SysResourceService {
     public ResultHelper<List<QueryResourceDTO>> queryAllValidResource() {
         List<QueryResourceDTO> queryResourceDTOList = QSysResource.sysResource
                 .select(QSysResource.sysResource.fieldContainer())
-                .where(QSysResource.isValid.eq$(true).and(QSysResource.isValid.eq$(true)))
+                .where(QSysResource.isValid.eq$(true).and(QSysResource.isDeleted.eq$(false)))
                 .mapperTo(QueryResourceDTO.class)
                 .execute();
         queryResourceDTOList = dealWithResource(queryResourceDTOList, false);
