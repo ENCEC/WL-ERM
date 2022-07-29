@@ -98,6 +98,8 @@ public class SysResourceDTO implements Serializable {
     @ApiModelProperty("菜单标题")
     private String resourceTitle;
 
+    private String parentResourceTitle;
+
     /**资源类型（1：模块/页面，2按钮，3接口）*/
     @ApiModelProperty("资源类型（1：模块/页面，2按钮，3接口）")
     private Integer resourceType;
