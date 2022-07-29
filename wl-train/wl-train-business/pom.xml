@@ -205,6 +205,18 @@
             <classifier>pg</classifier>
         </dependency>
 
+        <!-- 认证中心api -->
+        <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>share-auth-api</artifactId>
+            <version>1.2020.001-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>mysql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!--ec: 定时调度-数据库配置获取与状态维护-->
         <dependency>

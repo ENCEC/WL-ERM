@@ -188,7 +188,8 @@ ec:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://train.eds.dps.gillion.com.cn/eureka
+      #eds的注册地址
+      defaultZone: http://dev.eds.lip.dps.gillion.com.cn/eureka/
   instance:
     # 优先使用IP地址方式进行注册服务
     prefer-ip-address: true
@@ -287,3 +288,12 @@ redis:
   maxIdle: 50
   # 最大连接数
   maxTotal: 100
+
+# 各个系统服务名,api包feign的value值使用占位符获取
+application:
+  name:
+    auth: share-auth
+    message: share-message
+    file: share-file
+    portal: share-portal
+    center: share-auth-center
