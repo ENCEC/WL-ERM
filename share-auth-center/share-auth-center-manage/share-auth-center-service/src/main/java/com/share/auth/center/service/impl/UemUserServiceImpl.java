@@ -3,7 +3,6 @@ package com.share.auth.center.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.gillion.ds.client.api.queryobject.expressions.AndExpression;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.ec.core.utils.CookieUtils;
 import com.gillion.ec.snowflakeid.SnowFlakeGenerator;
@@ -124,6 +123,7 @@ public class UemUserServiceImpl implements UemUserService {
                 QUemUser.account.eq$(username)
                         .or(QUemUser.mobile.eq$(username))
                         .or(QUemUser.email.eq$(username))
+                        .and(QUemUser.isDeleted.eq$(false))
         ).execute();
         // 查询是否管理员登录
         SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().where(
@@ -246,10 +246,10 @@ public class UemUserServiceImpl implements UemUserService {
      */
     @Override
     public ResultHelper<Object> validateUser(String account, String password, String clientId, String checkMoveId, Double xWidth, HttpServletRequest request, HttpServletResponse response) {
-        String resultStr = validateCode(checkMoveId, xWidth, true);
-        if (StringUtils.isNotEmpty(resultStr)) {
-            return CommonResult.getFaildResultData(resultStr);
-        }
+//        String resultStr = validateCode(checkMoveId, xWidth, true);
+//        if (StringUtils.isNotEmpty(resultStr)) {
+//            return CommonResult.getFaildResultData(resultStr);
+//        }
         // 将滑动结算成功标志设置到session中，/login接口的拦截器中直接判断session中标志即可
         HttpSession session = request.getSession();
         session.setAttribute(checkMoveId, true);
@@ -410,10 +410,10 @@ public class UemUserServiceImpl implements UemUserService {
     @Override
     @Deprecated
     public ResultHelper<Object> validateUserByDigitalCode(String account, String password, String clientId, String checkDigitalId, String verifyCode, HttpServletRequest request, HttpServletResponse response) {
-        String resultStr = validateDigitalCode(checkDigitalId, verifyCode, true);
-        if (StringUtils.isNotEmpty(resultStr)) {
-            return CommonResult.getFaildResultData(resultStr);
-        }
+//        String resultStr = validateDigitalCode(checkDigitalId, verifyCode, true);
+//        if (StringUtils.isNotEmpty(resultStr)) {
+//            return CommonResult.getFaildResultData(resultStr);
+//        }
         // 验证码验证通过设置到session中，/login接口的拦截器中直接判断session中标志即可
         HttpSession session = request.getSession();
         session.setAttribute(checkDigitalId, true);
