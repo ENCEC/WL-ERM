@@ -5,9 +5,6 @@ import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.gillion.model.entity.SupportedLocale;
 
-import java.lang.Integer;
-import java.lang.String;
-
 
 /**
 * @author daoServiceGenerator
@@ -17,12 +14,12 @@ import java.lang.String;
 public class QSupportedLocale extends BaseModelExpression<SupportedLocale, Integer> {
 
     public static final BaseModelExpression<SupportedLocale, Integer> supportedLocale = new QSupportedLocale();
+    public static final FieldExpression<String> country = supportedLocale.fieldOf("country", String.class);
+    public static final FieldExpression<String> display = supportedLocale.fieldOf("display", String.class);
     public static final FieldExpression<Integer> id = supportedLocale.fieldOf("id", Integer.class);
     public static final FieldExpression<String> language = supportedLocale.fieldOf("language", String.class);
-    public static final FieldExpression<String> country = supportedLocale.fieldOf("country", String.class);
-    public static final FieldExpression<String> variant = supportedLocale.fieldOf("variant", String.class);
-    public static final FieldExpression<String> display = supportedLocale.fieldOf("display", String.class);
     public static final FieldExpression<String> state = supportedLocale.fieldOf("state", String.class);
+    public static final FieldExpression<String> variant = supportedLocale.fieldOf("variant", String.class);
 
 
     public QSupportedLocale() {
