@@ -167,4 +167,9 @@ public interface ShareAuthInterface {
     @ResponseBody
     ResultHelper<UemUserDto> getLoginUserInfo();
 
+    @ApiOperation("获取问好接口")
+    @GetMapping("/user/getHelloFlag")
+    @ResponseBody
+    ResultHelper<String> getHelloFlag();
+
 }

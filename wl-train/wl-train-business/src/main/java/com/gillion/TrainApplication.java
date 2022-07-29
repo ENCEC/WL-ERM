@@ -34,7 +34,7 @@ import javax.sql.DataSource;
                 "com.gillion.ds.excel.export.controller"
         })
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = {"com.gillion.ec.rule.number", "com.gillion.ds", "com.gillion.service","com.gillion.demo.api"})
+@EnableFeignClients(basePackages = {"com.gillion.ec.rule.number", "com.gillion.ds", "com.gillion.service", "com.share"})
 @EnableFeignRuleNumberClient
 @EnableSchedulerSupervisor
 @EnableSchedulerDashboard
