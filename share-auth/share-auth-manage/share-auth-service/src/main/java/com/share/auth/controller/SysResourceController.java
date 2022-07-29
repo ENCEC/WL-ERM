@@ -1,8 +1,10 @@
 package com.share.auth.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.share.auth.domain.*;
-import com.share.auth.model.entity.SysResource;
+import com.share.auth.domain.PageDto;
+import com.share.auth.domain.QueryResourceDTO;
+import com.share.auth.domain.SysResourceDTO;
+import com.share.auth.domain.SysResourceQueryVO;
 import com.share.auth.service.SysResourceService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -67,6 +69,33 @@ public class SysResourceController {
     @ApiOperation(value = "根据应用ID、用户ID和页面URL获取页面的按钮列表")
     public ResultHelper<List<QueryResourceDTO>> queryButtonInPage(@RequestBody SysResourceQueryVO sysResourceQueryVO) {
         return sysResourceService.queryButtonInPage(sysResourceQueryVO);
+    }
+
+
+    /**
+     * 根据角色ID获取资源列表
+     * @param sysRoleIdList 角色ID列表
+     * @return ResultHelper<List<Long>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @PostMapping("/sysResource/queryResourceByRole")
+    @ApiOperation(value = "根据角色ID获取资源列表")
+    @ApiImplicitParam(name = "sysRoleId", value = "角色ID", dataTypeClass = Long.class, required = true, paramType = "body")
+    public ResultHelper<List<SysResourceDTO>> queryResourceByRole(@RequestBody List<Long> sysRoleIdList) {
+        return sysResourceService.queryResourceByRole(sysRoleIdList);
+    }
+
+    /**
+     * 获取所有未禁用菜单
+     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysResourceDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    @GetMapping("/sysResource/queryAllValidResource")
+    @ApiOperation(value = "获取所有未禁用菜单")
+    public ResultHelper<List<QueryResourceDTO>> queryAllValidResource() {
+        return sysResourceService.queryAllValidResource();
     }
 
     /**

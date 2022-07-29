@@ -59,6 +59,23 @@ public interface SysResourceService {
     ResultHelper<List<QueryResourceDTO>> queryButtonInPage(SysResourceQueryVO sysResourceQueryVO);
 
     /**
+     * 根据角色ID获取资源列表
+     *
+     * @param sysRoleIdList 角色ID列表
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<List<SysResourceDTO>> queryResourceByRole(List<Long> sysRoleIdList);
+
+    /**
+     * 获取所有未禁用角色
+     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysResourceDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-07-28
+     */
+    ResultHelper<List<QueryResourceDTO>> queryAllValidResource();
+
+    /**
      * 新增菜单
      *
      * @param sysResourceDTO -
@@ -92,12 +109,11 @@ public interface SysResourceService {
      * @param sysResourceDTO
      */
     ResultHelper<Object> updateResourceStatus(SysResourceDTO sysResourceDTO);
-
-    /**
-     * 逻辑删除菜单信息
-     *
-     * @param sysResourceId
-     */
+/**
+ * 逻辑删除菜单信息
+ *
+ * @param sysResourceId
+ */
     ResultHelper<Object> deleteResource(Long sysResourceId);
 
     /**
