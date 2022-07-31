@@ -2,6 +2,8 @@ package com.share.auth.service.impl;
 
 import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.expressions.Expression;
+import com.gillion.ds.client.api.queryobject.model.Page;
+import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.ec.core.security.IUser;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -496,6 +498,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         return CommonResult.getSuccessResultData(queryResourceDTOList);
     }
 
+
     /**
      * 根据角色ID获取资源列表
      *
@@ -529,10 +532,160 @@ public class SysResourceServiceImpl implements SysResourceService {
     public ResultHelper<List<QueryResourceDTO>> queryAllValidResource() {
         List<QueryResourceDTO> queryResourceDTOList = QSysResource.sysResource
                 .select(QSysResource.sysResource.fieldContainer())
-                .where(QSysResource.isValid.eq$(true).and(QSysResource.isValid.eq$(true)))
+                .where(QSysResource.isValid.eq$(true).and(QSysResource.isDeleted.eq$(false)))
                 .mapperTo(QueryResourceDTO.class)
                 .execute();
         queryResourceDTOList = dealWithResource(queryResourceDTOList, false);
         return CommonResult.getSuccessResultData(queryResourceDTOList);
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 新增菜单信息
+     * @Date: 2022/7/25
+     */
+    @Override
+    public ResultHelper<Object> saveResource(SysResourceDTO sysResourceDTO) {
+        SysResource sysResource = new SysResource();
+        String resourceTitle = sysResourceDTO.getResourceTitle();
+        String resourceUrl = sysResourceDTO.getResourceUrl();
+        Integer resourceSort = sysResourceDTO.getResourceSort();
+        String resourceRemark = sysResourceDTO.getResourceRemark();
+        Long sysResourceId = sysResourceDTO.getSysResourceId();
+        Long resourcePid = sysResourceDTO.getResourcePid();
+        sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        sysResource.setSysApplicationId(1L);
+        sysResource.setIsValid(true);
+        sysResource.setSysResourceId(sysResourceId);
+        sysResource.setResourcePid(resourcePid);
+        sysResource.setResourceTitle(resourceTitle);
+        sysResource.setResourceUrl(resourceUrl);
+        sysResource.setResourceSort(resourceSort);
+        sysResource.setResourceRemark(resourceRemark);
+        sysResource.setResourcePid(resourcePid);
+        QSysResource.sysResource.save(sysResource);
+        return CommonResult.getSuccessResultData("新增成功");
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 分页带条件查询菜单信息
+     * @Date: 2022/7/25
+     */
+    @Override
+    public Page<SysResourceDTO> queryResourceByPage(SysResourceDTO sysResourceDTO) {
+        Integer currentPage = sysResourceDTO.getCurrentPage();
+        Integer pageSize = sysResourceDTO.getPageSize();
+        return DSContext.customization("WL-ERM_queryResourceByPage").select()
+                .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class)
+                .sorting()
+                .execute(sysResourceDTO);
+      /*  return QSysResource.sysResource.select(
+                        QSysResource.sysResourceId,
+                        QSysResource.sysResource.chain(QSysResource.resourceTitle).as("parentName"),
+                        QSysResource.resourceTitle,
+                        QSysResource.resourcePid,
+                        QSysResource.creatorName,
+                        QSysResource.resourceUrl,
+                        QSysResource.resourceSort,
+                        QSysResource.createTime,
+                        QSysResource.isValid).
+                where(QSysResource.resourceTitle._like$_(sysResourceDTO.getResourceTitle())
+                        .and(QSysResource.isValid.eq(":isValid")))
+                .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class)
+                .sorting(QSysResource.resourceSort.asc()).execute(sysResourceDTO);*/
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 根据id查询菜单信息
+     * @Date: 2022/7/25
+     */
+    @Override
+    public SysResourceDTO queryResourceById(Long sysResourceId) {
+        return QSysResource.sysResource.selectOne(
+                        //QSysResource.resourcePid,
+                        QSysResource.sysResourceId,
+                        QSysResource.resourceTitle,
+                        QSysResource.resourcePid,
+                        QSysResource.resourceUrl,
+                        QSysResource.resourceSort,
+                        QSysResource.resourceRemark
+                ).where(
+                        QSysResource.sysResourceId.eq$(sysResourceId)
+                )
+                .mapperTo(SysResourceDTO.class)
+                .execute();
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 修改菜单信息
+     * @Date: 2022/7/25
+     */
+    @Override
+    public ResultHelper<Object> updateResource(SysResourceDTO sysResourceDTO) {
+        Long resourceId = sysResourceDTO.getSysResourceId();
+        // Boolean isValid = sysResourceDTO.getIsValid();
+        String resourceTitle = sysResourceDTO.getResourceTitle();
+        String resourceUrl = sysResourceDTO.getResourceUrl();
+        Integer resourceSort = sysResourceDTO.getResourceSort();
+        String resourceRemark = sysResourceDTO.getResourceRemark();
+        SysResource sysResource = QSysResource.sysResource.selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
+        sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        sysResource.setSysResourceId(resourceId);
+        // sysResource.setIsValid(isValid);
+        sysResource.setResourceTitle(resourceTitle);
+        sysResource.setResourceUrl(resourceUrl);
+        sysResource.setResourceSort(resourceSort);
+        sysResource.setResourceRemark(resourceRemark);
+        QSysResource.sysResource.save(sysResource);
+        return CommonResult.getSuccessResultData("修改成功");
+    }
+
+    /**
+     * @Author:wzr
+     * @Description: 菜单信息是否禁用状态
+     * @Date: 2022/7/26
+     */
+    @Override
+    public ResultHelper<Object> updateResourceStatus(SysResourceDTO sysResourceDTO) {
+        Long resourceId = sysResourceDTO.getSysResourceId();
+        //是否禁用（0禁用，1启用）
+        Boolean isValid = sysResourceDTO.getIsValid();
+
+        int updateCount = QSysResource.sysResource
+                .update(
+                        QSysResource.isValid,
+                        QSysResource.invalidTime
+                )
+                .where(QSysResource.sysResourceId.eq$(resourceId))
+                .execute(isValid, new Date(), resourceId);
+        if (updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+            return CommonResult.getSuccessResultData("禁用成功");
+        } else {
+            return CommonResult.getFaildResultData("禁用失败");
+        }
+    }
+
+    /**
+     * 逻辑删除菜单信息
+     *
+     * @author wzr
+     * @date 2022-07-26
+     */
+    @Override
+    public ResultHelper<Object> deleteResource(Long sysResourceId) {
+        int i = QSysResource.sysResource.deleteById(sysResourceId);
+        return CommonResult.getSuccessResultData("删除成功");
+    }
+
+    @Override
+    public List<SysResourceDTO> queryParentResource() {
+        return DSContext.customization("WL-ERM_queryResourceTitle").select()
+                .mapperTo(SysResourceDTO.class)
+                .execute();
     }
 }
