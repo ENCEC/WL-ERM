@@ -67,11 +67,11 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
         Integer pageSize = pageDto.getPageSize();
 
-        if(!StringUtils.isEmpty(dictTypeCode)){
+        if (!StringUtils.isEmpty(dictTypeCode)) {
             sysDictTypeDto.setDictTypeCode("%" + dictTypeCode + "%");
         }
 
-        if(!StringUtils.isEmpty(dictTypeName)){
+        if (!StringUtils.isEmpty(dictTypeName)) {
             sysDictTypeDto.setDictTypeName("%" + dictTypeName + "%");
         }
 
@@ -91,11 +91,13 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .execute(sysDictTypeDto);
     }
 
-    /**基础管理 数据字典 新增字典
+    /**
+     * 基础管理 数据字典 新增字典
+     *
      * @param sysDictTypeDto 数据字典表映射表
      * @return
      * @author xrp
-     * */
+     */
     @Override
     public ResultHelper<Object> saveSysDictType(SysDictTypeDto sysDictTypeDto) {
         log.info("平台客服新增数据字典");
@@ -108,11 +110,11 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         //备注
         String remark = sysDictTypeDto.getRemark();
 
-        if(StringUtils.isEmpty(dictTypeCode)){
+        if (StringUtils.isEmpty(dictTypeCode)) {
             log.error("字典类型不能为空");
             return CommonResult.getFaildResultData("字典类型不能为空");
         }
-        if(StringUtils.isEmpty(dictTypeName)){
+        if (StringUtils.isEmpty(dictTypeName)) {
             log.error("字典名称不能为空");
             return CommonResult.getFaildResultData("字典名称不能为空");
         }
@@ -123,7 +125,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                         .and(QSysDictType.sysDictTypeId.ne(SYS_DICT_TYPE_ID_PLACEHOLDER)))
                 .execute(ImmutableMap.of("dictTypeCode", dictTypeCode, SYS_DICT_TYPE, sysDictTypeId));
 
-        if(!CollectionUtils.isEmpty(sysDictTypeList)){
+        if (!CollectionUtils.isEmpty(sysDictTypeList)) {
             log.error("字典类型：{}，已存在该字典类型的数据：{}", dictTypeCode, sysDictTypeList.get(0));
             return CommonResult.getFaildResultData("字典类型必须唯一");
         }
@@ -139,18 +141,20 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         log.info("平台客服保存数据字典信息：{}", sysDictType);
         int saveCount = QSysDictType.sysDictType.save(sysDictType);
         log.info("平台客服保存数据字典信息，返回保存行数为：{}", saveCount);
-        if(saveCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM){
+        if (saveCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
             return CommonResult.getSuccessResultData("保存成功");
-        }else{
+        } else {
             return CommonResult.getFaildResultData("保存失败");
         }
     }
 
-    /**基础管理 数据字典 修改字典
+    /**
+     * 基础管理 数据字典 修改字典
+     *
      * @param sysDictTypeDto 数据字典表映射表
      * @return
      * @author xrp
-     * */
+     */
     @Override
     public ResultHelper<Object> updateSysDictType(SysDictTypeDto sysDictTypeDto) {
         log.info("平台客服修改数据字典");
@@ -166,11 +170,11 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
             log.error("字典ID不能为空");
             return CommonResult.getFaildResultData("字典ID不能为空");
         }
-        if(StringUtils.isEmpty(dictTypeCode)){
+        if (StringUtils.isEmpty(dictTypeCode)) {
             log.error("字典类型不能为空");
             return CommonResult.getFaildResultData("字典类型不能为空");
         }
-        if(StringUtils.isEmpty(dictTypeName)){
+        if (StringUtils.isEmpty(dictTypeName)) {
             log.error("字典名称不能为空");
             return CommonResult.getFaildResultData("字典名称不能为空");
         }
@@ -180,11 +184,10 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .where(QSysDictType.dictTypeCode.eq(":dictTypeCode")
                         .and(QSysDictType.sysDictTypeId.ne(SYS_DICT_TYPE_ID_PLACEHOLDER)))
                 .execute(ImmutableMap.of("dictTypeCode", dictTypeCode, SYS_DICT_TYPE, sysDictTypeId));
-        if(!CollectionUtils.isEmpty(sysDictTypeList)){
+        if (!CollectionUtils.isEmpty(sysDictTypeList)) {
             log.error("字典类型：{}，已存在该字典类型的数据：{}", dictTypeCode, sysDictTypeList.get(0));
             return CommonResult.getFaildResultData("字典类型必须唯一");
         }
-
         SysDictType sysDictType = QSysDictType.sysDictType.selectOne(QSysDictType.sysDictType.fieldContainer()).byId(Long.valueOf(sysDictTypeId));
         sysDictType.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         sysDictType.setDictTypeName(dictTypeName);
@@ -193,18 +196,20 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         log.info("平台客服修改数据字典信息为：{}", sysDictType);
         int updateCount = QSysDictType.sysDictType.save(sysDictType);
         log.info("平台客服修改数据字典信息，返回修改行数为：{}", updateCount);
-        if(updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM){
+        if (updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
             return CommonResult.getSuccessResultData("修改成功");
-        }else{
+        } else {
             return CommonResult.getFaildResultData("修改失败");
         }
     }
 
-    /**基础管理 数据字典 详情
+    /**
+     * 基础管理 数据字典 详情
+     *
      * @param sysDictTypeId 数据字典表ID
      * @return List<SysDictType>
      * @author xrp
-     * */
+     */
     @Override
     public List<SysDictType> getSysDictType(String sysDictTypeId) {
 
@@ -214,14 +219,15 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .execute(ImmutableMap.of(SYS_DICT_TYPE, sysDictTypeId));
     }
 
-    /**基础管理 数据字典 启停
+    /**
+     * 基础管理 数据字典 启停
+     *
      * @param sysDictTypeDto 数据字典表映射表
      * @return Map<String, Object>
      * @author xrp
-     * */
+     */
     @Override
     public ResultHelper<Object> updateDictTypeStatus(SysDictTypeDto sysDictTypeDto) {
-
         //数据字典表ID
         String sysDictTypeId = sysDictTypeDto.getSysDictTypeId();
         //是否禁用（0禁用，1启用）
@@ -231,23 +237,25 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .update(QSysDictType.isValid,
                         QSysDictType.invalidTime)
                 .where(QSysDictType.sysDictTypeId.eq(SYS_DICT_TYPE_ID_PLACEHOLDER))
-                .execute(isValid,new Date(),sysDictTypeId);
+                .execute(isValid, new Date(), sysDictTypeId);
 
-        if(updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM){
+        if (updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
             return CommonResult.getSuccessResultData("启停成功");
-        }else{
+        } else {
             return CommonResult.getFaildResultData("启停失败");
         }
     }
 
-    /**基础管理 数据字典 配置项分页查询
+    /**
+     * 基础管理 数据字典 配置项分页查询
+     *
      * @param sysDictCodeDto 数据字典配置项表映射
-     * @param pageDto 分页
+     * @param pageDto        分页
      * @return Page<SysDictCodeDto>
      * @author xrp
-     * */
+     */
     @Override
-    public Page<SysDictCodeDto> queryByDictTypeId(SysDictCodeDto sysDictCodeDto,PageDto pageDto) {
+    public Page<SysDictCodeDto> queryByDictTypeId(SysDictCodeDto sysDictCodeDto, PageDto pageDto) {
 
         //配置项编码
         String dictCode = sysDictCodeDto.getDictCode();
@@ -256,10 +264,10 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         String dictName = sysDictCodeDto.getDictName();
 
 
-        if(!StringUtils.isEmpty(dictCode)){
+        if (!StringUtils.isEmpty(dictCode)) {
             sysDictCodeDto.setDictCode("%" + dictCode + "%");
         }
-        if(!StringUtils.isEmpty(dictName)){
+        if (!StringUtils.isEmpty(dictName)) {
             sysDictCodeDto.setDictName("%" + dictName + "%");
         }
 
@@ -278,17 +286,19 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .where(QSysDictCode.isValid.eq(":isValid")
                         .and(QSysDictCode.dictName.like(":dictName").or(QSysDictCode.dictCode.like(":dictName")))
                         .and(QSysDictCode.sysDictTypeId.eq(SYS_DICT_TYPE_ID_PLACEHOLDER)))
-                .paging((pageNo == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : pageNo,(pageSize == null) ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize)
+                .paging((pageNo == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : pageNo, (pageSize == null) ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize)
                 .sorting(QSysDictCode.modifyTime.desc())
                 .mapperTo(SysDictCodeDto.class)
                 .execute(sysDictCodeDto);
     }
 
-    /**基础管理 数据字典 配置项新增或者修改
+    /**
+     * 基础管理 数据字典 配置项新增或者修改
+     *
      * @param sysDictCodeDto 数据字典配置项表映射
      * @return Map<String, Object>
      * @author xrp
-     * */
+     */
     @Override
     public ResultHelper<Object> saveSysDictCode(SysDictCodeDto sysDictCodeDto) {
         log.info("平台客服新增数据字典配置项");
@@ -305,11 +315,11 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         if (Objects.isNull(sysDictTypeId)) {
             return CommonResult.getFaildResultData("字典id不能为空");
         }
-        if(StringUtils.isEmpty(dictCode)){
+        if (StringUtils.isEmpty(dictCode)) {
             log.error("配置项编码不能为空");
             return CommonResult.getFaildResultData("配置项编码不能为空");
         }
-        if(StringUtils.isEmpty(dictName)){
+        if (StringUtils.isEmpty(dictName)) {
             log.error("配置项名称不能为空");
             return CommonResult.getFaildResultData("配置项名称不能为空");
         }
@@ -321,7 +331,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                         .and(QSysDictCode.sysDictCodeId.ne(SYS_DICT_CODE_ID_PLACEHOLDER)))
                 .execute(ImmutableMap.of("dictCode", dictCode, SYS_DICT_TYPE, sysDictTypeId, "sysDictCodeId", sysDictCodeId));
 
-        if(!CollectionUtils.isEmpty(sysDictCodeList)){
+        if (!CollectionUtils.isEmpty(sysDictCodeList)) {
             log.error("字典类型id：{}，配置项编码：{}，已存在该配置项编码的数据：{}", sysDictTypeId, dictCode, sysDictCodeList.get(0));
             return CommonResult.getFaildResultData("同一个字典类型下，编码必须唯一 ");
         }
@@ -339,11 +349,13 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     }
 
-    /**基础管理 数据字典 配置项新增或者修改
+    /**
+     * 基础管理 数据字典 配置项新增或者修改
+     *
      * @param sysDictCodeDto 数据字典配置项表映射
      * @return Map<String, Object>
      * @author xrp
-     * */
+     */
     @Override
     public ResultHelper<Object> updateSysDictCode(SysDictCodeDto sysDictCodeDto) {
         log.info("平台客服修改数据字典配置项");
@@ -365,11 +377,11 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
             log.error("字典id不能为空");
             return CommonResult.getFaildResultData("字典id不能为空");
         }
-        if(StringUtils.isEmpty(dictCode)){
+        if (StringUtils.isEmpty(dictCode)) {
             log.error("配置项编码不能为空");
             return CommonResult.getFaildResultData("配置项编码不能为空");
         }
-        if(StringUtils.isEmpty(dictName)){
+        if (StringUtils.isEmpty(dictName)) {
             log.error("配置项名称不能为空");
             return CommonResult.getFaildResultData("配置项名称不能为空");
         }
@@ -380,7 +392,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                         .and(QSysDictCode.sysDictTypeId.eq(SYS_DICT_TYPE_ID_PLACEHOLDER))
                         .and(QSysDictCode.sysDictCodeId.ne(SYS_DICT_CODE_ID_PLACEHOLDER)))
                 .execute(ImmutableMap.of("dictCode", dictCode, SYS_DICT_TYPE, sysDictTypeId, "sysDictCodeId", sysDictCodeId));
-        if(!CollectionUtils.isEmpty(sysDictCodeList)){
+        if (!CollectionUtils.isEmpty(sysDictCodeList)) {
             log.error("字典类型id：{}，配置项编码：{}，已存在该配置项编码的数据：{}", sysDictTypeId, dictCode, sysDictCodeList.get(0));
             return CommonResult.getFaildResultData("同一个字典类型下，编码必须唯一 ");
         }
@@ -395,11 +407,13 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     }
 
 
-    /**基础管理 数据字典 配置项详情
+    /**
+     * 基础管理 数据字典 配置项详情
+     *
      * @param sysDictCodeId 数据字典配置项ID
      * @return List<SysDictCode>
      * @author xrp
-     * */
+     */
     @Override
     public List<SysDictCode> getSysDictCode(String sysDictCodeId) {
 
@@ -409,11 +423,13 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .execute(ImmutableMap.of("sysDictCodeId", sysDictCodeId));
     }
 
-    /**基础管理 数据字典 配置项 启停
+    /**
+     * 基础管理 数据字典 配置项 启停
+     *
      * @param sysDictCodeDto 数据字典配置项表映射
      * @return Map<String, Object>
      * @author xrp
-     * */
+     */
     @Override
     public ResultHelper<Object> updateDictCodeStatus(SysDictCodeDto sysDictCodeDto) {
 
@@ -423,9 +439,9 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         Boolean isValid = sysDictCodeDto.getIsValid();
 
         QSysDictCode.sysDictCode.update(QSysDictCode.isValid,
-                QSysDictCode.invalidTime)
+                        QSysDictCode.invalidTime)
                 .where(QSysDictCode.sysDictCodeId.eq(SYS_DICT_CODE_ID_PLACEHOLDER))
-                .execute(isValid,new Date(),sysDictCodeId);
+                .execute(isValid, new Date(), sysDictCodeId);
         return CommonResult.getSuccessResultData("启停成功");
     }
 
@@ -433,7 +449,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     @Override
     public Map<String, List<SysDictCodeDTO>> selectSysDictCodeMapToCodeList(List<String> codeList) {
         HashMap<String, Object> paramMa = new HashMap<>();
-        paramMa.put("dictTypeCodeList",codeList);
+        paramMa.put("dictTypeCodeList", codeList);
         List<SysDictCodeDTO> sysDictCodeDTOList = DSContext.customization("CZT_selectSysDictCode_Auth").select()
                 .mapperTo(SysDictCodeDTO.class)
                 .execute(paramMa);
