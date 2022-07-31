@@ -24,6 +24,7 @@ public class TestControllerTest {
 
     @Autowired
     DaoServiceClient client;
+
     @Test
     void saveSysApplication() {
         System.out.println("tttt");
@@ -35,25 +36,25 @@ public class TestControllerTest {
 //        int savedCount = QSysApplication.sysApplication.save(sys);
         List<SysApplication> lists = client.customCommand("BmsSqlParam")
                 .mapperTo(SysApplication.class)
-                .execute(ImmutableMap.of("application_name","test"));
-        for(SysApplication sysApplication : lists){
+                .execute(ImmutableMap.of("application_name", "test"));
+        for (SysApplication sysApplication : lists) {
             System.out.println(sysApplication.getApplicationName());
         }
     }
 
     @Test
-    void selectSysApplication(){
+    void selectSysApplication() {
         List<SysApplication> sysApplicationList = QSysApplication.sysApplication
                 .select(QSysApplication.sysApplication.fieldContainer())
                 .where(QSysApplication.applicationName.like(":applicationName"))
                 .execute(ImmutableMap.of("applicationName", "44"));
-        for(SysApplication sys : sysApplicationList){
+        for (SysApplication sys : sysApplicationList) {
             System.out.println(sys.getApplicationName());
         }
     }
 
     @Test
-    void companySave(){
+    void companySave() {
         UemCompany uemCompany = new UemCompany();
         uemCompany.setCompanyNameCn("code");
         //uemCompany.setOrganizationType(12);
@@ -69,7 +70,7 @@ public class TestControllerTest {
     }
 
     @Test
-    void relatedSelect(){
+    void relatedSelect() {
         Page page = QUemUser.uemUser
                 .select(QUemUser.uemUserId,
                         QUemUser.account,
@@ -78,14 +79,14 @@ public class TestControllerTest {
                         QUemUser.source,
                         QUemUser.oriApplication,
                         QUemUser.uemUser.chain(QSysApplication.applicationName))
-                .paging(1,10)
+                .paging(1, 10)
                 .mapperTo(ApplicationVO.class)
                 .execute();
         System.out.println(page);
     }
 
     @Test
-    void saveApplication(){
+    void saveApplication() {
         SysApplication sys = new SysApplication();
         //sys.setSysApplicationId("1234");
         //sys.setApplicationName("tt");
@@ -95,4 +96,14 @@ public class TestControllerTest {
         System.out.println(savedCount);
     }
 
+    @Test
+    void san() {
+        String str = "1,2,3,4,5,6";
+        String[] split = str.split(",");
+
+        for (int i = 0; i < split.length; i++) {
+            System.out.println(split[i]);
+            Long  j = Long.valueOf(split[i]);
+        }
+    }
 }

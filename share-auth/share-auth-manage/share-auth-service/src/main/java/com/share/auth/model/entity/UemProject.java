@@ -154,4 +154,8 @@ private static final long serialVersionUID=1;
     @JsonDeserialize(using = String2Long.class)
     private Long uemDeptId;
 
+    /**项目名称*/
+    @Column(name = "project_name")
+    private String projectName;
+
 }
