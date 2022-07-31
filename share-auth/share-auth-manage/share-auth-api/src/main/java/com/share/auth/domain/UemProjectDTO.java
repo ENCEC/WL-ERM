@@ -170,6 +170,13 @@ private static final long serialVersionUID=1;
     @ApiModelProperty("需求成员名称")
     private String genDemandUsersName;
 
+    /** 分页页数 */
+    @ApiModelProperty("分页页数")
+    private Integer currentPage;
+
+    /** 分页显示条数 */
+    @ApiModelProperty("分页显示条数")
+    private Integer pageSize;
 
 
 }

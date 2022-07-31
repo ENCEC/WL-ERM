@@ -6,6 +6,7 @@ import com.gillion.ds.entity.base.BaseModel;
 import com.gillion.ec.core.annotations.Generator;
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 
@@ -118,5 +119,8 @@ private static final long serialVersionUID=1;
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long uemDeptId;
+
+    /**项目名称*/
+    private String projectName;
 
 }

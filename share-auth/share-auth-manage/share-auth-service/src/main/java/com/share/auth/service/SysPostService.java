@@ -11,7 +11,7 @@ import com.share.support.result.ResultHelper;
 public interface SysPostService {
 
     /**
-     * 查询岗位信息
+     * 新增岗位信息
      *
      * @param sysPostDTO 岗位信息封装类
      * @return Page<SysPostDTO>

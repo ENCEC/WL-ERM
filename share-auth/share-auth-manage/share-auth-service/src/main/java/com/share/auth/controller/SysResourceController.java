@@ -92,11 +92,11 @@ public class SysResourceController {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
-    @GetMapping("/sysResource/queryAllValidResource")
-    @ApiOperation(value = "获取所有未禁用菜单")
-    public ResultHelper<List<QueryResourceDTO>> queryAllValidResource() {
-        return sysResourceService.queryAllValidResource();
-    }
+//    @GetMapping("/sysResource/queryAllValidResource")
+//    @ApiOperation(value = "获取所有未禁用菜单")
+//    public ResultHelper<List<QueryResourceDTO>> queryAllValidResource() {
+//        return sysResourceService.queryAllValidResource();
+//    }
 
     /**
      * 获取所有未禁用菜单
@@ -104,9 +104,9 @@ public class SysResourceController {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
-    @GetMapping("/sysResource/queryAllValidResource")
-    @ApiOperation(value = "获取所有未禁用菜单")
-    public ResultHelper<List<SysResourceDTO>> queryAllValidResource() {
-        return sysResourceService.queryAllValidResource();
-    }
+//    @GetMapping("/sysResource/queryAllValidResource")
+//    @ApiOperation(value = "获取所有未禁用菜单")
+//    public ResultHelper<List<SysResourceDTO>> queryAllValidResource() {
+//        return sysResourceService.queryAllValidResource();
+//    }
 }

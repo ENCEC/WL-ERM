@@ -214,4 +214,6 @@ public class UemUserDto extends BaseModel implements Serializable {
     /**组织类型**/
     private String organizationType;
 
+
+
 }
