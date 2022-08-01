@@ -18,7 +18,7 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final BaseModelExpression<TaskDetailInfo, Long> taskDetailInfo = new QTaskDetailInfo();
     public static final FieldExpression<Integer> actionPeriod = taskDetailInfo.fieldOf("actionPeriod", Integer.class);
     public static final FieldExpression<Integer> actionSerialNum = taskDetailInfo.fieldOf("actionSerialNum", Integer.class);
-    public static final FieldExpression<Date> actionTime = taskDetailInfo.fieldOf("actionTime", Date.class);
+    public static final FieldExpression<Integer> actionTime = taskDetailInfo.fieldOf("actionTime", Integer.class);
     public static final FieldExpression<Date> applyDate = taskDetailInfo.fieldOf("applyDate", Date.class);
     public static final FieldExpression<Date> approvalDate = taskDetailInfo.fieldOf("approvalDate", Date.class);
     public static final FieldExpression<Long> approver = taskDetailInfo.fieldOf("approver", Long.class);
@@ -26,7 +26,6 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<Long> creatorId = taskDetailInfo.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = taskDetailInfo.fieldOf("creatorName", String.class);
     public static final FieldExpression<Date> endDate = taskDetailInfo.fieldOf("endDate", Date.class);
-    public static final FieldExpression<Long> executor = taskDetailInfo.fieldOf("executor", Long.class);
     public static final FieldExpression<String> faceRemark = taskDetailInfo.fieldOf("faceRemark", String.class);
     public static final FieldExpression<Date> faceTime = taskDetailInfo.fieldOf("faceTime", Date.class);
     public static final FieldExpression<Long> leader = taskDetailInfo.fieldOf("leader", Long.class);
@@ -41,7 +40,10 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<String> progress = taskDetailInfo.fieldOf("progress", String.class);
     public static final FieldExpression<Integer> recordVersion = taskDetailInfo.fieldOf("recordVersion", Integer.class);
     public static final FieldExpression<String> resultAccess = taskDetailInfo.fieldOf("resultAccess", String.class);
+    public static final FieldExpression<Long> standardDetailId = taskDetailInfo.fieldOf("standardDetailId", Long.class);
+    public static final FieldExpression<String> standardDetailName = taskDetailInfo.fieldOf("standardDetailName", String.class);
     public static final FieldExpression<Long> standardEntryId = taskDetailInfo.fieldOf("standardEntryId", Long.class);
+    public static final FieldExpression<String> standardEntryName = taskDetailInfo.fieldOf("standardEntryName", String.class);
     public static final FieldExpression<Date> startDate = taskDetailInfo.fieldOf("startDate", Date.class);
     public static final FieldExpression<Integer> status = taskDetailInfo.fieldOf("status", Integer.class);
     public static final FieldExpression<Long> taskDetailId = taskDetailInfo.fieldOf("taskDetailId", Long.class);

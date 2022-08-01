@@ -46,7 +46,7 @@ private static final long serialVersionUID=1;
 
     /**执行时间*/
     @Column(name = "action_time")
-    private Date actionTime;
+    private Integer actionTime;
 
     /**申请日期*/
     @Column(name = "apply_date")
@@ -79,12 +79,6 @@ private static final long serialVersionUID=1;
     /**实际完成日期*/
     @Column(name = "end_date")
     private Date endDate;
-
-    /**执行人ID*/
-    @Column(name = "executor")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
-    private Long executor;
 
     /**面谈评语*/
     @Column(name = "face_remark")
@@ -148,11 +142,23 @@ private static final long serialVersionUID=1;
     @Column(name = "result_access")
     private String resultAccess;
 
+    /**规范条目细则ID*/
+    @Column(name = "standard_detail_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long standardDetailId;
+
+    @Column(name = "standard_detail_name")
+    private String standardDetailName;
+
     /**规范条目ID*/
     @Column(name = "standard_entry_id")
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long standardEntryId;
+
+    @Column(name = "standard_entry_name")
+    private String standardEntryName;
 
     /**实际开始日期*/
     @Column(name = "start_date")
