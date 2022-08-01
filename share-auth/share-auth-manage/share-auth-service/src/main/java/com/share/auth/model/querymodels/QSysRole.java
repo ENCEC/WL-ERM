@@ -3,15 +3,16 @@ package com.share.auth.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
+import com.share.auth.model.entity.SysResource;
 import com.share.auth.model.entity.SysRole;
 
 import java.util.Date;
 
 
 /**
-* @author daoServiceGenerator
-* @version 1.0.0.0
-*/
+ * @author daoServiceGenerator
+ * @version 1.0.0.0
+ */
 @SuppressWarnings({"AlibabaConstantFieldShouldBeUpperCase", "unused", "AlibabaClassNamingShouldBeCamel"})
 public class QSysRole extends BaseModelExpression<SysRole, Long> {
 
@@ -39,6 +40,7 @@ public class QSysRole extends BaseModelExpression<SysRole, Long> {
     public static final FieldExpression<Long> topRoleId = sysRole.fieldOf("topRoleId", Long.class);
     public static final FieldExpression<Long> uemDeptId = sysRole.fieldOf("uemDeptId", Long.class);
 
+    public static final BaseModelExpression<SysResource, Long> sysResource = new QSysResource(sysRole, "sysResource");
 
     public QSysRole() {
         super("SysRole", SysRole.class);
