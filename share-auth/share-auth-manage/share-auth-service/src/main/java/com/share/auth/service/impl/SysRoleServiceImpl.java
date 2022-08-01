@@ -346,7 +346,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     public ResultHelper<List<SysRoleDTO>> queryAllValidRole() {
         List<SysRoleDTO> sysRoleDTOList = QSysRole.sysRole
                 .select(QSysRole.sysRole.fieldContainer())
-                .where(QSysRole.isValid.eq$(true).and(QSysRole.isValid.eq$(true)))
+                .where(QSysRole.isValid.eq$(true).and(QSysRole.isDeleted.eq$(false)))
                 .mapperTo(SysRoleDTO.class)
                 .execute();
         return CommonResult.getSuccessResultData(sysRoleDTOList);
