@@ -1,39 +1,24 @@
-package com.gillion.model.entity;
+package com.gillion.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gillion.ds.entity.base.BaseModel;
-import com.gillion.ec.core.annotations.Generator;
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
-
 
 /**
- * @author DaoServiceGenerator
+ * @author xuzt <xuzt@gillion.com.cn>
+ * @date 2022/8/1
  */
-@SuppressWarnings("JpaDataSourceORMInspection")
-        @EqualsAndHashCode(callSuper = true)
-    @Data
-    @Entity
-@Table(name = "standard_entry")
-public class StandardEntry extends BaseModel implements Serializable{
-private static final long serialVersionUID=1;
+@Data
+public class StandardDetailVo {
 
     /**规范条目ID*/
-    @Id
     @Column(name = "standard_entry_id")
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
-    @Generator("snowFlakeGenerator")
     private Long standardEntryId;
 
     /**执行周期*/
@@ -66,20 +51,6 @@ private static final long serialVersionUID=1;
     @Column(name = "apply_professor_id")
     private String applyProfessorId;
 
-    /**创建时间*/
-    @Column(name = "create_time")
-    private Date createTime;
-
-    /**创建人id*/
-    @Column(name = "creator_id")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
-    private Long creatorId;
-
-    /**创建人名称*/
-    @Column(name = "creator_name")
-    private String creatorName;
-
     /**条目名称*/
     @Column(name = "entry_name")
     private String entryName;
@@ -92,30 +63,21 @@ private static final long serialVersionUID=1;
     @Column(name = "item_type")
     private String itemType;
 
-    /**修改人id*/
-    @Column(name = "modifier_id")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
-    private Long modifierId;
-
-    /**修改人名称*/
-    @Column(name = "modifier_name")
-    private String modifierName;
-
-    /**修改时间*/
-    @Column(name = "modify_time")
-    private Date modifyTime;
-
     /**统筹人ID*/
     @Column(name = "ordinator_id")
     private String ordinatorId;
 
-    /**版本号*/
-    @Column(name = "record_version")
-    private Integer recordVersion;
+    /**规范细则ID*/
+    @Column(name = "standard_detail_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long standardDetailId;
 
-    /**状态（0：启用 1：禁用）*/
-    @Column(name = "status")
-    private Boolean status;
+    /**执行序号*/
+    @Column(name = "detail_action_serial_num")
+    private Integer detailActionSerialNum;
 
+    /**细则名称*/
+    @Column(name = "detail_name")
+    private String detailName;
 }
