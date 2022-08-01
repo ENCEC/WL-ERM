@@ -1,0 +1,3 @@
+com\share\support\mail\model\EmailModel.class
+com\share\support\mail\service\MailService.class
+com\share\support\mail\service\impl\MailServiceImpl.class

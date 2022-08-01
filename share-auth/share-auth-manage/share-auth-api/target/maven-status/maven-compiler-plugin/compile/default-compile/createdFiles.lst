@@ -1,0 +1,17 @@
+com\share\auth\api\UemCompanyInterface.class
+com\share\auth\api\ShareAuthInterface.class
+com\share\auth\domain\UemProjectDTO.class
+com\share\auth\domain\QueryResourceDTO.class
+com\share\auth\domain\QueryApplicationDTO.class
+com\share\auth\domain\UemCompanyVO.class
+com\share\auth\domain\QuerySysResourceResultVO.class
+com\share\auth\domain\VaccineCompanyDTO.class
+com\share\auth\domain\CompanyBasicInfoVO.class
+com\share\auth\domain\QueryUemCompanyConditionVO.class
+com\share\auth\api\StandardEntryInterface.class
+com\share\auth\domain\SysPostDTO.class
+com\share\auth\domain\SysTechnicalTitleAndPostVO.class
+com\share\auth\domain\QueryUserSubCompanyDTO.class
+com\share\auth\domain\SysResourceQueryVO.class
+com\share\auth\domain\UemUserDto.class
+com\share\auth\domain\UemUserVO.class

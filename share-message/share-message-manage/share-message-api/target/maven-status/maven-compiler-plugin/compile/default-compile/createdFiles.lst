@@ -1,0 +1,16 @@
+com\share\message\domain\MsgMessageVO.class
+com\share\message\domain\SendMsgReturnVo.class
+com\share\message\api\MsgApiService.class
+com\share\message\api\EmailTemplateService.class
+com\share\message\domain\UserVO.class
+com\share\message\api\MessageService.class
+com\share\message\domain\SendEmailVO.class
+com\share\message\domain\MsgEmailTemplateVO.class
+com\share\message\domain\QueryMessageByUserDTO.class
+com\share\message\domain\MsgMessageTemplateVO.class
+com\share\message\domain\MsgSmsApiVO.class
+com\share\message\domain\QueryMsgMessageTemplateDTO.class
+com\share\message\domain\MdMsgStatusDTO.class
+com\share\message\domain\MdMessageVO.class
+com\share\message\domain\UnReadCountDTO.class
+com\share\message\domain\UserVO$UserVOBuilder.class
