@@ -49,6 +49,7 @@ public interface UemUserManageService {
 
     /**
      * 修改用户信息
+     *
      * @param uemUserEditDTO 用户表封装类
      * @return com.share.support.result.ResultHelper<java.lang.Object>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -85,18 +86,19 @@ public interface UemUserManageService {
     /**
      * 新增用户时异步发送短信提醒给新用户
      *
-     * @param account 用户名
-     * @param email 邮件地址
+     * @param account      用户名
+     * @param email        邮件地址
      * @param passwordText 新密码
-     * @param isReset true:发送重置密码邮件; false:发送新增用户邮件
+     * @param isReset      true:发送重置密码邮件; false:发送新增用户邮件
      * @date 2022-07-25
      */
     void sendEmailWithPassword(String account, String email, String passwordText, boolean isReset);
 
     /**
      * 根据用户ID获取角色列表
+     *
      * @param uemUserDto 用户信息
-     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysRoleDTO>>
+     * @return com.share.support.result.ResultHelper<java.util.List < com.share.auth.domain.SysRoleDTO>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
@@ -104,6 +106,7 @@ public interface UemUserManageService {
 
     /**
      * 赋予用户角色
+     *
      * @param uemUserRoleDtoList 获取uemUserId和sysRoleId
      * @return com.share.support.result.ResultHelper<?>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -113,10 +116,21 @@ public interface UemUserManageService {
 
     /**
      * 清除一个用户的所有角色
+     *
      * @param uemUserId 用户ID
      * @return com.share.support.result.ResultHelper<?>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
     ResultHelper<?> unbindAllRoleOfUser(Long uemUserId);
+
+    /**
+     * 查询员工信息
+     *
+     * @param uemUserDto
+     * @return com.share.support.result.ResultHelper<?>
+     * @author wzr
+     * @date 2022-08-01
+     */
+    Page<UemUserDto> queryStaffByPage(UemUserDto uemUserDto);
 }

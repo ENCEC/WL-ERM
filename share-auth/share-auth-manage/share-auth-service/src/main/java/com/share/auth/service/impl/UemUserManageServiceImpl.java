@@ -12,6 +12,7 @@ import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
 import com.share.auth.model.entity.UemUser;
 import com.share.auth.model.entity.UemUserRole;
+import com.share.auth.model.querymodels.QSysRole;
 import com.share.auth.model.querymodels.QUemUser;
 import com.share.auth.model.querymodels.QUemUserRole;
 import com.share.auth.service.UemUserManageService;
@@ -81,16 +82,16 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         int pageSize = (uemUserDto.getPageSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : uemUserDto.getPageSize();
 
         Page<UemUserDto> uemUserDtoPage = QUemUser.uemUser.select(
-                QUemUser.uemUser.fieldContainer()
-        ).where(
-                QUemUser.account.like(":account")
-                        .and(QUemUser.name.like(":name"))
-                        .and(QUemUser.isValid.eq(":isValid"))
-                        .and(QUemUser.isDeleted.eq$(false))
-        ).paging(pageNo, pageSize)
-        .sorting(QUemUser.createTime.desc())
-        .mapperTo(UemUserDto.class)
-        .execute(uemUserDto);
+                        QUemUser.uemUser.fieldContainer()
+                ).where(
+                        QUemUser.account.like(":account")
+                                .and(QUemUser.name.like(":name"))
+                                .and(QUemUser.isValid.eq(":isValid"))
+                                .and(QUemUser.isDeleted.eq$(false))
+                ).paging(pageNo, pageSize)
+                .sorting(QUemUser.createTime.desc())
+                .mapperTo(UemUserDto.class)
+                .execute(uemUserDto);
 
         return CommonResult.getSuccessResultData(uemUserDtoPage);
     }
@@ -195,7 +196,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                     .select(QUemUser.uemUser.fieldContainer())
                     .where(QUemUser.mobile.eq$(uemUserEditDto.getMobile()))
                     .execute();
-            if(CollectionUtils.isNotEmpty(uemUserList)) {
+            if (CollectionUtils.isNotEmpty(uemUserList)) {
                 return CommonResult.getSuccessResultData("该手机号已经被占用！");
             }
         }
@@ -257,7 +258,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .select(QUemUser.uemUser.fieldContainer())
                 .where(QUemUser.account.eq$(uemUserEditDTO.getAccount()))
                 .execute();
-        if(CollectionUtils.isNotEmpty(accountUser)) {
+        if (CollectionUtils.isNotEmpty(accountUser)) {
             return CommonResult.getSuccessResultData("该用户名已注册过！");
         }
         // 手机号是否可用
@@ -265,7 +266,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .select(QUemUser.uemUser.fieldContainer())
                 .where(QUemUser.mobile.eq$(uemUserEditDTO.getMobile()))
                 .execute();
-        if(CollectionUtils.isNotEmpty(uemUserList)) {
+        if (CollectionUtils.isNotEmpty(uemUserList)) {
             return CommonResult.getSuccessResultData("该手机号已注册过！");
         }
         // 设置字段
@@ -332,10 +333,10 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     /**
      * 新增用户时异步发送短信提醒给新用户
      *
-     * @param account 用户名
-     * @param email 邮件地址
+     * @param account      用户名
+     * @param email        邮件地址
      * @param passwordText 新密码
-     * @param isReset true:发送重置密码邮件; false:发送新增用户邮件
+     * @param isReset      true:发送重置密码邮件; false:发送新增用户邮件
      * @date 2022-07-25
      */
     @Async
@@ -362,7 +363,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * 根据用户ID获取角色列表
      *
      * @param uemUserDto 用户信息
-     * @return ResultHelper<List<SysRoleDTO>>
+     * @return ResultHelper<List < SysRoleDTO>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
@@ -435,5 +436,37 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .where(QUemUserRole.uemUserId.eq$(uemUserId))
                 .execute();
         return CommonResult.getSuccessResultData("删除成功");
+    }
+
+    /**
+     * 分页带条件查询员工信息
+     *
+     * @param uemUserDto
+     * @author wzr
+     * @date 2022-08-01
+     */
+    @Override
+    public Page<UemUserDto> queryStaffByPage(UemUserDto uemUserDto) {
+        Integer currentPage = uemUserDto.getPageNo();
+        Integer pageSize = uemUserDto.getPageSize();
+        return QUemUser.uemUser.select(
+                        QUemUser.uemUserId,
+                        QUemUser.name,
+                        QUemUser.sex,
+                        QUemUser.telephone,
+                        QUemUser.deptName,
+                        QUemUser.uemDeptId,
+                        QUemUser.staffDutyCode,
+                        QUemUser.staffDuty,
+                        QUemUser.technicalTitleId,
+                        QUemUser.technicalName,
+                        QUemUser.jobStatus).
+                where(QUemUser.name._like$_(uemUserDto.getName())
+                        .and(QUemUser.uemDeptId.eq$(uemUserDto.getUemDeptId()))
+                        .and(QUemUser.technicalTitleId.eq$(uemUserDto.getTechnicalTitleId()))
+                        .and(QUemUser.staffDutyCode.eq$(uemUserDto.getStaffDutyCode())))
+                .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(UemUserDto.class)
+                .execute();
     }
 }

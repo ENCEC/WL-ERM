@@ -164,4 +164,6 @@ public interface UemUserService {
      * @author cxq
      * */
     List<UserAndCompanyVo> queryUemUserCompanyByUserId(List<Long> userIdList);
+
+
 }

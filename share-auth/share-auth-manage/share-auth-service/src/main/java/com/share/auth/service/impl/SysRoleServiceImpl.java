@@ -5,6 +5,7 @@ import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.google.common.collect.Lists;
 import com.share.auth.constants.CodeFinal;
+import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.model.entity.SysResource;
@@ -392,20 +393,6 @@ public class SysRoleServiceImpl implements SysRoleService {
         return CommonResult.getSuccessResultData("新增成功!");
     }
 
-    /**
-     * 查询菜单表中所有的权限
-     *
-     * @author wzr
-     * @date 2022-07-29
-     */
-    @Override
-    public List<SysResource> queryAllResource() {
-        return QSysResource.sysResource.select(
-                QSysResource.resourceTitle,
-                QSysResource.sysResourceId,
-                QSysResource.resourcePid
-        ).where(QSysResource.isValid.eq("IS_VALID_PLACEHOLDER")).execute();
-    }
 
     /**
      * 逻辑删除菜单信息
@@ -431,6 +418,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         Integer pageSize = sysRoleDTO.getPageSize();
         return QSysRole.sysRole.select(
                         QSysRole.roleName,
+                        QSysRole.sysRoleId,
                         QSysRole.remark,
                         QSysRole.creatorName,
                         QSysRole.createTime,
@@ -485,6 +473,32 @@ public class SysRoleServiceImpl implements SysRoleService {
             return CommonResult.getFaildResultData("更新失败！");
         }*/
         return CommonResult.getSuccessResultData("更新成功!");
+    }
+
+    /**
+     * 菜单是否禁用状态
+     *
+     * @author wzr
+     * @date 2022-07-29
+     */
+    @Override
+    public ResultHelper<Object> updateRoleStatus(SysRoleDTO sysRoleDTO) {
+        Long sysRoleId = sysRoleDTO.getSysRoleId();
+        //是否禁用（0禁用，1启用）
+        Boolean isValid = sysRoleDTO.getIsValid();
+
+        int updateCount = QSysRole.sysRole
+                .update(
+                        QSysRole.isValid,
+                        QSysRole.invalidTime
+                )
+                .where(QSysRole.sysRoleId.eq$(sysRoleId))
+                .execute(isValid, new Date(), sysRoleId);
+        if (updateCount > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
+            return CommonResult.getSuccessResultData("禁用成功");
+        } else {
+            return CommonResult.getFaildResultData("禁用失败");
+        }
     }
 
 }

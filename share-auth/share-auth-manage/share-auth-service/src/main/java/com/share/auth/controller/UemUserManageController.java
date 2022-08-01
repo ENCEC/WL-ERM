@@ -43,7 +43,7 @@ public class UemUserManageController {
      * 根据用户名、姓名或启禁用状态查询用户信息
      *
      * @param uemUserDto 用户信息封装类
-     * @return ResultHelper<Page<UemUserDto>>
+     * @return ResultHelper<Page < UemUserDto>>
      * @date 2022-07-25
      */
     @ApiOperation("根据用户名、姓名或启禁用状态查询用户信息")
@@ -157,6 +157,7 @@ public class UemUserManageController {
 
     /**
      * 根据用户ID获取角色列表
+     *
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
@@ -169,6 +170,7 @@ public class UemUserManageController {
 
     /**
      * 赋予用户角色
+     *
      * @param uemUserRoleDtoList 获取uemUserId和sysRoleId
      * @return com.share.support.result.ResultHelper<?>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -186,6 +188,7 @@ public class UemUserManageController {
 
     /**
      * 清除一个用户的所有角色
+     *
      * @param uemUserDto 用户信息
      * @return com.share.support.result.ResultHelper<?>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -196,5 +199,19 @@ public class UemUserManageController {
     @ApiImplicitParam(name = "uemUserId", value = "用户ID", required = true, dataType = "Long", paramType = "body")
     public ResultHelper<?> unbindAllRoleOfUser(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.unbindAllRoleOfUser(uemUserDto.getUemUserId());
+    }
+
+    /**
+     * 分页待条件查询员工信息
+     *
+     * @param uemUserDto 员工信息
+     * @author wzr
+     * @date 2022-08-01
+     */
+    @PostMapping("/queryStaffByPage")
+    @ApiOperation(value = "分页带条件查询所有员工的信息")
+    public Page<UemUserDto> queryStaffByPage(@RequestBody UemUserDto uemUserDto) {
+        Page<UemUserDto> uemUserDtoPage = uemUserManageService.queryStaffByPage(uemUserDto);
+        return uemUserDtoPage;
     }
 }

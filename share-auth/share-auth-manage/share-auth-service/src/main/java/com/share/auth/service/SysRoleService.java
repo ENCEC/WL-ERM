@@ -1,6 +1,7 @@
 package com.share.auth.service;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.model.entity.SysResource;
@@ -46,7 +47,7 @@ public interface SysRoleService {
      * @Description: 新增更新保存角色接口
      * @Date: 10:29 2020/11/17
      */
-  //  ResultHelper<Object> updateSysRole(SysRoleDTO sysRoleDTO);
+    //  ResultHelper<Object> updateSysRole(SysRoleDTO sysRoleDTO);
 
     /**
      * 权限分配角色联想控件查询接口
@@ -96,13 +97,6 @@ public interface SysRoleService {
      */
     ResultHelper<Object> saveSysRole(SysRoleDTO sysRoleDTO);
 
-    /**
-     * 查出菜单表中的所有权限
-     *
-     * @author wzr <wzr@gillion.com.cn>
-     * @date 2022-07-29
-     */
-    List<SysResource> queryAllResource();
 
     /**
      * 逻辑删除角色信息
@@ -125,6 +119,7 @@ public interface SysRoleService {
      * @param sysRoleId
      */
     List<SysRoleDTO> queryRoleById(Long sysRoleId);
+
     /**
      * 更新数据
      *
@@ -132,4 +127,10 @@ public interface SysRoleService {
      */
     ResultHelper<Object> updateSysRole(SysRoleDTO sysRoleDTO);
 
+    /**
+     * 菜单是否禁用状态
+     *
+     * @param sysRoleDTO
+     */
+    ResultHelper<Object> updateRoleStatus(SysRoleDTO sysRoleDTO);
 }

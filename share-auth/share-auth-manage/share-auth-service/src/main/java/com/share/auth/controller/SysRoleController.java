@@ -74,17 +74,6 @@ public class SysRoleController {
         return sysRoleService.saveSysRole(sysRoleDTO);
     }
 
-    /**
-     * 获取菜单表中所有权限
-     *
-     * @author wzr
-     * @date 2022-07-29
-     */
-    @PostMapping("/queryAllResource")
-    @ApiOperation("获取所有权限")
-    public List<SysResource> queryAllResource() {
-        return sysRoleService.queryAllResource();
-    }
 
     /**
      * 分页带条件分页查询
@@ -105,7 +94,7 @@ public class SysRoleController {
      * @author wzr
      * @date 2022-07-29
      */
-    @GetMapping("/queryRoleAndResource")
+    @GetMapping("/queryRoleAndResourceById")
     @ApiOperation("根据id查询角色以及绑定的权限信息")
     public List<SysRoleDTO> queryRoleAndResource(@RequestParam Long sysRoleId) {
         return sysRoleService.queryRoleById(sysRoleId);
@@ -130,11 +119,24 @@ public class SysRoleController {
      * @author wzr
      * @date 2022-07-29
      */
-    @PostMapping("/deleteRole")
+    @GetMapping("/deleteRole")
     @ApiOperation("删除角色")
     @ApiImplicitParam(name = "sysRoleId", value = "删除角色接口入参", required = true, dataType = "Long")
     public ResultHelper<Object> deleteRole(@RequestParam(name = "sysRoleId") Long sysRoleId) {
         return sysRoleService.deleteRole(sysRoleId);
+    }
+
+    /**ne
+     * 角色信息是否禁用状态
+     *
+     * @author wzr
+     * @date 2022-07-29
+     */
+    @ApiOperation("更改状态")
+    @PostMapping("/updateRoleStatus")
+    @ResponseBody
+    public ResultHelper<Object> updateRoleStatus(@RequestBody SysRoleDTO sysRoleDTO) {
+        return sysRoleService.updateRoleStatus(sysRoleDTO);
     }
 
     /**
