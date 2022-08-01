@@ -35,6 +35,7 @@ public class QStandardEntry extends BaseModelExpression<StandardEntry, Long> {
     public static final FieldExpression<Integer> recordVersion = standardEntry.fieldOf("recordVersion", Integer.class);
     public static final FieldExpression<Long> standardEntryId = standardEntry.fieldOf("standardEntryId", Long.class);
     public static final FieldExpression<Boolean> status = standardEntry.fieldOf("status", Boolean.class);
+    public static final FieldExpression<String> itemType = standardEntry.fieldOf("itemType", String.class);
 
 
     public QStandardEntry() {

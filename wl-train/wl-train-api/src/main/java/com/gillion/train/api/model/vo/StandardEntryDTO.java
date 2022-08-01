@@ -110,6 +110,10 @@ public class StandardEntryDTO implements Serializable {
     @Column(name = "status")
     private Boolean status;
 
+    /**条目类型*/
+    @Column(name = "status")
+    private String itemType;
+
     /**执行角色名称*/
     @Column(name = "actionRoleName")
     private String actionRoleName;
