@@ -232,4 +232,10 @@ public class UemUserController {
         return userDtoResultHelper;
     }
 
+    @ApiOperation("获取问好接口")
+    @GetMapping("/getHelloFlag")
+    @ResponseBody
+    public ResultHelper<String> getHelloFlag(){
+        return CommonResult.getSuccessResultData("Hello World!");
+    }
 }

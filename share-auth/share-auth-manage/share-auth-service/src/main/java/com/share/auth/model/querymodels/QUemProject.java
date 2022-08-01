@@ -43,6 +43,7 @@ public class QUemProject extends BaseModelExpression<UemProject, Long> {
     public static final FieldExpression<Integer> totalNum = uemProject.fieldOf("totalNum", Integer.class);
     public static final FieldExpression<Long> uemDeptId = uemProject.fieldOf("uemDeptId", Long.class);
     public static final FieldExpression<Long> uemProjectId = uemProject.fieldOf("uemProjectId", Long.class);
+    public static final FieldExpression<String> projectName = uemProject.fieldOf("projectName", String.class);
 
     public static final BaseModelExpression<UemUser, Long> uemUser = new QUemUser(uemProject, "uemUser");
 

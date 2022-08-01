@@ -33,14 +33,14 @@ private static final long serialVersionUID=1;
 
     /**实际结束日期*/
     @ApiModelProperty("实际结束日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date actualEndTime;
 
     /**实际开始日期*/
     @ApiModelProperty("实际开始日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date actualStartTime;
 
     /**总监ID*/
@@ -55,8 +55,8 @@ private static final long serialVersionUID=1;
 
     /**创建时间*/
     @ApiModelProperty("创建时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date createTime;
 
     /**创建人id*/
@@ -127,20 +127,20 @@ private static final long serialVersionUID=1;
 
     /**修改时间*/
     @ApiModelProperty("修改时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date modifyTime;
 
     /**计划结束日期*/
     @ApiModelProperty("计划结束日期*")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date planEndTime;
 
     /**计划开始日期*/
     @ApiModelProperty("计划开始日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date planStartTime;
 
     /**版本号*/
@@ -170,6 +170,13 @@ private static final long serialVersionUID=1;
     @ApiModelProperty("需求成员名称")
     private String genDemandUsersName;
 
+    /** 分页页数 */
+    @ApiModelProperty("分页页数")
+    private Integer currentPage;
+
+    /** 分页显示条数 */
+    @ApiModelProperty("分页显示条数")
+    private Integer pageSize;
 
 
 }

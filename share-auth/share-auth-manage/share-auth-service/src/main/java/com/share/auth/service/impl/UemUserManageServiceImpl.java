@@ -278,8 +278,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setIsDeleted(false);
         // 设置密码
         String passwordText = RandomUtil.randomString(12);
-        String password = MD5EnCodeUtils.MD5EnCode(passwordText);
-        password = MD5EnCodeUtils.encryptionPassword(password);
+        String password = MD5EnCodeUtils.encryptionPassword(passwordText);
+//        password = MD5EnCodeUtils.encryptionPassword(password);
         uemUser.setPassword(password);
         // 新增用户
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
@@ -314,8 +314,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
         // 生成新密码
         String passwordText = RandomUtil.randomString(12);
-        String password = MD5EnCodeUtils.MD5EnCode(passwordText);
-        password = MD5EnCodeUtils.encryptionPassword(password);
+        String password = MD5EnCodeUtils.encryptionPassword(passwordText);
+//        password = MD5EnCodeUtils.encryptionPassword(password);
         // 更新用户
         uemUser.setPassword(password);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
@@ -392,6 +392,10 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Transactional(rollbackFor = Exception.class)
     public ResultHelper<?> bindUserAndRole(List<UemUserRoleDto> uemUserRoleDtoList) {
         List<UemUserRole> uemUserRoles = new LinkedList<>();
+        if (uemUserRoleDtoList.size() <= 0) {
+            return CommonResult.getFaildResultData("列表不能为空");
+        }
+        long uniqueUemUserId = Long.parseLong(uemUserRoleDtoList.get(0).getUemUserId());
         for (UemUserRoleDto uemUserRoleDto : uemUserRoleDtoList) {
             if (Objects.isNull(uemUserRoleDto.getUemUserId())) {
                 return CommonResult.getFaildResultData("用户ID不能为空");
@@ -401,14 +405,18 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             }
             Long uemUserId = Long.parseLong(uemUserRoleDto.getUemUserId());
             Long sysRoleId = Long.parseLong(uemUserRoleDto.getSysRoleId());
+            if (uemUserId != uniqueUemUserId) {
+                return CommonResult.getFaildResultData("只能同时修改一个用户的绑定关系");
+            }
             UemUserRole uemUserRole = new UemUserRole();
-            uemUserRole.setUemUserId(uemUserId);
+            uemUserRole.setUemUserId(uniqueUemUserId);
             uemUserRole.setSysRoleId(sysRoleId);
             uemUserRole.setIsValid(true);
             uemUserRole.setSysApplicationId(1L);
             uemUserRole.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
             uemUserRoles.add(uemUserRole);
         }
+        this.unbindAllRoleOfUser(uniqueUemUserId);
         int rowCount = QUemUserRole.uemUserRole.save(uemUserRoles);
         if (rowCount == uemUserRoleDtoList.size()) {
             return CommonResult.getSuccessResultData("绑定成功");
