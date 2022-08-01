@@ -7,9 +7,7 @@ import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @ClassName StandardEntryController
@@ -26,8 +24,8 @@ public class StandardEntryController {
     private StandardEntryInterface standardEntryInterface;
 
 
-    @GetMapping("/sysTechnicalTitle/queryByTechnicalTitleName")
-   public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO){
+    @PostMapping("/sysTechnicalTitle/queryByTechnicalTitleName")
+   public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(@RequestBody SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO){
         return standardEntryInterface.queryByTechnicalTitleName(sysTechnicalTitleAndPostVO);
     }
 
