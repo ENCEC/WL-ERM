@@ -60,9 +60,8 @@ public class SysTechnicalTitleController {
     @ApiOperation("新增职称信息")
     @ApiImplicitParam(name = "sysTechnicalTitleAndPostVO", value = "岗位职称封装类", required = true, dataType = "SysTechnicalTitleAndPostVO")
     @PostMapping("/saveSysTechnicalTitle")
-    public Map<String,Object> saveSysTechnicalTitle(@RequestBody SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO ) {
-        sysTechnicalTitleService.saveSysTechnicalTitle(sysTechnicalTitleAndPostVO);
-        return ResultUtils.getSuccessResultData(true);
+    public ResultHelper<?> saveSysTechnicalTitle(@RequestBody SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO ) {
+        return sysTechnicalTitleService.saveSysTechnicalTitle(sysTechnicalTitleAndPostVO);
     }
 
     /**
@@ -73,9 +72,8 @@ public class SysTechnicalTitleController {
     @ApiOperation("编辑职称信息")
     @ApiImplicitParam(name = "sysTechnicalTitleAndPostVO", value = "岗位职称封装类", required = true, dataType = "SysTechnicalTitleAndPostVO")
     @PostMapping("/updateSysTechnicalTitle")
-    public Map<String,Object> updateSysTechnicalTitle(@RequestBody SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
-        sysTechnicalTitleService.updateSysTechnicalTitle(sysTechnicalTitleAndPostVO);
-        return ResultUtils.getSuccessResultData(true);
+    public ResultHelper<?> updateSysTechnicalTitle(@RequestBody SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+        return sysTechnicalTitleService.updateSysTechnicalTitle(sysTechnicalTitleAndPostVO);
     }
 
     /**
