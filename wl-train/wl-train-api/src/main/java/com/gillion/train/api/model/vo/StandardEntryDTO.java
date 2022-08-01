@@ -1,32 +1,24 @@
-package com.gillion.model.entity;
+package com.gillion.train.api.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gillion.ds.entity.base.BaseModel;
 import com.gillion.ec.core.annotations.Generator;
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
-
 /**
- * @author DaoServiceGenerator
- */
-@SuppressWarnings("JpaDataSourceORMInspection")
-        @EqualsAndHashCode(callSuper = true)
-    @Data
-    @Entity
-@Table(name = "standard_entry")
-public class StandardEntry extends BaseModel implements Serializable{
-private static final long serialVersionUID=1;
+ * @ClassName StandardEntryDTO
+ * @Author weiq
+ * @Date 2022/8/1 13:18
+ * @Version 1.0
+ **/
+public class StandardEntryDTO implements Serializable {
+    private static final long serialVersionUID=1;
 
     /**规范条目ID*/
     @Id
@@ -118,4 +110,11 @@ private static final long serialVersionUID=1;
     @Column(name = "status")
     private Boolean status;
 
+    /**执行角色名称*/
+    @Column(name = "actionRoleName")
+    private String actionRoleName;
+
+    /**执行岗位名称*/
+    @Column(name = "applyPostName")
+    private String applyPostName;
 }

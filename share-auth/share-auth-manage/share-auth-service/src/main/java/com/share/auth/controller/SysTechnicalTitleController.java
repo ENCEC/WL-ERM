@@ -3,8 +3,8 @@ package com.share.auth.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ec.core.utils.ResultUtils;
-import com.share.auth.model.entity.SysTechnicalTitle;
-import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
+import com.share.auth.api.StandardEntryInterface;
+import com.share.auth.domain.SysTechnicalTitleAndPostVO;
 import com.share.auth.service.SysTechnicalTitleService;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
@@ -28,7 +28,7 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("/sysTechnicalTitle")
-public class SysTechnicalTitleController {
+public class SysTechnicalTitleController implements StandardEntryInterface {
 
     @Autowired
     private SysTechnicalTitleService sysTechnicalTitleService;

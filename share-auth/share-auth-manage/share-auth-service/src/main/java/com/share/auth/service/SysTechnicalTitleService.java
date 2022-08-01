@@ -2,7 +2,7 @@ package com.share.auth.service;
 
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
+import com.share.auth.domain.SysTechnicalTitleAndPostVO;
 import com.share.support.result.ResultHelper;
 
 

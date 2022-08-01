@@ -17,6 +17,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>share-auth-api</artifactId>
+            <version>1.2020.001-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>1.0.1</version>
