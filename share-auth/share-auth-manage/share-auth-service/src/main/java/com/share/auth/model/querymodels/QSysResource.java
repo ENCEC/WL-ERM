@@ -35,7 +35,6 @@ public class QSysResource extends BaseModelExpression<SysResource, Long> {
     public static final FieldExpression<String> resourceUrl = sysResource.fieldOf("resourceUrl", String.class);
     public static final FieldExpression<Long> sysApplicationId = sysResource.fieldOf("sysApplicationId", Long.class);
     public static final FieldExpression<Long> sysResourceId = sysResource.fieldOf("sysResourceId", Long.class);
-    public static final FieldExpression<Boolean> isDeleted = sysResource.fieldOf("isDeleted", Boolean.class);
     //public static final FieldExpression<String> parentName = sysResource.fieldOf("parentName", String.class);
 
     public static final BaseModelExpression<SysRoleResource, Long> sysRoleResource = new QSysRoleResource(sysResource, "sysRoleResource");
