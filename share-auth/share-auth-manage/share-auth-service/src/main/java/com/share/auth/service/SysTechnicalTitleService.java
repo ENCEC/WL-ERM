@@ -26,14 +26,14 @@ public interface SysTechnicalTitleService {
      * @param sysTechnicalTitleAndPostVO
      * @return
      */
-    void saveSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
+    ResultHelper<?> saveSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
 
     /**
      * 编辑职称
      * @param sysTechnicalTitleAndPostVO
      * @return
      */
-    void updateSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
+    ResultHelper<?> updateSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
 
     /**
      * 删除职称
