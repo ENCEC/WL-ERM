@@ -3,6 +3,8 @@ package com.gillion.controller;
 import com.gillion.ec.core.utils.ResultUtils;
 import com.gillion.model.entity.Employee;
 import com.gillion.service.EmployeeService;
+import com.share.auth.api.ShareAuthInterface;
+import com.share.support.result.ResultHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ import java.util.Map;
 public class TestController {
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private ShareAuthInterface authInterface;
 
 
     @PostMapping("/query1")
@@ -45,5 +49,12 @@ public class TestController {
     public Map<String, Object> deleteEmployeeId(@PathVariable("id") Integer id) {
         employeeService.deleteEmployeeId(id);
         return ResultUtils.getSuccessResultData(true);
+    }
+
+    @GetMapping("/hello")
+    public String getHelloFlag(){
+       ResultHelper resultHelper = authInterface.getHelloFlag();
+       String str = (String) resultHelper.getData();
+       return str;
     }
 }

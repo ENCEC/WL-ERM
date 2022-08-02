@@ -13,8 +13,11 @@ import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
 import com.share.auth.service.SysTechnicalTitleService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
+import io.seata.common.util.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 /**
@@ -53,8 +56,14 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
      * @return
      */
     @Override
-    public void saveSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
-       SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postId)
+    public ResultHelper<?> saveSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+        List<SysTechnicalTitle> sysTechnicalTitles = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.sysTechnicalTitle.fieldContainer())
+                .where(QSysTechnicalTitle.technicalName.eq$(sysTechnicalTitleAndPostVO.getTechnicalName()))
+                .execute();
+        if (CollectionUtils.isNotEmpty(sysTechnicalTitles)) {
+            return CommonResult.getFaildResultData("该岗位职称已经存在");
+        }
+        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postId)
                 .where(QSysPost.postName.eq$(sysTechnicalTitleAndPostVO.getPostName()))
                 .execute();
         SysTechnicalTitle sysTechnicalTitle = new SysTechnicalTitle();
@@ -66,7 +75,7 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
         sysTechnicalTitle.setStatus("0");
         sysTechnicalTitle.setCreateTime(new DateTime());
         QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
-
+        return CommonResult.getSuccessResultData("新增成功");
     }
 
     /**
@@ -75,7 +84,13 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
      * @return
      */
     @Override
-    public void updateSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+    public ResultHelper<?> updateSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+        List<SysTechnicalTitle> sysTechnicalTitles = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.sysTechnicalTitle.fieldContainer())
+                .where(QSysTechnicalTitle.technicalName.eq$(sysTechnicalTitleAndPostVO.getTechnicalName()))
+                .execute();
+        if (CollectionUtils.isNotEmpty(sysTechnicalTitles)) {
+            return CommonResult.getFaildResultData("该岗位职称已经存在");
+        }
         SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postId)
                 .where(QSysPost.postName.eq$(sysTechnicalTitleAndPostVO.getPostName()))
                 .execute();
@@ -88,6 +103,7 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
         sysTechnicalTitle.setCreateBy("系统管理员");
         sysTechnicalTitle.setStatus("0");
         QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
+        return CommonResult.getSuccessResultData("更新成功");
     }
 
     /**
