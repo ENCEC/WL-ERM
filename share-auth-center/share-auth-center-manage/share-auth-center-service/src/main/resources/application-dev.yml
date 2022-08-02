@@ -206,7 +206,7 @@ dao-service:
   clientAutoAssemble:
     enabled: true
     # 项⽬唯⼀键
-    project-key: "share_auth_dev"
+    project-key: "zhwl_lip_auth_train_project"
     # 通常为 true, 为 false 使⽤HttpClient
     useEmbedEngine: true
     # 该数据源对应数据服务的数据源信息的名称
