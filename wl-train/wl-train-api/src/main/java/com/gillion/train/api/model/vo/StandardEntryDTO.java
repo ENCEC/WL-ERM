@@ -2,9 +2,13 @@ package com.gillion.train.api.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import com.gillion.ds.entity.base.BaseModel;
 import com.gillion.ec.core.annotations.Generator;
+
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
+import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -17,7 +21,8 @@ import java.util.Date;
  * @Date 2022/8/1 13:18
  * @Version 1.0
  **/
-public class StandardEntryDTO implements Serializable {
+@Data
+public class StandardEntryDTO extends BaseModel implements Serializable {
     private static final long serialVersionUID=1;
 
     /**规范条目ID*/
@@ -121,4 +126,10 @@ public class StandardEntryDTO implements Serializable {
     /**执行岗位名称*/
     @Column(name = "applyPostName")
     private String applyPostName;
+
+    /**分页页数*/
+    private Integer currentPage;
+
+    /**分页条数*/
+    private Integer pageSize;
 }

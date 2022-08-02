@@ -15,4 +15,6 @@ import com.share.support.result.ResultHelper;
 public interface StandardEntryService {
 
     ResultHelper<Page<StandardEntryDTO>> queryStandardEntry(StandardEntryDTO standardEntryDTO);
+
+    ResultHelper<?> saveStandardEntry(StandardEntryDTO standardEntryDTO);
 }

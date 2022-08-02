@@ -1,8 +1,12 @@
 package com.share.auth.api;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.share.auth.domain.SysPostDTO;
 import com.share.auth.domain.SysTechnicalTitleAndPostVO;
+import com.share.auth.domain.UemUserDto;
 import com.share.support.result.ResultHelper;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +23,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Component
 @FeignClient(value = "${application.name.auth}")
 public interface StandardEntryInterface {
-
+    /**
+     * 获取岗位职称信息
+     * @param sysTechnicalTitleAndPostVO
+     * @return
+     */
     @PostMapping("/sysTechnicalTitle/queryByTechnicalTitleName")
     ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(@RequestBody SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO);
+
+    /**
+     * 获取岗位信息
+     * @param sysPostDTO
+     * @return
+     */
+    @PostMapping("/sysPost/querySysPost")
+    ResultHelper<Page<SysPostDTO>> querySysPost(@RequestBody SysPostDTO sysPostDTO);
+
+    /**
+     * 获取用户信息
+     * @param uemUserDto
+     * @return
+     */
+    @PostMapping("/uemUserManage/queryUemUser")
+    ResultHelper<Page<UemUserDto>> queryUemUser(@RequestBody UemUserDto uemUserDto);
+
+//    @PostMapping("/queryRoleList")
+//    public ResultHelper<Page<SysRoleDTO>> queryRoleList(@RequestBody SysRoleQueryVO sysRoleQueryVo)
 }

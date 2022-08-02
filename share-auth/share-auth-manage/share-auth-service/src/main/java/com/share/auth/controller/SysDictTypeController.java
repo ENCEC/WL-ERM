@@ -208,7 +208,11 @@ public class SysDictTypeController {
         return CommonResult.getSuccessResultData(stringListMap);
     }
 
-
+    @PostMapping("/querySysDictType")
+    @ResponseBody
+    public ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto) {
+        return sysDictTypeService.querySysDictType(sysDictTypeDto);
+    }
 
 
 

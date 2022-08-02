@@ -124,5 +124,7 @@ public interface SysDictTypeService {
      */
     Map<String,List<SysDictCodeDTO>> selectSysDictCodeMapToCodeList(List<String> codeList);
 
+    ResultHelper<Page<SysDictTypeDto>> querySysDictType(SysDictTypeDto sysDictTypeDto);
+
 
 }

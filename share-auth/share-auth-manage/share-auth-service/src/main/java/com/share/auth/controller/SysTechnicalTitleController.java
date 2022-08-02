@@ -28,7 +28,7 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("/sysTechnicalTitle")
-public class SysTechnicalTitleController implements StandardEntryInterface {
+public class SysTechnicalTitleController {
 
     @Autowired
     private SysTechnicalTitleService sysTechnicalTitleService;
