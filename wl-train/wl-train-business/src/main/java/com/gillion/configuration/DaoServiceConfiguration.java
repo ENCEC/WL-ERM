@@ -45,7 +45,7 @@ public class DaoServiceConfiguration extends WebMvcConfigurerAdapter {
 
 
     @Primary
-    @Bean(name = "quickstartDataSource")
+    @Bean(name = "basicDataSource")
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource quickstartDataSource() {
         final DruidDataSource quickstartDataSource = new DruidDataSource();

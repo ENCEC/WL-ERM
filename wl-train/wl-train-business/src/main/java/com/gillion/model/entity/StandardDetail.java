@@ -58,10 +58,6 @@ private static final long serialVersionUID=1;
     @Column(name = "detail_name")
     private String detailName;
 
-    /**条目类型*/
-    @Column(name = "item_type")
-    private String itemType;
-
     /**修改人id*/
     @Column(name = "modifier_id")
     @JsonSerialize(using = Long2String.class)

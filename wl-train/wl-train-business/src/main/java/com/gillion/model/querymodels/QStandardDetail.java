@@ -21,7 +21,6 @@ public class QStandardDetail extends BaseModelExpression<StandardDetail, Long> {
     public static final FieldExpression<Long> creatorId = standardDetail.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = standardDetail.fieldOf("creatorName", String.class);
     public static final FieldExpression<String> detailName = standardDetail.fieldOf("detailName", String.class);
-    public static final FieldExpression<String> itemType = standardDetail.fieldOf("itemType", String.class);
     public static final FieldExpression<Long> modifierId = standardDetail.fieldOf("modifierId", Long.class);
     public static final FieldExpression<String> modifierName = standardDetail.fieldOf("modifierName", String.class);
     public static final FieldExpression<Date> modifyTime = standardDetail.fieldOf("modifyTime", Date.class);
