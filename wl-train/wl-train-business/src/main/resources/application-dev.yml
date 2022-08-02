@@ -50,7 +50,8 @@ spring:
       enabled: true
       force: true
 
-
+mySwagger:
+  host: localhost:${server.port}
 
 #EC相关配置
 ec:
