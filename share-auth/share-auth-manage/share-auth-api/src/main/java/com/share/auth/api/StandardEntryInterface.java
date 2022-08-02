@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(value = "${application.name.auth}")
 public interface StandardEntryInterface {
     /**
-     * 获取岗位职称信息
+     * 获取岗位职称信息1
      * @param sysTechnicalTitleAndPostVO
      * @return
      */
