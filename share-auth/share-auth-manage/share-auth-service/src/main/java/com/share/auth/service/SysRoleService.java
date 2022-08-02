@@ -102,6 +102,7 @@ public interface SysRoleService {
      * 逻辑删除角色信息
      *
      * @param sysRoleId
+     * @author wzr <wzr@gillion.com.cn>
      */
     ResultHelper<Object> deleteRole(Long sysRoleId);
 
@@ -109,6 +110,7 @@ public interface SysRoleService {
      * 分页查询角色信息
      *
      * @param sysRoleDTO
+     * @author wzr <wzr@gillion.com.cn>
      */
 
     Page<SysRoleDTO> queryRoleByPage(SysRoleDTO sysRoleDTO);
@@ -117,6 +119,7 @@ public interface SysRoleService {
      * 根据id查出数据
      *
      * @param sysRoleId
+     * @author wzr <wzr@gillion.com.cn>
      */
     List<SysRoleDTO> queryRoleById(Long sysRoleId);
 
@@ -124,6 +127,7 @@ public interface SysRoleService {
      * 更新数据
      *
      * @param sysRoleDTO
+     * @author wzr <wzr@gillion.com.cn>
      */
     ResultHelper<Object> updateSysRole(SysRoleDTO sysRoleDTO);
 
@@ -131,6 +135,7 @@ public interface SysRoleService {
      * 菜单是否禁用状态
      *
      * @param sysRoleDTO
+     * @author wzr <wzr@gillion.com.cn>
      */
     ResultHelper<Object> updateRoleStatus(SysRoleDTO sysRoleDTO);
 }

@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import proguard.util.StringUtil;
 
 import java.util.List;
 
@@ -47,7 +48,6 @@ public class SysRoleController {
     public ResultHelper<Page<SysRoleDTO>> getRoleListByDeptId(@RequestParam(name = "deptId") Long deptId) {
         throw new UnsupportedOperationException();
     }
-
     /**
      * 根据部门ID获取角色列表
      *

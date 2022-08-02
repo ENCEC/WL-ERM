@@ -10,9 +10,10 @@ import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
+import com.share.auth.model.entity.SysResource;
 import com.share.auth.model.entity.UemUser;
 import com.share.auth.model.entity.UemUserRole;
-import com.share.auth.model.querymodels.QSysRole;
+import com.share.auth.model.querymodels.QSysResource;
 import com.share.auth.model.querymodels.QUemUser;
 import com.share.auth.model.querymodels.QUemUserRole;
 import com.share.auth.service.UemUserManageService;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -453,7 +455,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.uemUserId,
                         QUemUser.name,
                         QUemUser.sex,
-                        QUemUser.telephone,
+                        QUemUser.mobile,
                         QUemUser.deptName,
                         QUemUser.uemDeptId,
                         QUemUser.staffDutyCode,
@@ -464,9 +466,114 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 where(QUemUser.name._like$_(uemUserDto.getName())
                         .and(QUemUser.uemDeptId.eq$(uemUserDto.getUemDeptId()))
                         .and(QUemUser.technicalTitleId.eq$(uemUserDto.getTechnicalTitleId()))
-                        .and(QUemUser.staffDutyCode.eq$(uemUserDto.getStaffDutyCode())))
+                        .and(QUemUser.staffDutyCode.eq$(uemUserDto.getStaffDutyCode()))
+                        .and(QUemUser.jobStatus.eq$(uemUserDto.getJobStatus())))
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
                         ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(UemUserDto.class)
                 .execute();
     }
+
+    @Override
+    public List<UemUserDto> queryDepartmentBySelect() {
+        return QUemUser.uemUser.select(
+                        QUemUser.uemDeptId,
+                        QUemUser.deptName
+                ).where(QUemUser.isDeleted.eq$(false)
+                        .and(QUemUser.uemDeptId.notNull()))
+                .mapperTo(UemUserDto.class).execute();
+    }
+
+    @Override
+    public List<UemUserDto> queryStaffDutyBySelect() {
+        return QUemUser.uemUser.select(
+                        QUemUser.staffDutyCode,
+                        QUemUser.staffDuty
+                ).where(QUemUser.isDeleted.eq$(false)
+                        .and(QUemUser.staffDutyCode.notNull()))
+                .mapperTo(UemUserDto.class).execute();
+    }
+
+    @Override
+    public List<UemUserDto> queryTechnicalNameBySelect() {
+        return QUemUser.uemUser.select(
+                        QUemUser.technicalTitleId,
+                        QUemUser.technicalName
+                ).where(QUemUser.isDeleted.eq$(false)
+                        .and(QUemUser.technicalTitleId.notNull()))
+                .mapperTo(UemUserDto.class).execute();
+    }
+
+    @Override
+    public List<UemUserDto> queryProjectNameBySelect() {
+        return QUemUser.uemUser.select(
+                        QUemUser.projectId,
+                        QUemUser.projectName
+                ).where(QUemUser.isDeleted.eq$(false)
+                        .and(QUemUser.projectId.notNull()))
+                .mapperTo(UemUserDto.class).execute();
+    }
+
+    @Override
+    public UemUserDto queryStaffById(Long uemUserId) {
+        return QUemUser.uemUser.selectOne().mapperTo(UemUserDto.class).byId(uemUserId);
+    }
+
+    @Override
+    public ResultHelper<Object> updateStaff(UemUserDto uemUserDto) {
+        Long uemUserId = uemUserDto.getUemUserId();
+        String account = uemUserDto.getAccount();
+        String name = uemUserDto.getName();
+        Boolean sex = uemUserDto.getSex();
+        String date = uemUserDto.getBirthday();
+        Long jobStatus = uemUserDto.getJobStatus();
+        String idCard = uemUserDto.getIdCard();
+        String mobile = uemUserDto.getMobile();
+        String address = uemUserDto.getAddress();
+        String sourceAddress = uemUserDto.getSourceAddress();
+        Long maritalStatus = uemUserDto.getMaritalStatus();
+        //政治面貌暂时不写---来源数据字典
+        Long education = uemUserDto.getEducation();
+        Date graduateDate = uemUserDto.getGraduateDate();
+        String graduateSchool = uemUserDto.getGraduateSchool();
+        String speciality = uemUserDto.getSpeciality();
+        Date entryDate = uemUserDto.getEntryDate();
+        Long uemDeptId = uemUserDto.getUemDeptId();
+        String staffDutyCode = uemUserDto.getStaffDutyCode();
+        Long technicalTitleId = uemUserDto.getTechnicalTitleId();
+        String email = uemUserDto.getEmail();
+        BigDecimal seniority = uemUserDto.getSeniority();
+        Long projectId = uemUserDto.getProjectId();
+        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        uemUser.setUemUserId(uemUserId);
+        uemUser.setAccount(account);
+        uemUser.setSex(sex);
+        uemUser.setBirthday(date);
+        uemUser.setJobStatus(jobStatus);
+        uemUser.setIdCard(idCard);
+        uemUser.setMobile(mobile);
+        uemUser.setAddress(address);
+        uemUser.setSourceAddress(sourceAddress);
+        uemUser.setMaritalStatus(maritalStatus);
+        uemUser.setEducation(education);
+        uemUser.setGraduateDate(graduateDate);
+        uemUser.setGraduateSchool(graduateSchool);
+        uemUser.setSpeciality(speciality);
+        uemUser.setEntryDate(entryDate);
+        uemUser.setUemDeptId(uemDeptId);
+        uemUser.setStaffDutyCode(staffDutyCode);
+        uemUser.setTechnicalTitleId(technicalTitleId);
+        uemUser.setEmail(email);
+        uemUser.setSeniority(seniority);
+        uemUser.setProjectId(projectId);
+        QUemUser.uemUser.save(uemUser);
+        return CommonResult.getSuccessResultData("修改成功!");
+    }
+
+    @Override
+    public ResultHelper<Object> deleteStaff(Long uemUserId) {
+        int i = QUemUser.uemUser.deleteById(uemUserId);
+        return CommonResult.getSuccessResultData("删除成功!");
+    }
+
 }

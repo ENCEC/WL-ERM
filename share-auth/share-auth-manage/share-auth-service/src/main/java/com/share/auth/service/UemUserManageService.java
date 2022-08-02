@@ -128,9 +128,70 @@ public interface UemUserManageService {
      * 查询员工信息
      *
      * @param uemUserDto
-     * @return com.share.support.result.ResultHelper<?>
      * @author wzr
      * @date 2022-08-01
      */
     Page<UemUserDto> queryStaffByPage(UemUserDto uemUserDto);
+
+    /**
+     * 下拉框查询对应部门的所有数据
+     *
+     * @author wzr
+     * @date 2022-08-02
+     */
+    List<UemUserDto> queryDepartmentBySelect();
+
+    /**
+     * 下拉框查询对应岗位的所有数据
+     *
+     * @author wzr
+     * @date 2022-08-02
+     */
+    List<UemUserDto> queryStaffDutyBySelect();
+
+    /**
+     * 下拉框查询对用所有职称的数据
+     *
+     * @author wzr
+     * @date 2022-08-02
+     */
+    List<UemUserDto> queryTechnicalNameBySelect();
+
+    /**
+     * 下拉框查询对用所有项目的数据
+     *
+     * @author wzr
+     * @date 2022-08-02
+     */
+    List<UemUserDto> queryProjectNameBySelect();
+
+    /**
+     * 根据id查询对应员工信息
+     *
+     * @param uemUserId
+     * @author wzr
+     * @date 2022-08-02
+     */
+    UemUserDto queryStaffById(Long uemUserId);
+
+    /**
+     * 编辑员工信息
+     *
+     * @param uemUserDto
+     * @author wzr
+     * @date 2022-08-02
+     */
+    ResultHelper<Object> updateStaff(UemUserDto uemUserDto);
+
+
+    /**
+     * 删除员工信息
+     *
+     * @param uemUserId
+     * @author wzr
+     * @date 2022-08-02
+     */
+    ResultHelper<Object> deleteStaff(Long uemUserId);
+
+
 }
