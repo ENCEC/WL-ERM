@@ -1,18 +1,13 @@
 package com.share.auth.api;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.share.auth.domain.SysPostDTO;
-import com.share.auth.domain.SysTechnicalTitleAndPostVO;
-import com.share.auth.domain.UemUserDto;
+import com.share.auth.domain.*;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @ClassName StandardEntryInterface
@@ -47,6 +42,20 @@ public interface StandardEntryInterface {
     @PostMapping("/uemUserManage/queryUemUser")
     ResultHelper<Page<UemUserDto>> queryUemUser(@RequestBody UemUserDto uemUserDto);
 
-//    @PostMapping("/queryRoleList")
-//    public ResultHelper<Page<SysRoleDTO>> queryRoleList(@RequestBody SysRoleQueryVO sysRoleQueryVo)
+    /**
+     * 获取角色信息
+     * @param sysRoleDTO
+     * @return
+     */
+    @PostMapping("/sysRole/queryRoleByPage")
+     ResultHelper<Page<SysRoleDTO>> queryRoleByPage(@RequestBody SysRoleDTO sysRoleDTO);
+
+    /**
+     * 获取条目类型信息
+     * @param sysDictTypeDto
+     * @return
+     */
+    @PostMapping("/sysDictType/querySysDictType")
+    @ResponseBody
+    ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto);
 }

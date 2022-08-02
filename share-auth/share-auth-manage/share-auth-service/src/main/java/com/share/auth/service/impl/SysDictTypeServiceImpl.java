@@ -457,10 +457,15 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         return queryResourceDTOMap;
     }
 
+    /**
+     * 查询数据字典
+     * @param sysDictTypeDto
+     * @return
+     */
     @Override
     public ResultHelper<Page<SysDictTypeDto>> querySysDictType(SysDictTypeDto sysDictTypeDto) {
         Page<SysDictTypeDto> pages = QSysDictType.sysDictType.select(QSysDictType.sysDictType.fieldContainer())
-                .where(QSysDictType.dictTypeCode.eq$(sysDictTypeDto.getDictTypeCode()).and(QSysDictType.dictTypeName.eq$(sysDictTypeDto.getDictTypeName())))
+                .where(QSysDictType.dictTypeCode._like$_(sysDictTypeDto.getDictTypeCode()).and(QSysDictType.dictTypeName._like$_(sysDictTypeDto.getDictTypeName())))
                 .paging(sysDictTypeDto.getCurrentPage(), sysDictTypeDto.getPageSize())
                 .sorting(QSysDictType.createTime.desc())
                 .mapperTo(SysDictTypeDto.class)

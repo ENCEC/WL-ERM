@@ -208,6 +208,11 @@ public class SysDictTypeController {
         return CommonResult.getSuccessResultData(stringListMap);
     }
 
+    /**
+     * 查询数据字典
+     * @param sysDictTypeDto
+     * @return
+     */
     @PostMapping("/querySysDictType")
     @ResponseBody
     public ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto) {

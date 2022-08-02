@@ -13,8 +13,17 @@ import com.share.support.result.ResultHelper;
  * @Version 1.0
  **/
 public interface StandardEntryService {
-
+    /**
+     * 查询条目
+     * @param standardEntryDTO
+     * @return
+     */
     ResultHelper<Page<StandardEntryDTO>> queryStandardEntry(StandardEntryDTO standardEntryDTO);
 
+    /**
+     * 新增条目
+     * @param standardEntryDTO
+     * @return
+     */
     ResultHelper<?> saveStandardEntry(StandardEntryDTO standardEntryDTO);
 }
