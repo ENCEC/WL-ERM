@@ -118,4 +118,5 @@ private static final long serialVersionUID=1;
     @Column(name = "status")
     private Boolean status;
 
+
 }
