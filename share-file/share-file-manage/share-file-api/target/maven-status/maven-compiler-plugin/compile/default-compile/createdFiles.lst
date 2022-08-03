@@ -1,8 +1,0 @@
-com\share\file\domain\FileListParamsVo.class
-com\share\file\domain\FileInfoReturnVo.class
-com\share\file\domain\FileInfoVO.class
-com\share\file\domain\FastDfsDeleteResult.class
-com\share\file\api\ShareFileInterface.class
-com\share\file\domain\FastDfsUploadResult.class
-com\share\file\domain\FastDfsDownloadResult.class
-com\share\file\domain\FastDfsTokenResult.class
