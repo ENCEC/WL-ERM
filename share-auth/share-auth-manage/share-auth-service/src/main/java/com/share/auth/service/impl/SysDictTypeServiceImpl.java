@@ -1,5 +1,6 @@
 package com.share.auth.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
@@ -471,5 +472,29 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .mapperTo(SysDictTypeDto.class)
                 .execute();
         return CommonResult.getSuccessResultData(pages);
+    }
+
+    /**
+     * 查询数据字典
+     *
+     * @param sysDictTypeDto
+     * @return com.share.support.result.ResultHelper<java.util.List < com.share.auth.domain.daoService.SysDictCodeDTO>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-03
+     */
+    @Override
+    public ResultHelper<List<SysDictCodeDTO>> querySysDictCodeByDictType(SysDictTypeDto sysDictTypeDto) {
+        if (StrUtil.isEmpty(sysDictTypeDto.getDictTypeCode())) {
+            return CommonResult.getFaildResultData("DictTypeCode不能为空");
+        }
+        SysDictType sysDictType = QSysDictType.sysDictType
+                .selectOne(QSysDictType.sysDictTypeId, QSysDictType.dictTypeName)
+                .where(QSysDictType.dictTypeCode.eq$(sysDictTypeDto.getDictTypeCode()))
+                .execute();
+        List<SysDictCode> sysDictCodeList = QSysDictCode.sysDictCode
+                .select(QSysDictCode.sysDictCodeId, QSysDictCode.dictCode, QSysDictCode.dictName)
+                .where(QSysDictCode.sysDictTypeId.eq$(sysDictType.getSysDictTypeId()))
+                .execute();
+        return CommonResult.getSuccessResultData(sysDictCodeList);
     }
 }

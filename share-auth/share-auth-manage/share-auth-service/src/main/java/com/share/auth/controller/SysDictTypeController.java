@@ -219,7 +219,9 @@ public class SysDictTypeController {
         return sysDictTypeService.querySysDictType(sysDictTypeDto);
     }
 
-
-
-
+    @PostMapping("/querySysDictCodeByDictType")
+    @ResponseBody
+    public ResultHelper<List<SysDictCodeDTO>> querySysDictCodeByDictType(@RequestBody SysDictTypeDto sysDictTypeDto) {
+        return sysDictTypeService.querySysDictCodeByDictType(sysDictTypeDto);
+    }
 }
