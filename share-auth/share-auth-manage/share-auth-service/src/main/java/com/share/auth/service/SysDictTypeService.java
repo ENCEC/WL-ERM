@@ -124,5 +124,11 @@ public interface SysDictTypeService {
      */
     Map<String,List<SysDictCodeDTO>> selectSysDictCodeMapToCodeList(List<String> codeList);
 
+    /**
+     * 查询数据字典
+     * @param sysDictTypeDto
+     * @return
+     */
+    ResultHelper<Page<SysDictTypeDto>> querySysDictType(SysDictTypeDto sysDictTypeDto);
 
 }
