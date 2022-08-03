@@ -220,7 +220,7 @@ dao-service:
   nashornEngineConfig:
     extendFilePath: 'classpath:DaoServiceNashornEngineExt.js'
   data-permission:
-    enabled: true
+    enabled: false
   datasource:
     url: jdbc:mysql://172.16.0.23:3306/daoservice_train?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
@@ -234,8 +234,8 @@ dao-service:
   clientAutoAssemble:
     enabled: true
     project-key: "wl-erm-project"
-      useEmbedEngine: true
-      dataSourceName: "zhwl_wl_erm"
+    useEmbedEngine: true
+    dataSourceName: "zhwl_wl_erm"
     embedEngineDataSourceBeanName: 'basicDataSource'
 
   debug-setting:
