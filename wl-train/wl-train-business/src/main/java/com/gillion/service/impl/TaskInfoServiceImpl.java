@@ -46,11 +46,12 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         int pageNo = taskInfoDto.getPageNo() == null ? 1 : taskInfoDto.getPageNo();
         int pageSize = taskInfoDto.getPageSize() == null ? 10 : taskInfoDto.getPageSize();
         Page<TaskInfoDto> taskInfoDtoPage = QTaskInfo.taskInfo
-                .select()
+                .select(QTaskInfo.taskInfo.fieldContainer())
                 .where(QTaskInfo.taskTitle.like(":taskTitle")
                         .and(QTaskInfo.taskType.eq(":taskType"))
                         .and(QTaskInfo.executor.eq(":executor"))
-                        .and(QTaskInfo.status.eq(":status")))
+                        .and(QTaskInfo.status.eq(":status"))
+                        .and(QTaskInfo.taskInfoId.notNull())) // 规避全表查询
                 .paging(pageNo, pageSize)
                 .mapperTo(TaskInfoDto.class)
                 .execute(taskInfoDto);
@@ -70,8 +71,12 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
             return CommonResult.getFaildResultData("在职状态不能为空");
         }
+        if (Objects.isNull(taskInfoDto.getTaskDetailInfoDtoList()) || taskInfoDto.getTaskDetailInfoDtoList().size() <= 0)  {
+            return CommonResult.getFaildResultData("任务细则列表不能为空");
+        }
         // 获取执行人信息
-        ResultHelper<UemUserDto> uemUserDtoResultHelper = uemUserInterface.getUemUser(taskInfoDto.getExecutor());
+        ResultHelper<UemUserDto> uemUserDtoResultHelper = uemUserInterface
+                .getUemUser(taskInfoDto.getExecutor());
         UemUserDto uemUserDto = uemUserDtoResultHelper.getData();
         if (Objects.isNull(uemUserDto)) {
             return CommonResult.getFaildResultData("执行人用户信息不存在");
@@ -92,6 +97,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         Date planStartDate = null;
         Date planEndDate = null;
         for (TaskDetailInfoDto taskDetailInfoDto : taskInfoDto.getTaskDetailInfoDtoList()) {
+            if (taskDetailInfoDto.getStandardDetailId() == null) {
+                throw new RuntimeException("规范细则ID不能为空");
+            }
             // 查询标准主表和子表内容
             StandardDetailVo standardDetailVo = DSContext
                     .customization("WL-ERM_selectStandardDetailById")
@@ -104,8 +112,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             // 设置任务细则
             TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
             taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
-            taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
-            taskDetailInfo.setOrdinator(Long.parseLong(standardDetailVo.getOrdinatorId()));
+            if (taskDetailInfo.getLeader() != null) {
+                taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
+            }
+//            taskDetailInfo.setOrdinator(Long.parseLong(standardDetailVo.getOrdinatorId()));
             taskDetailInfo.setStandardEntryId(standardDetailVo.getStandardEntryId());
             taskDetailInfo.setStandardEntryName(standardDetailVo.getEntryName());
             taskDetailInfo.setStandardDetailId(standardDetailVo.getStandardDetailId());
@@ -122,6 +132,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 planStartDate = startDate;
             }
             planEndDate = endDate;
+            taskDetailInfoList.add(taskDetailInfo);
         }
         // 保存任务并更新任务细则
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfoList);
@@ -149,6 +160,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
             return CommonResult.getFaildResultData("在职状态不能为空");
         }
+        if (Objects.isNull(taskInfoDto.getTaskDetailInfoDtoList()) || taskInfoDto.getTaskDetailInfoDtoList().size() <= 0)  {
+            return CommonResult.getFaildResultData("任务细则列表不能为空");
+        }
         // 获取执行人信息
         ResultHelper<UemUserDto> uemUserDtoResultHelper = uemUserInterface.getUemUser(taskInfoDto.getExecutor());
         UemUserDto uemUserDto = uemUserDtoResultHelper.getData();
@@ -170,6 +184,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         Date planStartDate = null;
         Date planEndDate = null;
         for (TaskDetailInfoDto taskDetailInfoDto : taskInfoDto.getTaskDetailInfoDtoList()) {
+            if (taskDetailInfoDto.getStandardDetailId() == null) {
+                throw new RuntimeException("规范细则ID不能为空");
+            }
             // 查询标准主表和子表内容
             StandardDetailVo standardDetailVo = DSContext
                     .customization("WL-ERM_selectStandardDetailById")
@@ -182,8 +199,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             // 设置任务细则
             TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
             taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
-            taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
-            taskDetailInfo.setOrdinator(Long.parseLong(standardDetailVo.getOrdinatorId()));
+            if (taskDetailInfo.getLeader() != null) {
+                taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
+            }
+//            taskDetailInfo.setOrdinator(Long.parseLong(standardDetailVo.getOrdinatorId()));
             taskDetailInfo.setStandardEntryId(standardDetailVo.getStandardEntryId());
             taskDetailInfo.setStandardEntryName(standardDetailVo.getEntryName());
             taskDetailInfo.setStandardDetailId(standardDetailVo.getStandardDetailId());
@@ -200,6 +219,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 planStartDate = startDate;
             }
             planEndDate = endDate;
+            taskDetailInfoList.add(taskDetailInfo);
         }
         // 保存任务并更新任务细则
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfoList);
@@ -243,5 +263,21 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .execute();
         QTaskInfo.taskInfo.deleteById(taskInfoId);
         return CommonResult.getSuccessResultData("删除条目成功");
+    }
+
+    @Override
+    public ResultHelper<Page<StandardDetailVo>> queryStandardFullDetailByTaskType(TaskInfoDto taskInfoDto) {
+        if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
+            return CommonResult.getFaildResultData("任务类型不能为空");
+        }
+        int pageNo = taskInfoDto.getPageNo() == null ? 1 : taskInfoDto.getPageNo();
+        int pageSize = taskInfoDto.getPageSize() == null ? 10 : taskInfoDto.getPageSize();
+        Page<StandardDetailVo> standardDetailVoPage = DSContext
+                .customization("WL-ERM_selectStandardDetailByTaskType")
+                .select()
+                .paging(pageNo, pageSize)
+                .mapperTo(StandardDetailVo.class)
+                .execute(taskInfoDto);
+        return CommonResult.getSuccessResultData(standardDetailVoPage);
     }
 }

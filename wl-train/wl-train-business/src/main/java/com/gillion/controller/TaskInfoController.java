@@ -2,6 +2,7 @@ package com.gillion.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.model.domain.TaskInfoDto;
+import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
@@ -49,14 +50,21 @@ public class TaskInfoController {
     @PostMapping("/getTaskInfoDetail")
     @ApiOperation("获取任务细节")
     @ApiImplicitParam(name = "taskInfoId", value = "任务信息ID", dataType = "Long", paramType = "body")
-    public ResultHelper<TaskInfoDto> getTaskInfoDetail(@RequestBody Long taskInfoId) {
-        return taskInfoService.getTaskInfoDetail(taskInfoId);
+    public ResultHelper<TaskInfoDto> getTaskInfoDetail(@RequestBody TaskInfoDto taskInfoDto) {
+        return taskInfoService.getTaskInfoDetail(taskInfoDto.getTaskInfoId());
     }
 
     @PostMapping("/deleteTaskInfo")
     @ApiOperation("删除任务细节")
     @ApiImplicitParam(name = "taskInfoId", value = "任务信息ID", dataType = "Long", paramType = "body")
-    public ResultHelper<Object> deleteTaskInfo(@RequestBody Long taskInfoId) {
-        return taskInfoService.deleteTaskInfo(taskInfoId);
+    public ResultHelper<Object> deleteTaskInfo(@RequestBody TaskInfoDto taskInfoDto) {
+        return taskInfoService.deleteTaskInfo(taskInfoDto.getTaskInfoId());
+    }
+
+    @PostMapping("/queryStandardFullDetailByTaskType")
+    @ApiOperation("根据任务类型分页查询完整规范细则")
+    @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
+    public ResultHelper<Page<StandardDetailVo>> queryStandardFullDetailByTaskType(@RequestBody TaskInfoDto taskInfoDto) {
+        return taskInfoService.queryStandardFullDetailByTaskType(taskInfoDto);
     }
 }
