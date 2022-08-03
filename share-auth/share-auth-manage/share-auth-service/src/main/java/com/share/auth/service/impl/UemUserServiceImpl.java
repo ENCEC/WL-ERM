@@ -845,44 +845,21 @@ public class UemUserServiceImpl implements UemUserService {
      */
     @Override
     public ResultHelper<UemUserDto> getLoginUserInfo() {
-//        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
-//        if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
-//            return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
-//        }
-//        UemUserDto uemUserDto = QUemUser.uemUser.selectOne().mapperTo(UemUserDto.class).byId(userInfoModel.getUemUserId());
-//        if (Objects.nonNull(uemUserDto)) {
-//            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
-//            if (!userInfoModel.getRecordVersion().equals(uemUserDto.getRecordVersion())) {
-//                userService.updateCurrentLoginUser();
-//            }
-//            // 不返回登录密码
-//            uemUserDto.setPassword(null);
-//            if (uemUserDto.getUemIdCardId()!=null){
-//                UemIdCard uemIdCard = QUemIdCard.uemIdCard.selectOne().byId(uemUserDto.getUemIdCardId());
-//                uemUserDto.setAuditTime(uemIdCard.getAuditTime());
-//            }
-//            uemUserDto.setHasRole(false);
-//            // 用户类型为国交管理员
-//            if (Objects.equals(uemUserDto.getUserType(), GlobalEnum.UserType.IMPT_ADMIN.getCode())) {
-//                uemUserDto.setIdentity(GlobalEnum.UserIdentity.IMPT_ADMIN.getCode());
-//                uemUserDto.setHasBind(false);
-//            }
-//        } else {
-//            SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(userInfoModel.getUemUserId());
-//            if (Objects.isNull(sysPlatformUser)) {
-//                return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
-//            }
-//            uemUserDto = new UemUserDto();
-//            uemUserDto.setAccount(sysPlatformUser.getAccount());
-//            uemUserDto.setName(sysPlatformUser.getName());
-//            uemUserDto.setMobile(sysPlatformUser.getTel());
-//            uemUserDto.setEmail(sysPlatformUser.getMail());
-//            uemUserDto.setIsValid(sysPlatformUser.getIsValid());
-//            // 标志平台客服
-//            uemUserDto.setIdentity(GlobalEnum.UserIdentity.ADMIN.getCode());
-//        }
-//        return CommonResult.getSuccessResultData(uemUserDto);
-        return null;
+        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
+            return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
+        }
+        UemUserDto uemUserDto = QUemUser.uemUser
+                .selectOne()
+                .mapperTo(UemUserDto.class)
+                .byId(userInfoModel.getUemUserId());
+        if (Objects.nonNull(uemUserDto)) {
+            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
+            if (!userInfoModel.getRecordVersion().equals(uemUserDto.getRecordVersion())) {
+                userService.updateCurrentLoginUser();
+            }
+        }
+        return CommonResult.getSuccessResultData(uemUserDto);
     }
 
     /**

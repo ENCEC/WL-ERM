@@ -10,10 +10,8 @@ import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
-import com.share.auth.model.entity.SysResource;
 import com.share.auth.model.entity.UemUser;
 import com.share.auth.model.entity.UemUserRole;
-import com.share.auth.model.querymodels.QSysResource;
 import com.share.auth.model.querymodels.QUemUser;
 import com.share.auth.model.querymodels.QUemUserRole;
 import com.share.auth.service.UemUserManageService;
@@ -110,7 +108,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         List<UemUser> uemUserList = QUemUser.uemUser
                 .select(QUemUser.uemUser.fieldContainer())
                 .where(QUemUser.uemUserId.eq$(uemUserId).and(QUemUser.isDeleted.eq$(false)))
-                .execute();
+                .paging(1, 1)
+                .execute()
+                .getRecords();
         if (uemUserList.size() == 1) {
             return uemUserList.get(0);
         } else {
@@ -281,7 +281,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         // 设置密码
         String passwordText = RandomUtil.randomString(12);
         String password = MD5EnCodeUtils.encryptionPassword(passwordText);
-//        password = MD5EnCodeUtils.encryptionPassword(password);
         uemUser.setPassword(password);
         // 新增用户
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
@@ -317,7 +316,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         // 生成新密码
         String passwordText = RandomUtil.randomString(12);
         String password = MD5EnCodeUtils.encryptionPassword(passwordText);
-//        password = MD5EnCodeUtils.encryptionPassword(password);
         // 更新用户
         uemUser.setPassword(password);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
