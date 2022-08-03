@@ -376,12 +376,15 @@ public class SysRoleServiceImpl implements SysRoleService {
         if (sysRoleId != null) {
             //获取前端勾选的权限id
             List<String> sysResourceIdList = sysRoleDTO.getSysResourceIdList();
+            //临时变量i
+            int i = 0;
             //逐个存入中间表中
-            for (int i = 0; i < sysResourceIdList.size(); i++) {
+            for (String s : sysResourceIdList) {
                 //中间表对象
                 SysRoleResource sysRoleResource = new SysRoleResource();
                 sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-                String s = sysResourceIdList.get(i);
+                s = sysResourceIdList.get(i);
+                i = ++i;
                 sysRoleResource.setSysRoleId(sysRoleId);
                 sysRoleResource.setSysResourceId(Long.valueOf(s));
                 //插入中间表
@@ -426,14 +429,16 @@ public class SysRoleServiceImpl implements SysRoleService {
                 where(QSysRole.roleName._like$_(sysRoleDTO.getRoleName())
                         .and(QSysRole.isValid.eq(":isValid")))
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
-                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysRoleDTO.class)
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysRoleDTO.class).sorting(QSysRole.sysRoleId.asc())
                 .execute();
     }
 
     @Override
     public List<SysRoleDTO> queryRoleById(Long sysRoleId) {
+        Map<String, Long> map = new HashMap<>(1);
+        map.put("sysRoleId", sysRoleId);
         return DSContext.customization("WL-ERM_queryRoleAndResource")
-                .select().mapperTo(SysRoleDTO.class).execute();
+                .select().mapperTo(SysRoleDTO.class).execute(map);
     }
 
     /**
@@ -455,23 +460,27 @@ public class SysRoleServiceImpl implements SysRoleService {
         sysRole.setSysApplicationId(1L);
         QSysRole.sysRole.save(sysRole);
         // 判断是角色id否存在
-     /*     if (sysRoleId != null) {
-          //获取前端勾选的权限id
+        if (sysRoleId != null) {
+            //获取前端勾选的权限id
             List<String> sysResourceIdList = sysRoleDTO.getSysResourceIdList();
+            List<String> sysRoleRourceIdList = sysRoleDTO.getSysRoleResourceIdList();
             //逐个存入中间表中
             for (int i = 0; i < sysResourceIdList.size(); i++) {
                 //中间表对象
                 SysRoleResource sysRoleResource = new SysRoleResource();
                 sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-                String s = sysResourceIdList.get(i);
+                String sysResourceId = sysResourceIdList.get(i);
+                //中间表主键为list---同一个角色拥有多种权限，但编辑时中间表主键id为多个,故存为List
+                String sysRoleResourceId = sysRoleRourceIdList.get(i);
                 sysRoleResource.setSysRoleId(sysRoleId);
-                sysRoleResource.setSysResourceId(Long.valueOf(s));
-                //插入中间表
+                sysRoleResource.setSysResourceId(Long.valueOf(sysResourceId));
+                sysRoleResource.setSysRoleResourceId(Long.valueOf(sysRoleResourceId));
+                //更新中间表
                 QSysRoleResource.sysRoleResource.save(sysRoleResource);
             }
         } else {
             return CommonResult.getFaildResultData("更新失败！");
-        }*/
+        }
         return CommonResult.getSuccessResultData("更新成功!");
     }
 

@@ -110,9 +110,9 @@ public class SysRoleDTO implements Serializable {
 
     private String resourceTitle;
 
-    private Long sysResourceId;
+    private String sysResourceId;
 
-    private  Long sysRoleResourceId;
+    private String sysRoleResourceId;
 
     /**
      * 优先级
@@ -169,7 +169,6 @@ public class SysRoleDTO implements Serializable {
     //修改之前为long类型
     private List<String> sysResourceIdList;
 
-    @ApiModelProperty("")
-    //修改之前为long类型,更新
-    private List<String> sysResourceIdList1;
+    //多对多关联编辑时主键List
+    private List<String> sysRoleResourceIdList;
 }

@@ -222,9 +222,9 @@ dao-service:
   data-permission:
     enabled: true
   datasource:
-    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: zhwl_lip_daoservice
-    password: zhwl_lip_daoservice
+    url: jdbc:mysql://172.16.0.23:3306/daoservice_train?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
     driverClassName: com.mysql.jdbc.Driver
     maxActive: 20
     maxWait: 60000
@@ -233,9 +233,9 @@ dao-service:
     testWhileIdle: true
   clientAutoAssemble:
     enabled: true
-    project-key: "zhwl_wl_erm_project"
-    useEmbedEngine: true
-    dataSourceName: "zhwl_wl_erm"
+    project-key: "wl-erm-project"
+      useEmbedEngine: true
+      dataSourceName: "zhwl_wl_erm"
     embedEngineDataSourceBeanName: 'basicDataSource'
 
   debug-setting:
