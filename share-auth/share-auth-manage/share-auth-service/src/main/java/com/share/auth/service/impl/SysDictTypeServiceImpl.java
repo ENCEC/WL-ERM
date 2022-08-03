@@ -102,7 +102,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     public ResultHelper<Object> saveSysDictType(SysDictTypeDto sysDictTypeDto) {
         log.info("平台客服新增数据字典");
         //数据字典表ID
-        String sysDictTypeId = sysDictTypeDto.getSysDictTypeId();
+        Long sysDictTypeId = sysDictTypeDto.getSysDictTypeId();
         //字典类型
         String dictTypeCode = sysDictTypeDto.getDictTypeCode();
         //字典名称
@@ -159,7 +159,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     public ResultHelper<Object> updateSysDictType(SysDictTypeDto sysDictTypeDto) {
         log.info("平台客服修改数据字典");
         //数据字典表ID
-        String sysDictTypeId = sysDictTypeDto.getSysDictTypeId();
+        Long sysDictTypeId = sysDictTypeDto.getSysDictTypeId();
         //字典类型
         String dictTypeCode = sysDictTypeDto.getDictTypeCode();
         //字典名称
@@ -229,7 +229,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     @Override
     public ResultHelper<Object> updateDictTypeStatus(SysDictTypeDto sysDictTypeDto) {
         //数据字典表ID
-        String sysDictTypeId = sysDictTypeDto.getSysDictTypeId();
+        Long sysDictTypeId = sysDictTypeDto.getSysDictTypeId();
         //是否禁用（0禁用，1启用）
         Boolean isValid = sysDictTypeDto.getIsValid();
 
@@ -455,5 +455,21 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
                 .execute(paramMa);
         Map<String, List<SysDictCodeDTO>> queryResourceDTOMap = sysDictCodeDTOList.stream().collect(Collectors.groupingBy(SysDictCodeDTO::getDictTypeCode));
         return queryResourceDTOMap;
+    }
+
+    /**
+     * 查询数据字典
+     * @param sysDictTypeDto
+     * @return
+     */
+    @Override
+    public ResultHelper<Page<SysDictTypeDto>> querySysDictType(SysDictTypeDto sysDictTypeDto) {
+        Page<SysDictTypeDto> pages = QSysDictType.sysDictType.select(QSysDictType.sysDictType.fieldContainer())
+                .where(QSysDictType.dictTypeCode._like$_(sysDictTypeDto.getDictTypeCode()).and(QSysDictType.dictTypeName._like$_(sysDictTypeDto.getDictTypeName())))
+                .paging(sysDictTypeDto.getCurrentPage(), sysDictTypeDto.getPageSize())
+                .sorting(QSysDictType.createTime.desc())
+                .mapperTo(SysDictTypeDto.class)
+                .execute();
+        return CommonResult.getSuccessResultData(pages);
     }
 }
