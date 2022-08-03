@@ -47,8 +47,8 @@ public class SysTechnicalTitleController {
             @ApiImplicitParam(name = "postName", value = "所属岗位", dataTypeClass = String.class, paramType = "body"),
             @ApiImplicitParam(name = "technicalName", value = "职称名称", dataTypeClass = String.class, paramType = "body"),
     })
-    @GetMapping ("/queryByTechnicalTitleName")
-    public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
+    @PostMapping ("/queryByTechnicalTitleName")
+    public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitle(@RequestBody SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
         return sysTechnicalTitleService.queryByTechnicalTitleName(sysTechnicalTitleAndPostVO);
     }
 
