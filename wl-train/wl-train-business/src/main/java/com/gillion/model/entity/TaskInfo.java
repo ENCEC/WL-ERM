@@ -56,6 +56,10 @@ private static final long serialVersionUID=1;
     @JsonDeserialize(using = String2Long.class)
     private Long dispatchers;
 
+    /**任务分配人姓名*/
+    @Column(name = "dispatchers_name")
+    private String dispatchersName;
+
     /**实际完成日期*/
     @Column(name = "end_date")
     private Date endDate;
@@ -65,6 +69,10 @@ private static final long serialVersionUID=1;
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long executor;
+
+    /**执行人姓名*/
+    @Column(name = "executor_name")
+    private String executorName;
 
     /**修改人id*/
     @Column(name = "modifier_id")

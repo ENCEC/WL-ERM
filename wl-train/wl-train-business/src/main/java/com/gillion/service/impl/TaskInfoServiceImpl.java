@@ -13,8 +13,11 @@ import com.gillion.model.querymodels.QTaskDetailInfo;
 import com.gillion.model.querymodels.QTaskInfo;
 import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
+import com.share.auth.api.ShareAuthInterface;
 import com.share.auth.api.UemUserInterface;
+import com.share.auth.center.api.AuthCenterInterface;
 import com.share.auth.domain.UemUserDto;
+import com.share.support.model.User;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,12 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Autowired
     private UemUserInterface uemUserInterface;
 
+    @Autowired
+    private AuthCenterInterface authCenterInterface;
+
+    @Autowired
+    private ShareAuthInterface shareAuthInterface;
+
     @Override
     public ResultHelper<Page<TaskInfoDto>> queryTaskInfoPage(TaskInfoDto taskInfoDto) {
         String taskTitle = taskInfoDto.getTaskTitle();
@@ -54,6 +63,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                         .and(QTaskInfo.taskInfoId.notNull())) // 规避全表查询
                 .paging(pageNo, pageSize)
                 .mapperTo(TaskInfoDto.class)
+                .sorting(QTaskInfo.createTime.desc())
                 .execute(taskInfoDto);
         return CommonResult.getSuccessResultData(taskInfoDtoPage);
     }
@@ -75,19 +85,26 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             return CommonResult.getFaildResultData("任务细则列表不能为空");
         }
         // 获取执行人信息
-        ResultHelper<UemUserDto> uemUserDtoResultHelper = uemUserInterface
-                .getUemUser(taskInfoDto.getExecutor());
-        UemUserDto uemUserDto = uemUserDtoResultHelper.getData();
-        if (Objects.isNull(uemUserDto)) {
+        UemUserDto executorUemUserDto = uemUserInterface
+                .getUemUser(taskInfoDto.getExecutor()).getData();
+        if (Objects.isNull(executorUemUserDto)) {
             return CommonResult.getFaildResultData("执行人用户信息不存在");
         }
+        // 获取分配人用户信息
+        UemUserDto dispatchersUemUserDto = shareAuthInterface.getLoginUserInfo().getData();
+        if (Objects.isNull(dispatchersUemUserDto) || Objects.isNull(dispatchersUemUserDto.getUemUserId())) {
+            return CommonResult.getFaildResultData("分配人用户信息不存在");
+        }
         // 获取入职时间
-        Date entryDate = uemUserDto.getEntryDate();
+        Date entryDate = executorUemUserDto.getEntryDate();
         // 设置主表信息
         TaskInfo taskInfo = new TaskInfo();
         taskInfo.setTaskTitle(taskInfoDto.getTaskTitle());
         taskInfo.setExecutor(taskInfoDto.getExecutor());
         taskInfo.setTaskType(taskInfoDto.getTaskType());
+        taskInfo.setExecutorName(executorUemUserDto.getName());
+        taskInfo.setDispatchers(dispatchersUemUserDto.getUemUserId());
+        taskInfo.setDispatchersName(dispatchersUemUserDto.getName());
         taskInfo.setStatus(0);
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         QTaskInfo.taskInfo.save(taskInfo);
@@ -164,10 +181,17 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             return CommonResult.getFaildResultData("任务细则列表不能为空");
         }
         // 获取执行人信息
-        ResultHelper<UemUserDto> uemUserDtoResultHelper = uemUserInterface.getUemUser(taskInfoDto.getExecutor());
-        UemUserDto uemUserDto = uemUserDtoResultHelper.getData();
-        if (Objects.isNull(uemUserDto)) {
+        UemUserDto executorUemUserDto = uemUserInterface
+                .getUemUser(taskInfoDto.getExecutor()).getData();
+        if (Objects.isNull(executorUemUserDto)) {
             return CommonResult.getFaildResultData("执行人用户信息不存在");
+        }
+        // 获取分配人用户信息
+        User userModelInfo = authCenterInterface.getUserInfo();
+        UemUserDto dispatchersUemUserDto = uemUserInterface
+                .getUemUser(userModelInfo.getUemUserId()).getData();
+        if (Objects.isNull(dispatchersUemUserDto)) {
+            return CommonResult.getFaildResultData("分配人用户信息不存在");
         }
         // 查询任务信息
         TaskInfo taskInfo = QTaskInfo.taskInfo.selectOne().byId(taskInfoId);
@@ -177,7 +201,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId))
                 .execute();
         // 获取入职时间
-        Date entryDate = uemUserDto.getEntryDate();
+        Date entryDate = executorUemUserDto.getEntryDate();
         // 遍历选中标准条目细则并生成任务细节
         List<TaskDetailInfo> taskDetailInfoList = new LinkedList<>();
         int seriesNum = 0;
@@ -228,6 +252,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         taskInfo.setTaskType(taskInfoDto.getTaskType());
         taskInfo.setPlanStartDate(planStartDate);
         taskInfo.setPlanEndDate(planEndDate);
+        taskInfo.setExecutorName(executorUemUserDto.getName());
+        taskInfo.setDispatchersName(dispatchersUemUserDto.getName());
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         QTaskInfo.taskInfo.save(taskInfo);
         return CommonResult.getSuccessResultData("更新条目成功");
