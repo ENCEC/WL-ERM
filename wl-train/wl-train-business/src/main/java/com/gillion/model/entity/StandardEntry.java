@@ -64,8 +64,6 @@ public class StandardEntry extends BaseModel implements Serializable{
 
     /**适用岗位职称*/
     @Column(name = "apply_professor_id")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
     private String applyProfessorId;
 
     /**创建时间*/
@@ -106,8 +104,6 @@ public class StandardEntry extends BaseModel implements Serializable{
 
     /**统筹人ID*/
     @Column(name = "ordinator_id")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
     private String ordinatorId;
 
     /**版本号*/
