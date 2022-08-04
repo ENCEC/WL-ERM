@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
-* @author daoServiceGenerator
-* @version 1.0.0.0
-*/
+ * @author daoServiceGenerator
+ * @version 1.0.0.0
+ */
 @SuppressWarnings({"AlibabaConstantFieldShouldBeUpperCase", "unused", "AlibabaClassNamingShouldBeCamel"})
 public class QUemUser extends BaseModelExpression<UemUser, Long> {
 
@@ -79,6 +79,12 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<Long> uemUserId = uemUser.fieldOf("uemUserId", Long.class);
     public static final FieldExpression<String> userType = uemUser.fieldOf("userType", String.class);
     public static final FieldExpression<String> wxId = uemUser.fieldOf("wxId", String.class);
+    public static final FieldExpression<Long> positiveType = uemUser.fieldOf("positiveType", Long.class);
+    public static final FieldExpression<Long> defenseScore = uemUser.fieldOf("defenseScore", Long.class);
+    public static final FieldExpression<String> interviewComments = uemUser.fieldOf("interviewComments", String.class);
+    public static final FieldExpression<String> positiveComments = uemUser.fieldOf("positiveComments", String.class);
+    public static final FieldExpression<Date> dismissDate = uemUser.fieldOf("dismissDate", Date.class);
+    public static final FieldExpression<String> dismissReason = uemUser.fieldOf("dismissReason", String.class);
 
     public static final BaseModelExpression<UemDept, Long> uemDept = new QUemDept(uemUser, "uemDept");
 

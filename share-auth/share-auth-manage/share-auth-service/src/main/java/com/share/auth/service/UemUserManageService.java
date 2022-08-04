@@ -6,6 +6,7 @@ import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
 import com.share.support.result.ResultHelper;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -128,6 +129,7 @@ public interface UemUserManageService {
      * 查询员工信息
      *
      * @param uemUserDto
+     * @return Page<UemUserDto>
      * @author wzr
      * @date 2022-08-01
      */
@@ -136,6 +138,7 @@ public interface UemUserManageService {
     /**
      * 下拉框查询对应部门的所有数据
      *
+     * @return List<UemUserDto>
      * @author wzr
      * @date 2022-08-02
      */
@@ -192,6 +195,52 @@ public interface UemUserManageService {
      * @date 2022-08-02
      */
     ResultHelper<Object> deleteStaff(Long uemUserId);
+
+    /**
+     * 重新上传员工简历---编辑功能
+     *
+     * @param multipartFile
+     * @author wzr
+     * @date 2022-08-03
+     */
+
+
+    /**
+     * 转正，离职，辞退---查看信息
+     *
+     * @param uemUserId
+     * @author wzr
+     * @date 2022-08-04
+     */
+
+    ResultHelper<UemUserDto> queryStaffInfo(Long uemUserId);
+
+    /**
+     * 添加转正信息
+     *
+     * @param uemUserDto
+     * @author wzr
+     * @date 2022-08-04
+     */
+    ResultHelper<Object> savePositiveInfo(UemUserDto uemUserDto);
+
+    /**
+     * 添加离职信息
+     *
+     * @param uemUserDto
+     * @author wzr
+     * @date 2022-08-04
+     */
+    ResultHelper<Object> saveResignInfo(UemUserDto uemUserDto);
+
+    /**
+     * 添加辞退信息
+     *
+     * @param uemUserDto
+     * @author wzr
+     * @date 2022-08-04
+     */
+    ResultHelper<Object> saveDismissInfo(UemUserDto uemUserDto);
 
 
 }
