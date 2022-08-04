@@ -1,19 +1,22 @@
 package com.gillion.service.impl;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.model.entity.StandardEntry;
 import com.gillion.model.querymodels.QStandardEntry;
 import com.gillion.service.StandardEntryService;
 import com.gillion.train.api.model.vo.StandardEntryDTO;
+import com.google.common.collect.ImmutableMap;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
-import io.swagger.models.auth.In;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @ClassName StandardEntryServiceImpl
@@ -22,7 +25,7 @@ import java.util.List;
  * @Version 1.0
  **/
 @Service
-public class StandardEntryServiceImpl implements StandardEntryService {
+public class StandardEntryServiceImpl implements StandardEntryService  {
     /**
      * 查询条目
      * @param standardEntryDTO
@@ -31,7 +34,11 @@ public class StandardEntryServiceImpl implements StandardEntryService {
     @Override
     public ResultHelper<Page<StandardEntryDTO>> queryStandardEntry(StandardEntryDTO standardEntryDTO) {
         Page<StandardEntryDTO> standardEntryDTOS = QStandardEntry.standardEntry.select()
-                .where(QStandardEntry.entryName.eq$(standardEntryDTO.getEntryName()).and(QStandardEntry.actionRoleId.eq$(standardEntryDTO.getActionRoleId()).and(QStandardEntry.applyPostId.eq$(standardEntryDTO.getApplyPostId()))))
+                .where(QStandardEntry.entryName._like$_(standardEntryDTO.getEntryName())
+                        .and(QStandardEntry.standardEntryId.goe$(1L))
+                        .and(QStandardEntry.actionRoleId.eq$(standardEntryDTO.getActionRoleId())
+                                .and(QStandardEntry.status.eq$(standardEntryDTO.getStatus()))
+                                .and(QStandardEntry.applyPostId._like$_(standardEntryDTO.getApplyPostId()))))
                 .paging(standardEntryDTO.getCurrentPage(),standardEntryDTO.getPageSize())
                 .sorting(QStandardEntry.actionSerialNum)
                 .mapperTo(StandardEntryDTO.class)
@@ -46,10 +53,32 @@ public class StandardEntryServiceImpl implements StandardEntryService {
      */
     @Override
     public ResultHelper<?> saveStandardEntry(StandardEntryDTO standardEntryDTO) {
-        List<StandardEntry> standardEntrys = QStandardEntry.standardEntry.select(QStandardEntry.standardEntry.fieldContainer())
+        if (StrUtil.isEmpty(standardEntryDTO.getEntryName())) {
+            return CommonResult.getFaildResultData("条目名称不能为空");
+        }
+        if (StrUtil.isEmpty(standardEntryDTO.getApplyPostId())) {
+            return CommonResult.getFaildResultData("适合岗位不能为空");
+        }
+        if (Objects.isNull(standardEntryDTO.getActionRoleId())) {
+            return CommonResult.getFaildResultData("执行角色不能为空");
+        }
+        if (StrUtil.isEmpty(standardEntryDTO.getApplyProfessorId())) {
+            return CommonResult.getFaildResultData("岗位职称不能为空");
+        }
+        if (Objects.isNull(standardEntryDTO.getIsNeed())) {
+            return CommonResult.getFaildResultData("是否必须不能为空");
+        }
+        if (StrUtil.isEmpty(standardEntryDTO.getOrdinatorId())) {
+            return CommonResult.getFaildResultData("统筹人不能为空");
+        }
+        if (StrUtil.isEmpty(standardEntryDTO.getActionRemark())) {
+            return CommonResult.getFaildResultData("执行说明不能为空");
+        }
+        List<StandardEntryDTO> standardEntryDTOS = QStandardEntry.standardEntry.select(QStandardEntry.standardEntry.fieldContainer())
                 .where(QStandardEntry.entryName.eq$(standardEntryDTO.getEntryName()))
+                .mapperTo(StandardEntryDTO.class)
                 .execute();
-        if (CollectionUtils.isNotEmpty(standardEntrys)) {
+        if (CollectionUtils.isNotEmpty(standardEntryDTOS)) {
             return CommonResult.getFaildResultData("该条目已经存在");
         }
         StandardEntry standardEntry = new StandardEntry();
@@ -64,7 +93,12 @@ public class StandardEntryServiceImpl implements StandardEntryService {
         standardEntry.setIsNeed(standardEntryDTO.getIsNeed());
         standardEntry.setOrdinatorId(standardEntryDTO.getOrdinatorId());
         standardEntry.setActionRemark(standardEntryDTO.getActionRemark());
-        standardEntry.setActionSerialNum(standardEntryDTO.getActionSerialNum());
+        Integer saveActionSerialNum = saveActionSerialNum(standardEntryDTO.getActionSerialNum());
+        if (saveActionSerialNum == 0) {
+            return  CommonResult.getFaildResultData("传入的执行序号要为正整数");
+        }
+        standardEntry.setActionSerialNum(saveActionSerialNum);
+        standardEntry.setStatus(Boolean.TRUE);
         standardEntry.setCreateTime(new DateTime());
         standardEntry.setCreatorName("系统管理员");
         QStandardEntry.standardEntry.save(standardEntry);
@@ -72,23 +106,284 @@ public class StandardEntryServiceImpl implements StandardEntryService {
         return CommonResult.getSuccessResultData("新增成功");
     }
 
-    public void change(Integer actionSerialNum) {
-        StandardEntry standardEntry = new StandardEntry();
-        List<StandardEntry> list = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
+    /**
+     * 查看一个条目信息
+     * @param standardEntryId
+     * @return
+     */
+    @Override
+    public ResultHelper<?> queryByStandardEntryId(Long standardEntryId) {
+        StandardEntryDTO standardEntry = QStandardEntry.standardEntry.selectOne()
+                .where(QStandardEntry.standardEntryId.eq$(standardEntryId))
+                .mapperTo(StandardEntryDTO.class)
+                .execute();
+        return CommonResult.getSuccessResultData(standardEntry);
+    }
+
+    /**
+     * 启动/禁用
+     * @param standardEntryDTO
+     * @return
+     */
+    @Override
+    public ResultHelper<?> updateStatus(StandardEntryDTO standardEntryDTO) {
+        QStandardEntry.standardEntry.update(QStandardEntry.status)
+                .where(QStandardEntry.standardEntryId.eq$(standardEntryDTO.getStandardEntryId()))
+                .execute(ImmutableMap.of("status",standardEntryDTO.getStatus()));
+        return CommonResult.getSuccessResultData("启动/禁用成功");
+    }
+
+    /**
+     * 删除条目
+     * @param standardEntryId
+     * @return
+     */
+    @Override
+    public ResultHelper<?> deleteStandardEntry(Long standardEntryId) {
+        StandardEntryDTO standardEntryDTO = QStandardEntry.standardEntry.selectOne(QStandardEntry.actionSerialNum)
+                .where(QStandardEntry.standardEntryId.eq$(standardEntryId))
+                .mapperTo(StandardEntryDTO.class)
+                .execute();
+        //获取删除的执行序号
+        Integer actionSerialNum = standardEntryDTO.getActionSerialNum();
+        QStandardEntry.standardEntry.deleteById(standardEntryId);
+        //获取剩余的全部条目
+        List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
                 .where(QStandardEntry.standardEntryId.goe$(1L))
                 .execute();
-//        Object[] array = list.toArray();
-        Integer[] strArray = list.toArray(new Integer[list.size()]);
+        Integer[] strArray = new Integer[lists.size()];
+        //将剩余的全部条目的执行序号放入数组中
         for (int i = 0; i <strArray.length ; i++) {
-            if (actionSerialNum <= strArray[i]) {
-                StandardEntry entry = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
+            strArray[i] = lists.get(i).getActionSerialNum();
+        }
+        //将比删除的执行序号的大的条目的执行序号减一
+        List<StandardEntryDTO> standardEntryDTOS = new ArrayList<>();
+        for (int i = 0; i < strArray.length; i++) {
+            if (actionSerialNum < strArray[i]) {
+                StandardEntryDTO standardEntry = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
                         .where(QStandardEntry.actionSerialNum.eq$(strArray[i]))
+                        .mapperTo(StandardEntryDTO.class)
                         .execute();
-                standardEntry.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-                standardEntry.setStandardEntryId(entry.getStandardEntryId());
-                standardEntry.setActionSerialNum(strArray[i]+1);
-                QStandardEntry.standardEntry.save(standardEntry);
+                standardEntryDTOS.add(standardEntry);
             }
+        }
+        standardEntryDTOS.forEach(x -> {x.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED); x.setActionSerialNum(x.getActionSerialNum()-1);});
+        QStandardEntry.standardEntry.save(standardEntryDTOS);
+        return CommonResult.getSuccessResultData("删除成功");
+    }
+
+    /**
+     * 编辑条目
+     * @param standardEntryDTO
+     * @return
+     */
+    @Override
+    public ResultHelper<?> updateStandardEntry(StandardEntryDTO standardEntryDTO) {
+        if (StrUtil.isEmpty(standardEntryDTO.getEntryName())) {
+            return CommonResult.getFaildResultData("条目名称不能为空");
+        }
+        if (StrUtil.isEmpty(standardEntryDTO.getApplyPostId())) {
+            return CommonResult.getFaildResultData("适合岗位不能为空");
+        }
+        if (Objects.isNull(standardEntryDTO.getActionRoleId())) {
+            return CommonResult.getFaildResultData("执行角色不能为空");
+        }
+        if (StrUtil.isEmpty(standardEntryDTO.getApplyProfessorId())) {
+            return CommonResult.getFaildResultData("岗位职称不能为空");
+        }
+        if (Objects.isNull(standardEntryDTO.getIsNeed())) {
+            return CommonResult.getFaildResultData("是否必须不能为空");
+        }
+        if (StrUtil.isEmpty(standardEntryDTO.getOrdinatorId())) {
+            return CommonResult.getFaildResultData("统筹人不能为空");
+        }
+        if (StrUtil.isEmpty(standardEntryDTO.getActionRemark())) {
+            return CommonResult.getFaildResultData("执行说明不能为空");
+        }
+        StandardEntryDTO standardEntryDto = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
+                .where(QStandardEntry.standardEntryId.eq$(standardEntryDTO.getStandardEntryId()))
+                .mapperTo(StandardEntryDTO.class)
+                .execute();
+        standardEntryDto.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        standardEntryDto.setEntryName(standardEntryDTO.getEntryName());
+        standardEntryDto.setItemType(standardEntryDTO.getItemType());
+        standardEntryDto.setApplyPostId(standardEntryDTO.getApplyPostId());
+        standardEntryDto.setActionRoleId(standardEntryDTO.getActionRoleId());
+        standardEntryDto.setApplyProfessorId(standardEntryDTO.getApplyProfessorId());
+        standardEntryDto.setActionTime(standardEntryDTO.getActionTime());
+        standardEntryDto.setActionPeriod(standardEntryDTO.getActionPeriod());
+        standardEntryDto.setIsNeed(standardEntryDTO.getIsNeed());
+        standardEntryDto.setOrdinatorId(standardEntryDTO.getOrdinatorId());
+        standardEntryDto.setActionRemark(standardEntryDTO.getActionRemark());
+        Integer actionSerialNum = updateActionSerialNum(standardEntryDTO);
+        if (actionSerialNum == 0) {
+            return  CommonResult.getFaildResultData("执行序号要为正整数");
+        }
+        standardEntryDto.setActionSerialNum(actionSerialNum);
+        QStandardEntry.standardEntry.save(standardEntryDto);
+        return CommonResult.getSuccessResultData("编辑成功");
+    }
+
+
+    /**
+     * 新增时执行序号逻辑
+     * @param actionSerialNum
+     * @return
+     */
+    public Integer saveActionSerialNum(Integer actionSerialNum) {
+        List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
+                .where(QStandardEntry.standardEntryId.goe$(1L))
+                .execute();
+        Integer[] strArray = new Integer[lists.size()];
+        for (int i = 0; i <strArray.length ; i++) {
+            strArray[i] = lists.get(i).getActionSerialNum();
+        }
+        int maxActionSerialNum = 0;
+        for (Integer integer : strArray) {
+            if (integer > maxActionSerialNum) {
+                maxActionSerialNum = integer;
+            }
+        }
+        //如果不传值则为最大执行序号+1
+        if (actionSerialNum == null) {
+            return maxActionSerialNum+1;
+        } else if ( actionSerialNum > maxActionSerialNum) {
+        //如果传的值大于最大执行序号值，则自动变成最大执行序号+1
+            return maxActionSerialNum+1;
+        } else if (actionSerialNum<=0){
+            return 0 ;
+        } else {
+         //如果传的值在1-最大执行序号之间
+            List<StandardEntryDTO> standardEntryDTOS = new ArrayList<>();
+            for (int i = 0; i < strArray.length; i++) {
+                if (actionSerialNum <= strArray[i]) {
+                    StandardEntryDTO standardEntry = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
+                            .where(QStandardEntry.actionSerialNum.eq$(strArray[i]))
+                            .mapperTo(StandardEntryDTO.class)
+                            .execute();
+                    standardEntryDTOS.add(standardEntry);
+                }
+            }
+            //将比传的值大于或者等于的执行序号加一
+               standardEntryDTOS.forEach(x -> {x.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED); x.setActionSerialNum(x.getActionSerialNum()+1);});
+                 QStandardEntry.standardEntry.save(standardEntryDTOS);
+            return actionSerialNum;
+        }
+
+    }
+
+    /**
+     * 编辑时执行序号逻辑
+     * @param standardEntryDTO
+     * @return
+     */
+    public Integer updateActionSerialNum(StandardEntryDTO standardEntryDTO) {
+        StandardEntryDTO standardEntryDto = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
+                .where(QStandardEntry.standardEntryId.eq$(standardEntryDTO.getStandardEntryId()))
+                .mapperTo(StandardEntryDTO.class)
+                .execute();
+        //获取更新前的执行序号
+        Integer actionSerialNum = standardEntryDto.getActionSerialNum();
+        //更新时执行序号传空值
+        if (standardEntryDTO.getActionSerialNum() == null) {
+            List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
+                    .where(QStandardEntry.standardEntryId.goe$(1L))
+                    .execute();
+            Integer[] strArray = new Integer[lists.size()];
+            for (int i = 0; i < strArray.length; i++) {
+                strArray[i] = lists.get(i).getActionSerialNum();
+            }
+            int maxActionSerialNum = 0;
+            for (Integer integer : strArray) {
+                if (integer > maxActionSerialNum) {
+                    maxActionSerialNum = integer;
+                }
+            }
+
+            List<StandardEntryDTO> standardEntryDTOS = new ArrayList<>();
+            for (int i = 0; i < strArray.length; i++) {
+                if (actionSerialNum < strArray[i]) {
+                    StandardEntryDTO standardEntry = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
+                            .where(QStandardEntry.actionSerialNum.eq$(strArray[i]))
+                            .mapperTo(StandardEntryDTO.class)
+                            .execute();
+                    standardEntryDTOS.add(standardEntry);
+                }
+            }
+            //将比传的值大于执行序号减一
+            standardEntryDTOS.forEach(x -> {
+                x.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+                x.setActionSerialNum(x.getActionSerialNum() - 1);
+            });
+            QStandardEntry.standardEntry.save(standardEntryDTOS);
+            return maxActionSerialNum;
+        }
+        //如果更新的执行序号，比以前的小
+        else if (standardEntryDTO.getActionSerialNum() < actionSerialNum && standardEntryDTO.getActionSerialNum() > 0) {
+            List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
+                    .where(QStandardEntry.actionSerialNum.between(":actionSerialNum1", ":actionSerialNum2"))
+                    .execute(ImmutableMap.of("actionSerialNum1", standardEntryDTO.getActionSerialNum(), "actionSerialNum2", actionSerialNum));
+            Integer[] strArray = new Integer[lists.size()];
+            for (int i = 0; i < strArray.length; i++) {
+                strArray[i] = lists.get(i).getActionSerialNum();
+            }
+            List<StandardEntryDTO> standardEntryDTOS = new ArrayList<>();
+            for (int i = 0; i < strArray.length; i++) {
+                StandardEntryDTO standardEntry = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
+                        .where(QStandardEntry.actionSerialNum.eq$(strArray[i]))
+                        .mapperTo(StandardEntryDTO.class)
+                        .execute();
+                standardEntryDTOS.add(standardEntry);
+            }
+            standardEntryDTOS.forEach(x -> {
+                x.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+                x.setActionSerialNum(x.getActionSerialNum() + 1);
+            });
+            QStandardEntry.standardEntry.save(standardEntryDTOS);
+            return standardEntryDTO.getActionSerialNum();
+        }
+        //如果更新执行序号比以前的大
+        else if (standardEntryDTO.getActionSerialNum() > actionSerialNum) {
+            List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
+                    .where(QStandardEntry.actionSerialNum.between(":actionSerialNum1", ":actionSerialNum2"))
+                    .execute(ImmutableMap.of("actionSerialNum1", actionSerialNum, "actionSerialNum2", standardEntryDTO.getActionSerialNum()));
+            Integer[] strArray = new Integer[lists.size()];
+            for (int i = 0; i < strArray.length; i++) {
+                strArray[i] = lists.get(i).getActionSerialNum();
+            }
+            int maxActionSerialNum = 0;
+            for (Integer integer : strArray) {
+                if (integer > maxActionSerialNum) {
+                    maxActionSerialNum = integer;
+                }
+            }
+
+            List<StandardEntryDTO> standardEntryDTOS = new ArrayList<>();
+            for (int i = 0; i < strArray.length; i++) {
+                StandardEntryDTO standardEntry = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
+                        .where(QStandardEntry.actionSerialNum.eq$(strArray[i]))
+                        .mapperTo(StandardEntryDTO.class)
+                        .execute();
+                standardEntryDTOS.add(standardEntry);
+            }
+            //将比传的值大于或者等于的执行序号减一
+            standardEntryDTOS.forEach(x -> {
+                x.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+                x.setActionSerialNum(x.getActionSerialNum() - 1);
+            });
+            QStandardEntry.standardEntry.save(standardEntryDTOS);
+            //如果更新的值比最大值大，则返回最大值，否则返回更新值
+            if (standardEntryDTO.getActionSerialNum() >= maxActionSerialNum) {
+                return maxActionSerialNum;
+            } else {
+                return standardEntryDTO.getActionSerialNum();
+            }
+        }
+        //如果更新的执行序号一样大
+        else if (standardEntryDTO.getActionSerialNum() == actionSerialNum) {
+            return standardEntryDTO.getActionSerialNum();
+        } else {
+            return 0;
         }
     }
 }
