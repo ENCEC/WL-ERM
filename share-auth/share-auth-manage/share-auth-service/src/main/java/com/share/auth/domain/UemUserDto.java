@@ -505,4 +505,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      **/
     @ApiModelProperty("是否已经获取验证码")
     private Boolean authCodeFlag;
+
+    @ApiModelProperty("修改密码")
+    private String newPassword;
 }

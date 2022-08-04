@@ -17,6 +17,6 @@ public interface UemUserInterface {
      * 获取用户信息
      * @date 2022-07-25
      */
-    @GetMapping("/getUemUser")
-    ResultHelper<UemUserDto> getUemUser(@RequestParam Long uemUserId);
+    @GetMapping("/uemUserManage/getUemUser")
+    ResultHelper<UemUserDto> getUemUser(@RequestParam(name = "uemUserId") Long uemUserId);
 }

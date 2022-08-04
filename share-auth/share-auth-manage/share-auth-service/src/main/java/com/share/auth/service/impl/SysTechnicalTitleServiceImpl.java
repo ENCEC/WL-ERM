@@ -1,6 +1,7 @@
 package com.share.auth.service.impl;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.google.common.collect.ImmutableMap;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -85,23 +87,25 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
      */
     @Override
     public ResultHelper<?> updateSysTechnicalTitle(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
-        List<SysTechnicalTitle> sysTechnicalTitles = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.sysTechnicalTitle.fieldContainer())
-                .where(QSysTechnicalTitle.technicalName.eq$(sysTechnicalTitleAndPostVO.getTechnicalName()))
-                .execute();
-        if (CollectionUtils.isNotEmpty(sysTechnicalTitles)) {
-            return CommonResult.getFaildResultData("该岗位职称已经存在");
+        if (StrUtil.isEmpty(sysTechnicalTitleAndPostVO.getTechnicalName())) {
+            return CommonResult.getFaildResultData("职称名称不能为空");
         }
+        if (StrUtil.isEmpty(sysTechnicalTitleAndPostVO.getSeniority())) {
+            return CommonResult.getFaildResultData("工作年限不能为空");
+        }
+        if (StrUtil.isEmpty(sysTechnicalTitleAndPostVO.getPostName())) {
+            return CommonResult.getFaildResultData("岗位名称不能为空");
+        }
+        SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne(QSysTechnicalTitle.sysTechnicalTitle.fieldContainer())
+                .where(QSysTechnicalTitle.technicalTitleId.eq$(sysTechnicalTitleAndPostVO.getTechnicalTitleId()))
+                .execute();
         SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postId)
                 .where(QSysPost.postName.eq$(sysTechnicalTitleAndPostVO.getPostName()))
                 .execute();
-        SysTechnicalTitle sysTechnicalTitle = new SysTechnicalTitle();
         sysTechnicalTitle.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        sysTechnicalTitle.setTechnicalTitleId(sysTechnicalTitleAndPostVO.getTechnicalTitleId());
         sysTechnicalTitle.setTechnicalName(sysTechnicalTitleAndPostVO.getTechnicalName());
         sysTechnicalTitle.setSeniority(sysTechnicalTitleAndPostVO.getSeniority());
         sysTechnicalTitle.setPostId(sysPost.getPostId());
-        sysTechnicalTitle.setCreateBy("系统管理员");
-        sysTechnicalTitle.setStatus("0");
         QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
         return CommonResult.getSuccessResultData("更新成功");
     }
