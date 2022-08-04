@@ -20,8 +20,10 @@ public class QTaskInfo extends BaseModelExpression<TaskInfo, Long> {
     public static final FieldExpression<Long> creatorId = taskInfo.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = taskInfo.fieldOf("creatorName", String.class);
     public static final FieldExpression<Long> dispatchers = taskInfo.fieldOf("dispatchers", Long.class);
+    public static final FieldExpression<String> dispatchersName = taskInfo.fieldOf("dispatchersName", String.class);
     public static final FieldExpression<Date> endDate = taskInfo.fieldOf("endDate", Date.class);
     public static final FieldExpression<Long> executor = taskInfo.fieldOf("executor", Long.class);
+    public static final FieldExpression<String> executorName = taskInfo.fieldOf("executorName", String.class);
     public static final FieldExpression<Long> modifierId = taskInfo.fieldOf("modifierId", Long.class);
     public static final FieldExpression<String> modifierName = taskInfo.fieldOf("modifierName", String.class);
     public static final FieldExpression<Date> modifyTime = taskInfo.fieldOf("modifyTime", Date.class);

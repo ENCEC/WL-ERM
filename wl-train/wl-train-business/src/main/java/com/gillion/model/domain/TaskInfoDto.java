@@ -32,6 +32,10 @@ public class TaskInfoDto implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long dispatchers;
 
+    /**任务分配人姓名*/
+    @ApiModelProperty("任务分配人姓名")
+    private Long dispatchersName;
+
     /**实际完成日期*/
     @ApiModelProperty("实际完成日期")
     private Date endDate;
@@ -41,6 +45,10 @@ public class TaskInfoDto implements Serializable {
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long executor;
+
+    /**执行人姓名*/
+    @ApiModelProperty("执行人姓名")
+    private Long executorName;
 
     /**父级任务ID*/
     @ApiModelProperty("父级任务ID")
@@ -88,5 +96,33 @@ public class TaskInfoDto implements Serializable {
 
     @ApiModelProperty("页码")
     private Integer pageNo;
+
+    /**创建时间*/
+    @ApiModelProperty("创建时间")
+    private Date createTime;
+
+    /**创建人id*/
+    @ApiModelProperty("创建人id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long creatorId;
+
+    /**创建人名称*/
+    @ApiModelProperty("创建人名称")
+    private String creatorName;
+
+    /**修改人id*/
+    @ApiModelProperty("修改人id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long modifierId;
+
+    /**修改人名称*/
+    @ApiModelProperty("修改人名称")
+    private String modifierName;
+
+    /**修改时间*/
+    @ApiModelProperty("修改时间")
+    private Date modifyTime;
 
 }

@@ -1,8 +1,6 @@
 # web service 配置
 server:
   port: 8080
-#  servlet:
-#    context-path: /ec-demo
 # 安全配置
 security:
   basic:
@@ -222,9 +220,9 @@ dao-service:
   data-permission:
     enabled: false
   datasource:
-    url: jdbc:mysql://172.16.0.23:3306/daoservice_train?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
+    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: zhwl_lip_daoservice
+    password: zhwl_lip_daoservice
     driverClassName: com.mysql.jdbc.Driver
     maxActive: 20
     maxWait: 60000
