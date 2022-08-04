@@ -305,11 +305,11 @@ public class UemUserServiceImpl implements UemUserService {
         // 查询是否是其他用户登录
         UemUser user = QUemUser.uemUser.selectOne().where(QUemUser.account.eq$(account).or(QUemUser.mobile.eq$(account)).or(QUemUser.email.eq$(account))).execute();
         // 校验账号是否锁定
-        boolean isLocked = this.validIsLocked(sysPlatformUser, user);
-        // 账号已锁定
-        if (isLocked) {
-            return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
-        }
+//        boolean isLocked = this.validIsLocked(sysPlatformUser, user);
+//        // 账号已锁定
+//        if (isLocked) {
+//            return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
+//        }
         // 平台客服登录
         if (Objects.nonNull(sysPlatformUser) && Objects.equals(sysPlatformUser.getPassword(), password)) {
             log.info("查询到登录管理员,管理员用户id：" + sysPlatformUser.getSysPlatformUserId());
@@ -361,11 +361,11 @@ public class UemUserServiceImpl implements UemUserService {
         // 设置用户锁定信息
         this.setUserLockedInfo(sysPlatformUser, user);
         // 校验账号是否锁定
-        isLocked = this.validIsLocked(sysPlatformUser, user);
-        // 账号已锁定
-        if (isLocked) {
-            return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
-        }
+//        isLocked = this.validIsLocked(sysPlatformUser, user);
+//        // 账号已锁定
+//        if (isLocked) {
+//            return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
+//        }
         Object obj = redisInterface.get(RedisMqConstant.ACCOUNT_LOCKED_KEY_PRE + account);
         if (Objects.nonNull(obj)) {
             long errorSize = Long.valueOf(obj.toString());

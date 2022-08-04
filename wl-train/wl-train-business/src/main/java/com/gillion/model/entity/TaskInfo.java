@@ -50,9 +50,21 @@ private static final long serialVersionUID=1;
     @Column(name = "creator_name")
     private String creatorName;
 
+    /**任务分配人*/
+    @Column(name = "dispatchers")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long dispatchers;
+
     /**实际完成日期*/
     @Column(name = "end_date")
     private Date endDate;
+
+    /**执行人*/
+    @Column(name = "executor")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long executor;
 
     /**修改人id*/
     @Column(name = "modifier_id")
