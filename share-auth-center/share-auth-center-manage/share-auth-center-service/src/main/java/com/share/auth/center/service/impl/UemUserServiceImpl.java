@@ -168,26 +168,14 @@ public class UemUserServiceImpl implements UemUserService {
         User userInfoModel = new User();
         // 查询用户
         UemUser uemUser = QUemUser.uemUser.selectOne().byId(uid);
-        // 查询管理员
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(uid);
         if (Objects.nonNull(uemUser)) {
             BeanUtils.copyProperties(uemUser, userInfoModel);
-        } else if (Objects.nonNull(sysPlatformUser)) {
-            BeanUtils.copyProperties(sysPlatformUser, userInfoModel);
         } else {
-            userInfoModel = null;
             return null;
-        }
-        // 查询绑定企业信息
-        if (Objects.nonNull(userInfoModel) && userInfoModel.getBlindCompanny() != null && Objects.nonNull(uemUser)) {
-            UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUser.getBlindCompanny());
-            if (Objects.nonNull(uemCompany)) {
-                userInfoModel.setCompanyName(uemCompany.getCompanyNameCn());
-            }
         }
         // 根据clientId查询应用id
         OauthClientDetails oauthClientDetail = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
-        if (Objects.nonNull(oauthClientDetail) && Objects.nonNull(uemUser)) {
+        if (Objects.nonNull(oauthClientDetail)) {
             // 根据应用id和用户id查询角色
             List<UemUserRole> uemUserRoleList = QUemUserRole.uemUserRole.select(
                     QUemUserRole.uemUserRole.fieldContainer()
@@ -208,14 +196,6 @@ public class UemUserServiceImpl implements UemUserService {
                     }
                 }
             }
-        }
-        if (Objects.nonNull(sysPlatformUser)) {
-            userInfoModel.setAccount(sysPlatformUser.getAccount());
-            userInfoModel.setUemUserId(sysPlatformUser.getSysPlatformUserId());
-            userInfoModel.setName(sysPlatformUser.getName());
-            userInfoModel.setSysRoleId(CodeFinal.DefaultRole.ADMIN_ROLE_ID);
-            userInfoModel.setSysRoleName(CodeFinal.DefaultRole.ADMIN_ROLE_NAME);
-            userInfoModel.setRoleCode(CodeFinal.DefaultRole.ADMIN_ROLE_CODE);
         }
         userInfoModel.setClientId(clientId);
         return userInfoModel;
@@ -294,11 +274,7 @@ public class UemUserServiceImpl implements UemUserService {
                 return ENABLED_MESSAGE;
             }
             User userInfoModel = new User();
-            userInfoModel.setAccount(user.getAccount());
-            userInfoModel.setUemUserId(user.getUemUserId());
-            userInfoModel.setName(user.getName());
-            userInfoModel.setEmail(user.getEmail());
-            userInfoModel.setMobile(user.getMobile());
+            BeanUtils.copyProperties(user, userInfoModel);
             String credential = credentialProcessor.createCredential(userInfoModel);
             credentialProcessor.deliveryCredential(response, credential, user.getUemUserId().toString());
             // 保存登录日志

@@ -1,9 +1,11 @@
 package com.share.auth.service.impl;
 
+import cn.hutool.core.lang.Validator;
 import com.gillion.ds.client.api.DaoServiceClient;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.saas.redis.SassRedisInterface;
 import com.google.common.collect.ImmutableMap;
+import com.share.auth.center.api.AuthCenterInterface;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.constants.GlobalConstant;
 import com.share.auth.domain.UemUserDto;
@@ -29,6 +31,7 @@ import com.share.support.model.Role;
 import com.share.support.model.User;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
+import com.share.support.util.AES128Util;
 import com.share.support.util.MD5EnCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -136,6 +139,9 @@ public class UemUserServiceImpl implements UemUserService {
     DaoServiceClient client;
     @Autowired
     private SysRoleService sysRoleService;
+
+    @Autowired
+    private AuthCenterInterface authCenterInterface;
     /**
      *手机号生成验证码
      * @param telephone 手机号
@@ -474,44 +480,37 @@ public class UemUserServiceImpl implements UemUserService {
      * */
     @Override
     public ResultHelper<Object> updatePassword(UemUserDto uemUserDto) {
-//        //新密码
-//        String newPassword = uemUserDto.getNewPassword();
-//        if(StringUtils.isEmpty(newPassword)){
-//            return CommonResult.getFaildResultData("新密码不能为空");
-//        }
-//        if (StringUtils.isEmpty(uemUserDto.getUpdatePwdToken())){
-//            return CommonResult.getFaildResultData("非法更新密码，请确认！");
-//        }
-//        try{
-//            String  decPassword = AES128Util.decrypt(newPassword, aesSecretKey);
+        //新密码
+        String newPassword = uemUserDto.getNewPassword();
+        if(StringUtils.isEmpty(newPassword)){
+            return CommonResult.getFaildResultData("新密码不能为空");
+        }
+        try{
+            String  decPassword = AES128Util.decrypt(newPassword, aesSecretKey);
 //            if (!PasswordUtils.matchersPassword(decPassword)){
 //                return CommonResult.getFaildResultData(NOT_SECURITY_PROMPT);
 //            }
-//            newPassword = MD5EnCodeUtils.MD5EnCode(decPassword).substring(8,24);
-//        }catch (Exception e){
-//            return CommonResult.getFaildResultData(DECODE_FAIL_PROMPT);
-//        }
-//        // 密码二次加密
-//        newPassword = MD5EnCodeUtils.MD5EnCode(newPassword);
-//        String uemUserId = sassRedisInterface.get(uemUserDto.getUpdatePwdToken());
-//        if (StringUtils.isEmpty(uemUserId)){
-//            return CommonResult.getFaildResultData("修改密码有效期已过，请重新找回密码！");
-//        }
-//        UemUser uemUser = QUemUser.uemUser.selectOne().byId(Long.valueOf(uemUserId));
-//        if (Objects.nonNull(uemUser) && uemUser.getPassword().equals(newPassword)){
-//            return CommonResult.getFaildResultData("该密码与原密码相同");
-//        }
-//        int updateCount = QUemUser.uemUser.update(QUemUser.password)
-//                    .where(QUemUser.uemUserId.eq(":uemUserId"))
-//                    .execute(newPassword,uemUserId);
-//        if(updateCount > 0){
-//            sassRedisInterface.del(uemUserDto.getUpdatePwdToken());
-//            return CommonResult.getSuccessResultData("恭喜，新密码已设置成功！");
-//        }else{
-//            return CommonResult.getFaildResultData("密码更新失败！");
-//        }
-
-        return null;
+            newPassword = MD5EnCodeUtils.encryptionPassword(decPassword);
+        }catch (Exception e){
+            return CommonResult.getFaildResultData(DECODE_FAIL_PROMPT);
+        }
+        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
+            return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
+        }
+        UemUser uemUser = QUemUser.uemUser.selectOne().byId(userInfoModel.getUemUserId());
+        if (Objects.nonNull(uemUser) && uemUser.getPassword().equals(newPassword)){
+            return CommonResult.getFaildResultData("该密码与原密码相同");
+        }
+        int updateCount = QUemUser.uemUser.update(QUemUser.password)
+                    .where(QUemUser.uemUserId.eq(":uemUserId"))
+                    .execute(newPassword, userInfoModel.getUemUserId());
+        if(updateCount > 0){
+            sassRedisInterface.del(uemUserDto.getUpdatePwdToken());
+            return CommonResult.getSuccessResultData("密码更新成功！");
+        } else {
+            return CommonResult.getFaildResultData("密码更新失败！");
+        }
     }
 
     /**
@@ -754,25 +753,32 @@ public class UemUserServiceImpl implements UemUserService {
      */
     @Override
     public ResultHelper<Object> updateUemUserInfo(UemUserDto uemUserDto) {
+        if (uemUserDto == null) {
+            return CommonResult.getFaildResultData("空参数，更新失败");
+        }
         AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
         if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
             return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
         }
         UemUser uemUser = QUemUser.uemUser.selectOne().byId(userInfoModel.getUemUserId());
-        if (uemUserDto != null) {
-            // 根据传入的字段决定更新哪些信息
-            // 用户名校验修改
-            String accountValidateResult = accountValidate(uemUserDto, uemUser, userInfoModel);
-            if (StringUtils.isNotBlank(accountValidateResult)) {
-                return CommonResult.getFaildResultData(accountValidateResult);
-            }
-            // 密码校验修改
-            String passwordValidateResult = passwordValidate(uemUserDto, uemUser);
-            if (StringUtils.isNotBlank(passwordValidateResult)) {
-                return CommonResult.getFaildResultData(passwordValidateResult);
-            }
-            uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        // 用户名校验修改
+        String accountValidateResult = accountValidate(uemUserDto, uemUser, userInfoModel);
+        if (StringUtils.isNotBlank(accountValidateResult)) {
+            return CommonResult.getFaildResultData(accountValidateResult);
         }
+        if (StringUtils.isNotBlank(uemUserDto.getEmail())) {
+            if (!Validator.isEmail(uemUserDto.getEmail())) {
+                return CommonResult.getFaildResultData("邮件格式错误");
+            }
+            uemUser.setEmail(uemUserDto.getEmail());
+        }
+        if (StringUtils.isNotBlank(uemUserDto.getMobile())) {
+            if (!Validator.isMobile(uemUserDto.getMobile())) {
+                return CommonResult.getFaildResultData("手机号格式错误");
+            }
+            uemUser.setMobile(uemUserDto.getMobile());
+        }
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int updateNum = QUemUser.uemUser.save(uemUser);
         if (updateNum == CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
             // 刷新当前登录人用户信息缓存
@@ -853,12 +859,12 @@ public class UemUserServiceImpl implements UemUserService {
                 .selectOne()
                 .mapperTo(UemUserDto.class)
                 .byId(userInfoModel.getUemUserId());
-        if (Objects.nonNull(uemUserDto)) {
-            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
-            if (!userInfoModel.getRecordVersion().equals(uemUserDto.getRecordVersion())) {
-                userService.updateCurrentLoginUser();
-            }
-        }
+//        if (Objects.nonNull(uemUserDto)) {
+//            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
+//            if (!userInfoModel.getRecordVersion().equals(uemUserDto.getRecordVersion())) {
+//                userService.updateCurrentLoginUser();
+//            }
+//        }
         return CommonResult.getSuccessResultData(uemUserDto);
     }
 
