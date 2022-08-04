@@ -1,0 +1,385 @@
+server:
+  port: 8000
+  tomcat:
+    uri-encoding: UTF-8
+  max-http-header-size: 4048576
+
+mySwagger:
+  host: localhost:${server.port}
+
+elasticsearch:
+  enable: false
+  cluster:
+    name: my-application
+  host: 172.16.0.25
+  port: 9300
+
+spring:
+  application:
+    name: share-auth-center-tjp
+  main:
+    allow-bean-definition-overriding: true
+  elasticsearch:
+    rest:
+      uris: http://172.16.0.25:9200
+  ####数据源
+  datasource:
+    name: basicDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.16.0.23:3306/zhwl_lip_share_auth?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    maxActive: 30
+    validationQuery: select 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    #### alibaba druid
+    minIdle: 10
+    initialSize: 5
+    ####dbcp druid common
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 300
+    removeAbandoned: true
+    filters: stat
+    maxWaitMillis: 30000
+    timeBetweenEvictionRunsMillis: 300000
+
+# spring boot安全检查
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+### Ribbon 配置
+ribbon:
+  ConnectTimeout: 30000
+  ReadTimeout: 30000
+  eureka:
+    enabled: true
+eureka:
+  client:
+    serviceUrl:
+      #eds的注册地址
+      defaultZone: http://dev.eds.lip.dps.gillion.com.cn/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    #lease-renewal-interval-in-seconds: 5
+    #lease-expiration-duration-in-seconds: 10
+####ec auto autoconfiguration
+ec:
+  debugger:
+    enable: true
+  validation:
+    enabled: true
+    staticDirPath:
+    entity:
+      package:
+        path:
+  ####i18n多语言 以下配置项可配可不配 默认就是 false
+  #  i18n:
+  #    enabled: false
+  ####以下配置项可配可不配 默认就是 false
+  #    interceptor:
+  #      dataPermission:
+  #        enabled: false
+  #      valueHandler:
+  #        enabled: false
+  #      optimistic:
+  #        enabled: false
+  ####缓存
+  cache:
+    enabled: true
+    redis:
+      enabled: true
+    ##密码
+    #password: f53af7e5f0993f37
+    ##redis地址(集群下多台使用,号隔开)
+    hostAndPort: 172.16.0.28:40070
+#    hostAndPort: 127.0.0.1:6379
+  ####文件上传 以下配置项可配可不配 默认就是 false
+  upload:
+    enabled: false
+  #####excel上传下载
+  excel:
+    io:
+      enabled: false
+  ####主键生成 以下配置项可配可不配 默认就是 false
+  identity:
+    generator:
+      numberInc:
+        enabled: false
+      snowFlake:
+        enabled: true
+      uuid:
+        enabled: false
+  ####地区控件
+  area:
+    enabled: false
+  rule-number:
+    server-name: supply-chain-cxq
+    path: rule-number
+
+# redis配置
+redis:
+  namespace: zj_dev
+  # redis连接地址，集群时用逗号分隔
+  hostAndPort: 172.16.0.28:40070
+#  hostAndPort: 127.0.0.1:6379
+  # 是否集群模式
+  cluster: false
+  # 重定向的最大数量，集群使用
+  maxRedirects: 8
+  # 连接超时时间2000
+  connectionTimeout: 2000
+  # 响应超时时间
+  soTimeout: 30000
+  # 密码
+  # password: foobared
+  #password: f53af7e5f0993f37
+  # 最大失败重试次数
+  failTimes: 3
+  # 最大闲置连接
+  maxIdle: 50
+  # 最大连接数
+  maxTotal: 100
+  # 集群状态扫描间隔时间，单位是毫秒
+  scanInterval: 2000
+
+resource:
+  background:
+    #是否需要后台服务权限控制，专门为FMS兼容错误数据使用
+    auth: false
+db:
+  chinese:
+    width: 1
+
+dao-service:
+  # 使用多数据源扫描用的
+  query-model-injector:
+    scan-path: "classpath*:com/share/**/service/impl/*.class"
+  enabled: true
+  logDatabaseId: 3
+  # 允许匿名⽤户操作, 后端MQ⽆登录信息
+  allowAnonymousUser: true
+  # 输出结果返回执⾏SQL, debug 启⽤
+  returnExecSql: true
+  # 输出结果去掉debugInfo的返回
+  debug-setting:
+    # http传输过程中加密 false:加密，true：不加密，对应前端也要开启
+    restfulPlainCodeArguments: true
+  # 管理端的配置项
+  manager-server:
+    # 管理端所使⽤的的数据服务引擎对应的数据库⽅⾔类型
+    dialect: MYSQL_GENERAL
+  nashornEngineConfig:
+    extendFilePath: 'classpath:DaoServiceNashornEngineExt.js'
+  # 数据服务指令的基础设置
+  basic-actions:
+    # 持久化指令设置项
+    saveOrUpdate:
+      # 是否⽀持层级对象持久化
+      enabled-cascaded: true
+    # 查询指令设置项
+    read:
+      # 分⻚对象的结构: ⾃定义分⻚输出时各项属性的字段名
+      page-schema:
+        records-field: data
+      throws-when-select-one-missing-result: false
+    # 多种操作类型通⽤的设置
+    common:
+      # 当⽤户未为指令显式设置 tag 时, 数据服务引擎是否⾃动为正执⾏的指定⾃动附加tag
+      enable-auto-tagging: true
+  # 内置引擎所使⽤的客户端组装所需配置项
+  clientAutoAssemble:
+    enabled: true
+    # 项⽬唯⼀键
+    project-key: "zhwl_lip_auth_train_project"
+    # 通常为 true, 为 false 使⽤HttpClient
+    useEmbedEngine: true
+    # 该数据源对应数据服务的数据源信息的名称
+    inside-dao-service-data-source-name: auth-mysql
+    # 该数据源对应数据服务的数据源所属 serviceCode 分组名称
+    inside-dao-service-data-source-service-code: 'devmsaeg'
+    # 该客户端所使⽤的数据源实例名称
+    embed-engine-data-source-bean-name: 'basicDataSource'
+  # 数据服务⾃身的项⽬配置的唯⼀键
+  itselfProjectKey: "dao-service-embed-model-graphs"
+  # XA事务的配置
+  gtx:
+    enableXA: true
+    enableTC: false
+    #单位秒
+    xaTimeout: 20
+    timerId: 1
+    #定期扫描间隔，秒
+    timerInterval: 5
+    enabled: true
+  datasource:
+    # 数据服务的数据库地址
+    #    url: jdbc:mysql://117.149.228.150:10066/daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8&serverTimezone=UTC
+    #    username: developer
+    #    password: Gjwl2020#
+    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: zhwl_lip_daoservice
+    password: zhwl_lip_daoservice
+    driverClassName: com.mysql.cj.jdbc.Driver
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    testWhileIdle: true
+  # 导⼊导出配置项
+  inout:
+    enabled: true
+    output:
+      # LOCAL/CLOUD 导出文件使用本地保存或使用云端文件服务保存
+      storeType: 'LOCAL'
+      # uploaderStrategyId: '' # 导出文件保存到云端时需要配置上传策略编号(与 EC 文件服务对应)
+      # 导出文件会暂存此处
+      fileStorePath: '/tmp/daoServiceExportFiles/'
+      # ⼦域名造成跨域时才需要设置该项
+      renderPageDomain: 'localhost'
+
+info:
+  version: @project.version@
+  groupId: @project.groupId@
+  artifactId: @project.artifactId@
+
+system:
+  social:
+    qq:
+      app-id: 101386962 #101909811
+      app-secret: 2a0f820407df400b84a854d054be8b6a #8b31e55b32baf86b4cc46ec20d151066
+      providerId: qq
+    filterProcessesUrl: /qqLogin
+    weixin:
+      app-id: wx8a47a66e22296c62
+      app-secret: deb57af7ec1753a2668889e74b34b789
+auth:
+  security:
+    qq:
+      app-id: 101386962 #101909811
+      app-secret: 2a0f820407df400b84a854d054be8b6a #8b31e55b32baf86b4cc46ec20d151066
+sso:
+  portal:
+    client_id: share-portal
+    client_secret: user123
+    redirect_uri: http://172.16.8.160:9542/dashboard
+  #    client_id: share-portal
+  #    client_secret: user123
+  #    redirect_uri: http://dev.lip.share-portal-ui.dps.gillion.com.cn/dashboard
+  allow:
+    all: 6726670753768472580
+    admin: 6726670753768472581,6726670753768472582,6726670753768472583
+    noRole: 6726670753768472578,6796311794549669888,6813391622029328384,6726670753768472579
+  applicationId:
+    logink-emergency: 6742407760051060736
+  login:
+    clientId: gjwl
+    clientSecret: d6ee6d05ae733c5e47d1a44ca1dfacee
+    supply-chain-url: http://172.16.6.110:1012
+    authorize:
+      requestUrl: http://36.110.10.186:50025/ssoserver/moc2/authorize
+      redirectUri: http://172.16.6.110:1011/share-auth-center/oauthSSO/callback
+    token:
+      requestUrl: http://36.110.10.186:50025/ssoserver/moc2/token
+      redirectUri: http://172.16.6.110:1011
+    openId:
+      requestUrl: http://36.110.10.186:50025/ssoserver/moc2/me
+    userInfo:
+      requestUrl: http://36.110.10.186:50025/ssoserver/user/info
+    errorPage: http://172.16.6.110:1011/auth-null
+    permissionApplyPage: http://172.16.6.110:1011/apply-permission
+    permissionApplyingPage: http://172.16.6.110:1011/no-permission
+#配置密码加密秘钥
+aes_secret_key: c1953a7wPB234x6l
+#网站域名
+web_domain: gillion.com.cn
+# 后端资源权限配置
+authentication:
+  anonymousRoleId: ba98c88eb2f14632948d189cd41e4518
+  adminRoleId: 0L
+  captchaEnabled: false
+  credentialExpireSeconds: 3000
+  cookieExpireSeconds: 3000
+  jwt:
+    enabled: true
+    jwtName: access_token
+    secretKey: "DfEqd%AvjY1!pFEx*4g$E%hL77b#ecjR"
+  ticket:
+    enabled: false
+    ticketName: access_token
+  everyResourceRequireLogin: false
+  failedWhenResourceNotFound: false
+  imtpUserAllowPath:
+    - /uemUserPermission/saveUemUserPermission
+    - /application/getSysApplicationByClientId
+  ignorePathPatterns:
+    - /auth-redirect
+    - /register
+    - /registAndBind
+    - /validateAccount
+    - /findPwd
+    - /findPwdByPhone
+    - /findPwdByEmailBefore
+    - /findPwdByEmail
+    - /scanCodeLogin
+    - /authentication/*
+    - /oauth/*
+    - /oauth/auth/*
+    - /system/security/getSessionAttrsAndNoPermits
+    - /share_portal_dev/auto-api/PubEnvironment/list/devmsaeg/DS_share_portal_dev_PubEnvironment_list
+    - /user/getAuthCode
+    - /user/verifyAuthCode
+    - /user/register
+    - /user/updatePassword
+    - /user/findPasswordByMail
+    - /user/queryUemUserByCompanyId
+    - /user/queryUemUserByUserId
+    - /user/getUserAllInfo
+    - /user/queryUemUserCompany
+    - /user/validateAccount
+    - /user/validatePassword
+    - /user/updateUemUserInfo
+    - /user/queryUserByRoleCode
+    - /qqLogin/qq
+    - /loginUserInfo/getCurrentLoginUser
+    - /dictCode/getDictCodeByCode
+    - /number/*
+    - /rule-number/*
+    - /number-home/*
+    - /numbers/*
+    - /numbers
+    - /getToken
+    - /oauth2/auth/authentication
+    - /ssoLogout
+    - /getImageVerifyCode
+    - /getImageVerifyCodeRe
+    - /validateUnlock
+    - /oauthSSO/*
+    - /api/uemCompany/operate
+    - /api/uemUser/operate
+    - /api/*
+    - /information/getCurrentLoginUser
+    - /emergency/getCurrentLoginUser
+    - /channelWarning/queryHomePageWarningInfo
+    - /share_auth_dev/auto-api/SysDictType/list/devmsaeg/getStaffDutyOptions
+
+# 各个系统服务名,api包feign的value值使用占位符获取
+application:
+  name:
+    auth: share-auth-tjp
+    center: share-auth-center-tjp

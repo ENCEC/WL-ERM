@@ -234,8 +234,8 @@ dao-service:
   clientAutoAssemble:
     enabled: true
     project-key: "wl-erm-project"
-      useEmbedEngine: true
-      dataSourceName: "zhwl_wl_erm"
+    useEmbedEngine: true
+    dataSourceName: "zhwl_wl_erm"
     embedEngineDataSourceBeanName: 'basicDataSource'
 
   debug-setting:
