@@ -26,4 +26,34 @@ public interface StandardEntryService {
      * @return
      */
     ResultHelper<?> saveStandardEntry(StandardEntryDTO standardEntryDTO);
+
+    /**
+     * 查看一个条目信息
+     * @param standardEntryId
+     * @return
+     */
+    ResultHelper<?> queryByStandardEntryId(Long standardEntryId);
+
+    /**
+     * 启动/禁用
+     * @param standardEntryDTO
+     * @return
+     */
+    ResultHelper<?> updateStatus(StandardEntryDTO standardEntryDTO);
+
+    /**
+     * 删除条目
+     * @param standardEntryId
+     * @return
+     */
+    ResultHelper<?> deleteStandardEntry(Long standardEntryId);
+
+    /**
+     * 编辑条目
+     * @param standardEntryDTO
+     * @return
+     */
+    ResultHelper<?> updateStandardEntry(StandardEntryDTO standardEntryDTO);
+
+
 }

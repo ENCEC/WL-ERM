@@ -11,9 +11,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 用户信息
@@ -31,7 +33,14 @@ public class UemUserDto extends BaseModel implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long uemUserId;
 
-    /**用户名*/
+    /**
+     * 主键id数组
+     */
+    @ApiModelProperty("主键数组")
+    private List<Long> uemUserIds;
+    /**
+     * 用户名
+     */
     @ApiModelProperty("用户名")
     private String account;
 
@@ -209,7 +218,22 @@ public class UemUserDto extends BaseModel implements Serializable {
     @ApiModelProperty("转正原因")
     private String offerReason;
 
-    /**来源应用*/
+    /**
+     * 辞退时间
+     */
+    @ApiModelProperty("辞退时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date dismissDate;
+
+    /**
+     * 辞退原因
+     */
+    @ApiModelProperty("辞退原因")
+    private String dismissReason;
+
+    /**
+     * 来源应用
+     */
     @ApiModelProperty("来源应用")
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
@@ -265,7 +289,32 @@ public class UemUserDto extends BaseModel implements Serializable {
     @ApiModelProperty("户籍地址")
     private String sourceAddress;
 
-    /**在校专业*/
+    /**
+     * 转正类型
+     */
+    @ApiModelProperty("转正类型")
+    private Long positiveType;
+    /**
+     * 答辩成绩
+     */
+    @ApiModelProperty("答辩成绩")
+    private Long defenseScore;
+
+    /**
+     * 面谈评语
+     */
+    @ApiModelProperty("面谈评语")
+    private String interviewComments;
+
+    /**
+     * 转正评语
+     */
+    @ApiModelProperty("转正评语")
+    private String positiveComments;
+
+    /**
+     * 在校专业
+     */
     @ApiModelProperty("在校专业")
     private String speciality;
 

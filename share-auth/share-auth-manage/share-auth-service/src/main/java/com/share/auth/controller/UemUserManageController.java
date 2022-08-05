@@ -17,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 用户管理接口
@@ -297,5 +297,103 @@ public class UemUserManageController {
     @ApiOperation(value = "删除员工信息")
     public ResultHelper<Object> deleteStaff(@RequestParam Long uemUserId) {
         return uemUserManageService.deleteStaff(uemUserId);
+    }
+
+    /**
+     * 编辑重新上传员工简历
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
+   /* public Map<String, Object> fileupload(MultipartFile file, HttpServletRequest req) {
+        //首先要给文件找一个目录
+        //先写返回值
+        Map<String, Object> result = new HashMap<>();
+        //再用pdf格式开始书写,先找原始的名字
+        String originName = file.getOriginalFilename();
+        //判断文件类型是不是pdf
+        if (!originName.endsWith(".pdf")) {
+            //如果不是的话，就返回类型
+            result.put("status", "error");
+            result.put("msg", "文件类型不对");
+            return result;
+        }
+        //如果是正确的话，就需要写保存文件的文件夹
+        //.format(new Date())的意思是 也就是格式化一个新的时间
+        //Date会创建一个时间，然后会按照当前的sdf格式调用format将当前时间创建出来 直接调用new Date()可能会出现这种格式
+        //再是getServletContext
+        String format = sdf.format(new Date());
+        //这也是一个临时的路径，项目重启之后，他就会变的
+        String realPath = req.getServletContext().getRealPath("/") + format;
+        //再是保存文件的文件夹
+        File folder = new File(realPath);
+        //如果不存在，就自己创建
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        System.out.println(folder);
+        //String newName = UUID.randomUUID().toString() + ".pdf";
+        //然后就可以保存了
+        try {
+            file.transferTo(new File(folder, originName));
+            //这个还有一个url
+            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + format + originName;
+            //如果指向成功了
+            result.put("status", "success");
+            result.put("url", url);
+        } catch (IOException e) {
+            //返回异常
+            result.put("status", "error");
+            result.put("msg", e.getMessage());
+        }
+        return result;
+    }*/
+
+    /**
+     * 转正，离职，辞退---查看信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @GetMapping("/queryStaffInfo")
+    @ApiOperation(value = "转正，离职，辞退---查看信息")
+    public ResultHelper<UemUserDto> queryStaffInfo(@RequestParam Long uemUserId) {
+        return uemUserManageService.queryStaffInfo(uemUserId);
+    }
+
+    /**
+     * 添加转正信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @PostMapping("/savePositiveInfo")
+    @ApiOperation(value = "添加转正信息")
+    public ResultHelper<Object> savePositiveInfo(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.savePositiveInfo(uemUserDto);
+    }
+
+    /**
+     * 添加离职信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @PostMapping("/saveResignInfo")
+    @ApiOperation(value = "添加离职信息")
+    public ResultHelper<Object> saveResignInfo(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.saveResignInfo(uemUserDto);
+    }
+
+    /**
+     * 添加辞退信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @PostMapping("/saveDismissInfo")
+    @ApiOperation(value = "添加辞退信息")
+    public ResultHelper<Object> saveDismissInfo(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.saveDismissInfo(uemUserDto);
     }
 }

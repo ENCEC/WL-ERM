@@ -2,7 +2,10 @@ package com.share.auth.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import com.alibaba.nacos.common.util.ClassUtils;
+import com.fr.web.core.A.C;
 import com.gillion.ds.client.DSContext;
+import com.gillion.ds.client.api.queryobject.command.FluentSelectOneCommand;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.share.auth.constants.CodeFinal;
@@ -31,7 +34,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -479,6 +484,12 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .execute();
     }
 
+    /**
+     * 下拉框获取所有部门信息
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
     @Override
     public List<UemUserDto> queryDepartmentBySelect() {
         return QUemUser.uemUser.select(
@@ -489,6 +500,12 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .mapperTo(UemUserDto.class).execute();
     }
 
+    /**
+     * 下拉框获取所有岗位信息
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
     @Override
     public List<UemUserDto> queryStaffDutyBySelect() {
         return QUemUser.uemUser.select(
@@ -499,6 +516,12 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .mapperTo(UemUserDto.class).execute();
     }
 
+    /**
+     * 下拉框获取所有职称信息
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
     @Override
     public List<UemUserDto> queryTechnicalNameBySelect() {
         return QUemUser.uemUser.select(
@@ -509,6 +532,12 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .mapperTo(UemUserDto.class).execute();
     }
 
+    /**
+     * 下拉框获取所有项目信息
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
     @Override
     public List<UemUserDto> queryProjectNameBySelect() {
         return QUemUser.uemUser.select(
@@ -519,11 +548,23 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .mapperTo(UemUserDto.class).execute();
     }
 
+    /**
+     * 根据id查询员工信息
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
     @Override
     public UemUserDto queryStaffById(Long uemUserId) {
         return QUemUser.uemUser.selectOne().mapperTo(UemUserDto.class).byId(uemUserId);
     }
 
+    /**
+     * 编辑员工信息
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
     @Override
     public ResultHelper<Object> updateStaff(UemUserDto uemUserDto) {
         Long uemUserId = uemUserDto.getUemUserId();
@@ -549,6 +590,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         String email = uemUserDto.getEmail();
         BigDecimal seniority = uemUserDto.getSeniority();
         Long projectId = uemUserDto.getProjectId();
+        //根据id查询出对应的员工信息，避免空字段
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         uemUser.setUemUserId(uemUserId);
@@ -557,6 +599,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setBirthday(date);
         uemUser.setJobStatus(jobStatus);
         uemUser.setIdCard(idCard);
+        uemUser.setName(name);
         uemUser.setMobile(mobile);
         uemUser.setAddress(address);
         uemUser.setSourceAddress(sourceAddress);
@@ -576,10 +619,178 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         return CommonResult.getSuccessResultData("修改成功!");
     }
 
+    /**
+     * 根据id删除员工信息
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
     @Override
     public ResultHelper<Object> deleteStaff(Long uemUserId) {
-        int i = QUemUser.uemUser.deleteById(uemUserId);
-        return CommonResult.getSuccessResultData("删除成功!");
+        int result = QUemUser.uemUser.deleteById(uemUserId);
+        if (result == 1) {
+            return CommonResult.getSuccessResultData("删除成功!");
+        } else {
+            return CommonResult.getFaildResultData("删除失败");
+        }
+    }
+
+    /**
+     * 转正，离职，辞退---查看信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @Override
+    public ResultHelper<UemUserDto> queryStaffInfo(Long uemUserId) {
+        UemUserDto execute = QUemUser.uemUser.selectOne(
+                        QUemUser.uemUserId,
+                        QUemUser.name,
+                        QUemUser.sex,
+                        QUemUser.entryDate,
+                        QUemUser.jobStatus,
+                        QUemUser.deptName,
+                        QUemUser.staffDuty,
+                        QUemUser.offerDate,
+                        QUemUser.positiveType
+                )
+                .where(QUemUser.uemUserId.eq$(uemUserId))
+                .mapperTo(UemUserDto.class)
+                .execute();
+        if (execute == null) {
+            return CommonResult.getFaildResultData("对象信息为空!查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(execute);
+        }
+    }
+
+    /**
+     * 添加转正信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @Override
+    public ResultHelper<Object> savePositiveInfo(UemUserDto uemUserDto) {
+        //主键数组--添加基本信息，添加面试人评语，添加审批人评语，都需要主键
+        List<Long> uemUserIds = uemUserDto.getUemUserIds();
+        int i = 0;
+        for (Long uemUserId : uemUserIds) {
+            Long infoId = uemUserIds.get(i);
+            if (i == 0) {
+                //第一个数组值为主键，执行添加基本信息操作
+                Date offerDate = uemUserDto.getOfferDate();
+                Long positiveType = uemUserDto.getPositiveType();
+                Long defenseScore = uemUserDto.getDefenseScore();
+                UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(infoId);
+                uemUser.setOfferDate(offerDate);
+                uemUser.setPositiveType(positiveType);
+                uemUser.setDefenseScore(defenseScore);
+                uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+                int result = QUemUser.uemUser.save(uemUser);
+                if (result == 1) {
+                    i = ++i;
+                    continue;
+                } else {
+                    return CommonResult.getSuccessResultData("出错啦!");
+                }
+            }
+            //第二个数组值为面谈人id,执行添加面谈人评语操作
+            else {
+                Long interviewId = uemUserIds.get(i);
+                if (i == 1) {
+                    String interviewComments = uemUserDto.getInterviewComments();
+                    UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(interviewId);
+                    uemUser.setInterviewComments(interviewComments);
+                    uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+                    int result = QUemUser.uemUser.save(uemUser);
+                    if (result == 1) {
+                        i = ++i;
+                        continue;
+                    } else {
+                        return CommonResult.getSuccessResultData("出错啦!");
+                    }
+                }
+                //第三个数组值为审批人id，执行添加转正评语操作
+                else {
+                    Long positiveId = uemUserIds.get(i);
+                    if (i == 2) {
+                        String positiveComments = uemUserDto.getPositiveComments();
+                        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(positiveId);
+                        uemUser.setPositiveComments(positiveComments);
+                        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+                        int result = QUemUser.uemUser.save(uemUser);
+                        if (result == 1) {
+                            continue;
+                        } else {
+                            return CommonResult.getSuccessResultData("出错啦!");
+                        }
+                    }
+                }
+            }
+        }
+        return CommonResult.getSuccessResultData("新增成功!");
+    }
+     /*   Long uemUserId = uemUserDto.getUemUserId();
+        Date offerDate = uemUserDto.getOfferDate();
+        Long positiveType = uemUserDto.getPositiveType();
+        Long defenseScore = uemUserDto.getDefenseScore();
+        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
+        uemUser.setOfferDate(offerDate);
+        uemUser.setPositiveType(positiveType);
+        uemUser.setDefenseScore(defenseScore);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int result = QUemUser.uemUser.save(uemUser);
+        if (result == 1) {
+            return CommonResult.getSuccessResultData("新增成功!");
+        } else {
+            return CommonResult.getFaildResultData("新增失败！");
+        }*/
+
+    /**
+     * 添加离职信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @Override
+    public ResultHelper<Object> saveResignInfo(UemUserDto uemUserDto) {
+        Long uemUserId = uemUserDto.getUemUserId();
+        Date leaveDate = uemUserDto.getLeaveDate();
+        String leaveReason = uemUserDto.getLeaveReason();
+        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
+        uemUser.setLeaveDate(leaveDate);
+        uemUser.setLeaveReason(leaveReason);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int result = QUemUser.uemUser.save(uemUser);
+        if (result == 1) {
+            return CommonResult.getSuccessResultData("新增成功");
+        } else {
+            return CommonResult.getFaildResultData("新增失败");
+        }
+    }
+
+    /**
+     * 添加辞退信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @Override
+    public ResultHelper<Object> saveDismissInfo(UemUserDto uemUserDto) {
+        Long uemUserId = uemUserDto.getUemUserId();
+        Date dismissDate = uemUserDto.getDismissDate();
+        String dismissReason = uemUserDto.getDismissReason();
+        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
+        uemUser.setLeaveDate(dismissDate);
+        uemUser.setLeaveReason(dismissReason);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int result = QUemUser.uemUser.save(uemUser);
+        if (result == 1) {
+            return CommonResult.getSuccessResultData("新增成功");
+        } else {
+            return CommonResult.getFaildResultData("新增失败");
+        }
     }
 
 }

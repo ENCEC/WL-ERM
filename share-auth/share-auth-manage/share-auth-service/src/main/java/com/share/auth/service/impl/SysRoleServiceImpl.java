@@ -405,12 +405,16 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public ResultHelper<Object> deleteRole(Long sysRoleId) {
-        QSysRole.sysRole.deleteById(sysRoleId);
-        return CommonResult.getSuccessResultData("删除成功");
+        int result = QSysRole.sysRole.deleteById(sysRoleId);
+        if (result == 1) {
+            return CommonResult.getSuccessResultData("删除成功");
+        } else {
+            return CommonResult.getFaildResultData("删除失败!");
+        }
     }
 
     /**
-     * 分页待条件查询角色信息
+     * 分页带条件查询角色信息
      *
      * @author wzr
      * @date 2022-07-29

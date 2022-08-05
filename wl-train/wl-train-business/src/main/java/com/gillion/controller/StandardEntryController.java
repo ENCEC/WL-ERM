@@ -74,6 +74,12 @@ public class StandardEntryController {
     ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto) {
         return standardEntryInterface.querySysDictType(sysDictTypeDto);
     }
+
+    /**
+     * 获取规范条目信息
+     * @param standardEntryDTO
+     * @return
+     */
     @PostMapping("/queryStandardEntry")
     public ResultHelper<Page<StandardEntryDTO>> queryStandardEntry(@RequestBody StandardEntryDTO standardEntryDTO) {
         return standardEntryService.queryStandardEntry(standardEntryDTO);
@@ -87,6 +93,46 @@ public class StandardEntryController {
     @PostMapping("/saveStandardEntry")
     public ResultHelper<?> saveStandardEntry(@RequestBody StandardEntryDTO standardEntryDTO) {
         return standardEntryService.saveStandardEntry(standardEntryDTO);
+    }
+
+    /**
+     * 查看一个条目信息
+     * @param standardEntryId
+     * @return
+     */
+    @GetMapping("/queryByStandardEntryId")
+    public ResultHelper<?> queryByStandardEntryId(Long standardEntryId) {
+        return standardEntryService.queryByStandardEntryId(standardEntryId);
+    }
+
+    /**
+     * 启动/禁用
+     * @param standardEntryDTO
+     * @return
+     */
+    @GetMapping("/updateStatus")
+    public ResultHelper<?> updateStatus(StandardEntryDTO standardEntryDTO) {
+        return standardEntryService.updateStatus(standardEntryDTO);
+    }
+
+    /**
+     * 删除条目
+     * @param standardEntryId
+     * @return
+     */
+    @GetMapping("/deleteStandardEntry")
+    public ResultHelper<?> deleteStandardEntry(Long standardEntryId) {
+        return standardEntryService.deleteStandardEntry(standardEntryId);
+    }
+
+    /**
+     * 编辑条目
+     * @param standardEntryDTO
+     * @return
+     */
+    @PostMapping("/updateStandardEntry")
+    public ResultHelper<?> updateStandardEntry(@RequestBody StandardEntryDTO standardEntryDTO) {
+        return standardEntryService.updateStandardEntry(standardEntryDTO);
     }
 
 }
