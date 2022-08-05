@@ -85,9 +85,8 @@ public class StandardDetailServiceImpl implements StandardDetailService {
         //获取最大的执行序号
         Integer max_actionSerialNum = this.maxActionSerialNum();
         //判断执行序号是否为null ，赋值1
-        if (Objects.isNull(actionSerialNum)) {
+        if (Objects.isNull(actionSerialNum) && actionSerialNum<=0) {
             actionSerialNum = 1;
-            standardDetailVO.setActionSerialNum(actionSerialNum);
         }
         //新增的执行序号<= 最大的执行序号
         if (actionSerialNum <= max_actionSerialNum) {
@@ -105,8 +104,12 @@ public class StandardDetailServiceImpl implements StandardDetailService {
         //新增的执行序号大于最大的执行序号，新增执行序号=max+1
         if (actionSerialNum > max_actionSerialNum) {
             actionSerialNum = max_actionSerialNum + 1;
-            standardDetailVO.setActionSerialNum(actionSerialNum);
         }
+
+        if (Objects.isNull(standardDetailVO.getStatus())){
+             standardDetailVO.setStatus(true);
+        }
+        standardDetailVO.setActionSerialNum(actionSerialNum);
         standardDetailVO.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         standardDetailVO.setCreateTime(new DateTime());
 
@@ -117,6 +120,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
         standardEntry.setEntryName(standardDetailVO.getEntryName());
         standardEntry.setItemType(standardDetailVO.getItemType());
         standardEntry.setActionSerialNum(standardDetailVO.getActionSerialNum());
+        standardEntry.setStatus(standardDetailVO.getStatus());
         standardEntry.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         QStandardEntry.standardEntry.save(standardEntry);
 
