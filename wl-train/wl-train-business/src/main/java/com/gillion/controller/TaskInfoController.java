@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Objects;
+
 /**
  * @author xuzt <xuzt@gillion.com.cn>
  * @date 2022/7/29
@@ -66,5 +69,58 @@ public class TaskInfoController {
     @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
     public ResultHelper<Page<StandardDetailVo>> queryStandardFullDetailByTaskType(@RequestBody TaskInfoDto taskInfoDto) {
         return taskInfoService.queryStandardFullDetailByTaskType(taskInfoDto);
+    }
+
+    @PostMapping("/queryNeedStandardFullDetailByTaskType")
+    @ApiOperation("根据任务类型查询全部必须的完整规范细则")
+    @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
+    public ResultHelper<List<StandardDetailVo>> queryNeedStandardFullDetailByTaskType(@RequestBody TaskInfoDto taskInfoDto) {
+        return taskInfoService.queryNeedStandardFullDetailByTaskType(taskInfoDto);
+    }
+
+    @PostMapping("/queryNotNeedStandardFullDetailByTaskType")
+    @ApiOperation("根据任务类型分页查询非必须的完整规范细则")
+    @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
+    public ResultHelper<Page<StandardDetailVo>> queryNotNeedStandardFullDetailByTaskType(@RequestBody TaskInfoDto taskInfoDto) {
+        return taskInfoService.queryNotNeedStandardFullDetailByTaskType(taskInfoDto);
+    }
+
+    @PostMapping("/queryStaffTaskInfo")
+    @ApiOperation("查询员工任务信息")
+    @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
+    public ResultHelper<Page<TaskInfoDto>> queryStaffTaskInfo(@RequestBody TaskInfoDto taskInfoDto) {
+        if (Objects.isNull(taskInfoDto.getPageNo())) {
+            taskInfoDto.setPageNo(1);
+        }
+        if (Objects.isNull(taskInfoDto.getPageSize())) {
+            taskInfoDto.setPageSize(10);
+        }
+        return taskInfoService.queryStaffTaskInfo(taskInfoDto);
+    }
+
+    @PostMapping("/queryLeaderTaskInfo")
+    @ApiOperation("查询负责人任务信息")
+    @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
+    public ResultHelper<Page<TaskInfoDto>> queryLeaderTaskInfo(@RequestBody TaskInfoDto taskInfoDto) {
+        if (Objects.isNull(taskInfoDto.getPageNo())) {
+            taskInfoDto.setPageNo(1);
+        }
+        if (Objects.isNull(taskInfoDto.getPageSize())) {
+            taskInfoDto.setPageSize(10);
+        }
+        return taskInfoService.queryLeaderTaskInfo(taskInfoDto);
+    }
+
+    @PostMapping("/queryOrdinatorTaskInfo")
+    @ApiOperation("查询统筹人任务信息")
+    @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
+    public ResultHelper<Page<TaskInfoDto>> queryOrdinatorTaskInfo(@RequestBody TaskInfoDto taskInfoDto) {
+        if (Objects.isNull(taskInfoDto.getPageNo())) {
+            taskInfoDto.setPageNo(1);
+        }
+        if (Objects.isNull(taskInfoDto.getPageSize())) {
+            taskInfoDto.setPageSize(10);
+        }
+        return taskInfoService.queryOrdinatorTaskInfo(taskInfoDto);
     }
 }

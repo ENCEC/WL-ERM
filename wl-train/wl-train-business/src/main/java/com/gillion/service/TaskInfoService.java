@@ -5,6 +5,8 @@ import com.gillion.model.domain.TaskInfoDto;
 import com.gillion.model.vo.StandardDetailVo;
 import com.share.support.result.ResultHelper;
 
+import java.util.List;
+
 /**
  * 任务信息服务
  * @author xuzt <xuzt@gillion.com.cn>
@@ -65,4 +67,49 @@ public interface TaskInfoService {
      * @date 2022-08-03
      */
     ResultHelper<Page<StandardDetailVo>> queryStandardFullDetailByTaskType(TaskInfoDto taskInfoDto);
+
+    /**
+     * 根据任务类型查询全部必须的完整规范细则
+     * @param taskInfoDto 任务信息
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-05
+     */
+    ResultHelper<List<StandardDetailVo>> queryNeedStandardFullDetailByTaskType(TaskInfoDto taskInfoDto);
+
+    /**
+     * 根据任务类型分页查询非必须的完整规范细则
+     * @param taskInfoDto 任务信息
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-05
+     */
+    ResultHelper<Page<StandardDetailVo>> queryNotNeedStandardFullDetailByTaskType(TaskInfoDto taskInfoDto);
+
+    /**
+     * 查询员工任务信息
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-05
+     */
+    ResultHelper<Page<TaskInfoDto>> queryStaffTaskInfo(TaskInfoDto taskInfoDto);
+
+    /**
+     * 查询负责人任务信息
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-05
+     */
+    ResultHelper<Page<TaskInfoDto>> queryLeaderTaskInfo(TaskInfoDto taskInfoDto);
+
+    /**
+     * 查询统筹人任务信息
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-05
+     */
+    ResultHelper<Page<TaskInfoDto>> queryOrdinatorTaskInfo(TaskInfoDto taskInfoDto);
 }

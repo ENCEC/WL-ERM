@@ -36,7 +36,7 @@ public class TaskInfoDto implements Serializable {
 
     /**任务分配人姓名*/
     @ApiModelProperty("任务分配人姓名")
-    private Long dispatchersName;
+    private String dispatchersName;
 
     /**实际完成日期*/
     @ApiModelProperty("实际完成日期")
@@ -52,7 +52,7 @@ public class TaskInfoDto implements Serializable {
 
     /**执行人姓名*/
     @ApiModelProperty("执行人姓名")
-    private Long executorName;
+    private String executorName;
 
     /**父级任务ID*/
     @ApiModelProperty("父级任务ID")
