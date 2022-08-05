@@ -28,6 +28,9 @@ public class FeignConfiguration {
                     while (attributeNames.hasMoreElements()) {
                         String name = attributeNames.nextElement();
                         String value = request.getHeader(name);
+                        if (name.equals("content-length")){
+                            continue;
+                        }
                         requestTemplate.header(name,value);
                     }
                 }
