@@ -1,8 +1,6 @@
 # web service 配置
 server:
   port: 8080
-#  servlet:
-#    context-path: /ec-demo
 # 安全配置
 security:
   basic:
@@ -220,11 +218,11 @@ dao-service:
   nashornEngineConfig:
     extendFilePath: 'classpath:DaoServiceNashornEngineExt.js'
   data-permission:
-    enabled: true
+    enabled: false
   datasource:
-    url: jdbc:mysql://172.16.0.23:3306/daoservice_train?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
+    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: zhwl_lip_daoservice
+    password: zhwl_lip_daoservice
     driverClassName: com.mysql.jdbc.Driver
     maxActive: 20
     maxWait: 60000
@@ -233,10 +231,11 @@ dao-service:
     testWhileIdle: true
   clientAutoAssemble:
     enabled: true
-    project-key: "wl-erm-project"
+    project-key: "zhwl_wl_erm_project"
     useEmbedEngine: true
     dataSourceName: "zhwl_wl_erm"
     embedEngineDataSourceBeanName: 'basicDataSource'
+
 
   debug-setting:
     print-executed-sql: true
