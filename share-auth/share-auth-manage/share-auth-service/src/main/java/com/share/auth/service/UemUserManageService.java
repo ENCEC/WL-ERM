@@ -199,10 +199,11 @@ public interface UemUserManageService {
     /**
      * 重新上传员工简历---编辑功能
      *
-     * @param multipartFile
+     * @param mFile
      * @author wzr
      * @date 2022-08-03
      */
+    ResultHelper<?> uploadStaffFile(MultipartFile mFile);
 
 
     /**

@@ -38,7 +38,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 主键id数组
      */
     @ApiModelProperty("主键数组")
-    private List<Long> uemUserIds;
+    private List<String> uemUserIds;
     /**
      * 用户名
      */
@@ -75,7 +75,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 审批时间
      */
     @ApiModelProperty("审批时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date auditTime;
 
     /**
@@ -108,7 +108,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date createTime;
 
     /**
@@ -155,7 +155,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 入职时间
      */
     @ApiModelProperty("入职时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 //    @JsonSerialize(using = Date2StringSerializer.class)
 //    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date entryDate;
@@ -164,7 +164,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 毕业时间
      */
     @ApiModelProperty("毕业时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 //    @JsonSerialize(using = Date2StringSerializer.class)
 //    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date graduateDate;
@@ -223,7 +223,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 离职时间
      */
     @ApiModelProperty("离职时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 //    @JsonSerialize(using = Date2StringSerializer.class)
 //    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date leaveDate;
@@ -266,7 +266,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 修改时间
      */
     @ApiModelProperty("修改时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date modifyTime;
 
     /**
@@ -279,7 +279,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 转正时间
      */
     @ApiModelProperty("转正时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd ", timezone = "GMT+8")
 //    @JsonSerialize(using = Date2StringSerializer.class)
 //    @JsonDeserialize(using = String2DateDeserializer.class)
     private Date offerDate;
@@ -294,7 +294,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 辞退时间
      */
     @ApiModelProperty("辞退时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd ", timezone = "GMT+8")
     private Date dismissDate;
 
     /**

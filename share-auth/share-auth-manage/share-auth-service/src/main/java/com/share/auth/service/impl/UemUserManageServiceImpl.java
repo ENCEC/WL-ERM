@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -568,7 +569,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Override
     public ResultHelper<Object> updateStaff(UemUserDto uemUserDto) {
         Long uemUserId = uemUserDto.getUemUserId();
-        String account = uemUserDto.getAccount();
+        // String account = uemUserDto.getAccount();
         String name = uemUserDto.getName();
         Boolean sex = uemUserDto.getSex();
         String date = uemUserDto.getBirthday();
@@ -594,7 +595,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         uemUser.setUemUserId(uemUserId);
-        uemUser.setAccount(account);
+        //  uemUser.setAccount(account);
         uemUser.setSex(sex);
         uemUser.setBirthday(date);
         uemUser.setJobStatus(jobStatus);
@@ -636,6 +637,40 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     }
 
     /**
+     * 员工简历编辑
+     *
+     * @author wzr
+     * @date 2022-08-03
+     */
+    @Override
+    public ResultHelper<?> uploadStaffFile(MultipartFile mFile) {
+        if (mFile.getSize() < 1) {
+            return CommonResult.getFaildResultData("文件为空");
+        }
+        //获取文件名
+        String orgFileName = mFile.getOriginalFilename();
+//        String dateTimeStr = DateUtil.formatDate(new Date(), "yyyyMMddHHmmss");
+        StringBuilder path = new StringBuilder("D:\\\\uploadFile\\");
+        path.append(orgFileName);
+        String filePath = path.toString();
+
+        File file = new File(filePath);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        try {
+            mFile.transferTo(file);
+            //把上传文件路径存进数据库
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return CommonResult.getFaildResultData("上传失败");
+        }
+        return CommonResult.getSuccessResultData("上传成功");
+    }
+
+
+    /**
      * 转正，离职，辞退---查看信息
      *
      * @author wzr
@@ -645,6 +680,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     public ResultHelper<UemUserDto> queryStaffInfo(Long uemUserId) {
         UemUserDto execute = QUemUser.uemUser.selectOne(
                         QUemUser.uemUserId,
+                        QUemUser.uemDeptId,
+                        QUemUser.staffDutyCode,
                         QUemUser.name,
                         QUemUser.sex,
                         QUemUser.entryDate,
@@ -673,16 +710,16 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Override
     public ResultHelper<Object> savePositiveInfo(UemUserDto uemUserDto) {
         //主键数组--添加基本信息，添加面试人评语，添加审批人评语，都需要主键
-        List<Long> uemUserIds = uemUserDto.getUemUserIds();
+        List<String> uemUserIds = uemUserDto.getUemUserIds();
         int i = 0;
-        for (Long uemUserId : uemUserIds) {
-            Long infoId = uemUserIds.get(i);
+        for (String uemUserId : uemUserIds) {
+            String infoId = uemUserIds.get(i);
             if (i == 0) {
                 //第一个数组值为主键，执行添加基本信息操作
                 Date offerDate = uemUserDto.getOfferDate();
                 Long positiveType = uemUserDto.getPositiveType();
                 Long defenseScore = uemUserDto.getDefenseScore();
-                UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(infoId);
+                UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(Long.valueOf(infoId));
                 uemUser.setOfferDate(offerDate);
                 uemUser.setPositiveType(positiveType);
                 uemUser.setDefenseScore(defenseScore);
@@ -697,10 +734,10 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             }
             //第二个数组值为面谈人id,执行添加面谈人评语操作
             else {
-                Long interviewId = uemUserIds.get(i);
+                String interviewId = uemUserIds.get(i);
                 if (i == 1) {
                     String interviewComments = uemUserDto.getInterviewComments();
-                    UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(interviewId);
+                    UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(Long.valueOf(interviewId));
                     uemUser.setInterviewComments(interviewComments);
                     uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
                     int result = QUemUser.uemUser.save(uemUser);
@@ -713,10 +750,10 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 }
                 //第三个数组值为审批人id，执行添加转正评语操作
                 else {
-                    Long positiveId = uemUserIds.get(i);
+                    String positiveId = uemUserIds.get(i);
                     if (i == 2) {
                         String positiveComments = uemUserDto.getPositiveComments();
-                        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(positiveId);
+                        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(Long.valueOf(positiveId));
                         uemUser.setPositiveComments(positiveComments);
                         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
                         int result = QUemUser.uemUser.save(uemUser);
