@@ -1,5 +1,6 @@
 package com.gillion.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ec.core.utils.Long2String;
@@ -7,6 +8,7 @@ import com.gillion.ec.core.utils.String2Long;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -35,14 +37,18 @@ public class TaskDetailInfoDto implements Serializable {
 
     /**执行时间*/
     @ApiModelProperty("执行时间")
-    private Date actionTime;
+    private Integer actionTime;
 
     /**申请日期*/
     @ApiModelProperty("申请日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date applyDate;
 
     /**审批日期*/
     @ApiModelProperty("审批日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date approvalDate;
 
     /**审批人ID*/
@@ -53,6 +59,8 @@ public class TaskDetailInfoDto implements Serializable {
 
     /**实际完成日期*/
     @ApiModelProperty("实际完成日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date endDate;
 
     /**执行人ID*/
@@ -67,6 +75,8 @@ public class TaskDetailInfoDto implements Serializable {
 
     /**面谈时间*/
     @ApiModelProperty("面谈时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date faceTime;
 
     /**责任人ID*/
@@ -91,10 +101,14 @@ public class TaskDetailInfoDto implements Serializable {
 
     /**计划完成日期*/
     @ApiModelProperty("计划完成日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planEndDate;
 
     /**计划开始日期*/
     @ApiModelProperty("计划开始日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planStartDate;
 
     /**完成进度*/
@@ -124,6 +138,8 @@ public class TaskDetailInfoDto implements Serializable {
 
     /**实际开始日期*/
     @ApiModelProperty("实际开始日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startDate;
 
     /**完成状态（0：待完成 1：执行中 2：已完成）*/
