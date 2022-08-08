@@ -1,6 +1,7 @@
 package com.gillion.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.gillion.model.domain.TaskDetailInfoDto;
 import com.gillion.model.domain.TaskInfoDto;
 import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
@@ -98,6 +99,26 @@ public class TaskInfoController {
         return taskInfoService.queryStaffTaskInfo(taskInfoDto);
     }
 
+    @PostMapping("/queryTaskDetailInfo")
+    @ApiOperation("查询员工任务详情信息")
+    @ApiImplicitParam(name = "taskInfoDto", value = "任务信息ID", dataType = "TaskInfoDto", paramType = "body")
+    public ResultHelper<Page<TaskDetailInfoDto>> queryTaskDetail(@RequestBody TaskInfoDto taskInfoDto) {
+        if (Objects.isNull(taskInfoDto.getPageNo())) {
+            taskInfoDto.setPageNo(1);
+        }
+        if (Objects.isNull(taskInfoDto.getPageSize())) {
+            taskInfoDto.setPageSize(10);
+        }
+        return taskInfoService.queryStaffTaskDetail(taskInfoDto);
+    }
+
+    @PostMapping("/updateTaskDetailProgress")
+    @ApiOperation("更新任务进度")
+    @ApiImplicitParam(name = "taskDetailInfoDtoList", value = "任务细则ID和进度数值", dataType = "TaskDetailInfoDto", paramType = "body")
+    public ResultHelper<String> updateTaskDetailProgress(@RequestBody List<TaskDetailInfoDto> taskDetailInfoDtoList) {
+        return taskInfoService.updateTaskDetailProgress(taskDetailInfoDtoList);
+    }
+
     @PostMapping("/queryLeaderTaskInfo")
     @ApiOperation("查询负责人任务信息")
     @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
@@ -109,6 +130,13 @@ public class TaskInfoController {
             taskInfoDto.setPageSize(10);
         }
         return taskInfoService.queryLeaderTaskInfo(taskInfoDto);
+    }
+
+    @PostMapping("/updateTaskDetailStatus")
+    @ApiOperation("更新任务完成状态")
+    @ApiImplicitParam(name = "taskDetailInfoDtoList", value = "任务细则ID和完成状态和完成结果", dataType = "TaskDetailInfoDto", paramType = "body")
+    public ResultHelper<String> updateTaskDetailStatus(@RequestBody List<TaskDetailInfoDto> taskDetailInfoDtoList) {
+        return taskInfoService.updateTaskDetailStatus(taskDetailInfoDtoList);
     }
 
     @PostMapping("/queryOrdinatorTaskInfo")

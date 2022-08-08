@@ -321,6 +321,61 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     }
 
     /**
+     * 查询员工任务详情信息
+     *
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-08
+     */
+    @Override
+    public ResultHelper<Page<TaskDetailInfoDto>> queryStaffTaskDetail(TaskInfoDto taskInfoDto) {
+        Page<TaskDetailInfoDto> taskDetailInfoDtoPage = QTaskDetailInfo.taskDetailInfo
+                .select(QTaskDetailInfo.taskDetailInfo.fieldContainer())
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId()))
+                .paging(taskInfoDto.getPageNo(), taskInfoDto.getPageSize())
+                .mapperTo(TaskDetailInfoDto.class)
+                .execute();
+        return CommonResult.getSuccessResultData(taskDetailInfoDtoPage);
+    }
+
+    /**
+     * 更新任务进度
+     *
+     * @param taskDetailInfoDtoList 任务细则ID和进度数值
+     * @return com.share.support.result.ResultHelper<java.lang.String>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-08
+     */
+    @Override
+    public ResultHelper<String> updateTaskDetailProgress(List<TaskDetailInfoDto> taskDetailInfoDtoList) {
+        if (taskDetailInfoDtoList == null || taskDetailInfoDtoList.isEmpty()) {
+            return CommonResult.getFaildResultData("传入参数不能为空");
+        }
+        List<TaskDetailInfo> taskDetailInfoList = new LinkedList<>();
+        for (TaskDetailInfoDto taskDetailInfoDto : taskDetailInfoDtoList) {
+            Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
+            String progress = taskDetailInfoDto.getProgress();
+            if (taskDetailId == null || progress == null) {
+                return CommonResult.getFaildResultData("任务细则ID和进度不能为空");
+            }
+            TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
+            taskDetailInfo.setTaskDetailId(taskDetailId);
+            taskDetailInfo.setProgress(progress);
+            taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+            taskDetailInfoList.add(taskDetailInfo);
+        }
+        int rowCount = QTaskDetailInfo.taskDetailInfo
+                .selective(QTaskDetailInfo.progress)
+                .update(taskDetailInfoList);
+        if (rowCount > 0) {
+            return CommonResult.getSuccessResultData("更新成功");
+        } else {
+            return CommonResult.getFaildResultData("更新失败");
+        }
+    }
+
+    /**
      * 查询负责人任务信息
      *
      * @param taskInfoDto 查询入参
@@ -338,7 +393,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         String taskTitle = StrUtil.isEmpty(taskInfoDto.getTaskTitle()) ? "" : "%" + taskInfoDto.getTaskTitle() + "%";
         List<Integer> status;
         if (Objects.isNull(taskInfoDto.getStatus())) {
-            status = Arrays.asList(0,1,2);
+            status = Arrays.asList(0,1,2,3);
         } else  {
             status = Arrays.asList(taskInfoDto.getStatus());
         }
@@ -352,6 +407,44 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .mapperTo(TaskInfoDto.class)
                 .execute(params);
         return CommonResult.getSuccessResultData(taskInfoDtoPage);
+    }
+
+    /**
+     * 更新任务完成状态
+     *
+     * @param taskDetailInfoDtoList 查询入参
+     * @return com.share.support.result.ResultHelper<java.lang.String>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-08
+     */
+    @Override
+    public ResultHelper<String> updateTaskDetailStatus(List<TaskDetailInfoDto> taskDetailInfoDtoList) {
+        if (taskDetailInfoDtoList == null || taskDetailInfoDtoList.isEmpty()) {
+            return CommonResult.getFaildResultData("传入参数不能为空");
+        }
+        List<TaskDetailInfo> taskDetailInfoList = new LinkedList<>();
+        for (TaskDetailInfoDto taskDetailInfoDto : taskDetailInfoDtoList) {
+            Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
+            Integer status = taskDetailInfoDto.getStatus();
+            String resultAccess = taskDetailInfoDto.getResultAccess();
+            if (taskDetailId == null || status == null || StrUtil.isEmpty(resultAccess)) {
+                return CommonResult.getFaildResultData("任务细则ID、完成情况和完成结果不能为空");
+            }
+            TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
+            taskDetailInfo.setTaskDetailId(taskDetailId);
+            taskDetailInfo.setStatus(status);
+            taskDetailInfo.setResultAccess(resultAccess);
+            taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+            taskDetailInfoList.add(taskDetailInfo);
+        }
+        int rowCount = QTaskDetailInfo.taskDetailInfo
+                .selective(QTaskDetailInfo.status, QTaskDetailInfo.resultAccess)
+                .update(taskDetailInfoList);
+        if (rowCount > 0) {
+            return CommonResult.getSuccessResultData("更新成功");
+        } else {
+            return CommonResult.getFaildResultData("更新失败");
+        }
     }
 
     /**
