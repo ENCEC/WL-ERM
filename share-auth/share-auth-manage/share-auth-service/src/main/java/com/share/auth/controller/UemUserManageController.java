@@ -19,7 +19,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -396,4 +399,55 @@ public class UemUserManageController {
     public ResultHelper<Object> saveDismissInfo(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.saveDismissInfo(uemUserDto);
     }
+
+    /**
+     * 上传文件
+     * @param mFile
+     * @return
+     */
+    @PostMapping ("/upload")
+    public ResultHelper<?> uploadFile(MultipartFile mFile) {
+        return uemUserManageService.uploadFile(mFile);
+    }
+    /**下载文件
+     * @param path   想要下载的文件的路径
+     * @param response
+     */
+    @RequestMapping("/download")
+    public ResultHelper<?> download(String path, HttpServletResponse response) throws Exception {
+        try {
+            // path是指想要下载的文件的路径
+            File file = new File(path);
+            System.out.println(file);
+            // 获取文件名
+            String filename = file.getName();
+            // 获取文件后缀名
+            String ext = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+            System.out.println("文件后缀："+ext);
+
+            // 将文件写入输入流
+            FileInputStream fileInputStream = new FileInputStream(file);
+            InputStream fis = new BufferedInputStream(fileInputStream);
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+
+            // 清空response
+            response.reset();
+            // 设置response的Header
+            response.setCharacterEncoding("UTF-8");
+            response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+            // 告知浏览器文件的大小
+            response.addHeader("Content-Length", "" + file.length());
+            OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            outputStream.write(buffer);
+            outputStream.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return CommonResult.getFaildResultData("下载失败");
+        }
+        return CommonResult.getSuccessResultData("下载成功");
+    }
+
 }
