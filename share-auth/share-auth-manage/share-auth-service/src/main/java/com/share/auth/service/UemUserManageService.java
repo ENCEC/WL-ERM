@@ -242,5 +242,33 @@ public interface UemUserManageService {
      */
     ResultHelper<Object> saveDismissInfo(UemUserDto uemUserDto);
 
+    /**
+     * 查看转正评语
+     * @param uemUserId
+     * @return
+     */
+    ResultHelper<UemUserDto> queryOfferInfo(Long uemUserId);
+
+    /**
+     * 查看离职原因
+     * @param uemUserId
+     * @return
+     */
+    ResultHelper<UemUserDto> queryLeaveInfo(Long uemUserId);
+
+    /**
+     * 查看辞退原因
+     * @param uemUserId
+     * @return
+     */
+    ResultHelper<UemUserDto> queryDismissInfo(Long uemUserId);
+
+    /**
+     * 上传文件
+     * @param mFile
+     * @return
+     */
+    ResultHelper<?> uploadFile(MultipartFile mFile);
+
 
 }

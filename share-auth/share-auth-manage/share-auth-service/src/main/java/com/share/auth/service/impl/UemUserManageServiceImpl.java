@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -792,5 +793,127 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             return CommonResult.getFaildResultData("新增失败");
         }
     }
+
+    /**
+     * 查看转正评语
+     * @param uemUserId
+     * @return
+     */
+    @Override
+    public ResultHelper<UemUserDto> queryOfferInfo(Long uemUserId) {
+        UemUserDto execute = QUemUser.uemUser.selectOne(
+                QUemUser.uemUserId,
+                QUemUser.name,
+                QUemUser.sex,
+                QUemUser.entryDate,
+                QUemUser.jobStatus,
+                QUemUser.deptName,
+                QUemUser.staffDuty,
+                QUemUser.offerDate,
+                QUemUser.positiveType,
+                QUemUser.defenseScore,
+                QUemUser.interviewComments,
+                QUemUser.positiveComments,
+                QUemUser.createTime,
+                QUemUser.creatorName
+        )
+                .where(QUemUser.uemUserId.eq$(uemUserId))
+                .mapperTo(UemUserDto.class)
+                .execute();
+        if (execute == null) {
+            return CommonResult.getFaildResultData("对象信息为空!查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(execute);
+        }
+    }
+
+    /**
+     * 查看离职原因
+     * @param uemUserId
+     * @return
+     */
+    @Override
+    public ResultHelper<UemUserDto> queryLeaveInfo(Long uemUserId) {
+        UemUserDto execute = QUemUser.uemUser.selectOne(
+                QUemUser.uemUserId,
+                QUemUser.name,
+                QUemUser.sex,
+                QUemUser.entryDate,
+                QUemUser.jobStatus,
+                QUemUser.deptName,
+                QUemUser.staffDuty,
+                QUemUser.leaveDate,
+                QUemUser.leaveReason
+        )
+                .where(QUemUser.uemUserId.eq$(uemUserId))
+                .mapperTo(UemUserDto.class)
+                .execute();
+        if (execute == null) {
+            return CommonResult.getFaildResultData("对象信息为空!查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(execute);
+        }
+    }
+
+    /**
+     * 查看辞退原因
+     * @param uemUserId
+     * @return
+     */
+    @Override
+    public ResultHelper<UemUserDto> queryDismissInfo(Long uemUserId) {
+        UemUserDto execute = QUemUser.uemUser.selectOne(
+                QUemUser.uemUserId,
+                QUemUser.name,
+                QUemUser.sex,
+                QUemUser.entryDate,
+                QUemUser.jobStatus,
+                QUemUser.deptName,
+                QUemUser.staffDuty,
+                QUemUser.dismissDate,
+                QUemUser.dismissReason
+        )
+                .where(QUemUser.uemUserId.eq$(uemUserId))
+                .mapperTo(UemUserDto.class)
+                .execute();
+        if (execute == null) {
+            return CommonResult.getFaildResultData("对象信息为空!查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(execute);
+        }
+    }
+
+    /**
+     *上传文件
+     * @param mFile
+     * @return
+     */
+    @Override
+    public ResultHelper<?> uploadFile(MultipartFile mFile) {
+        if (mFile.getSize() < 1) {
+            return CommonResult.getFaildResultData("文件为空");
+        }
+        //获取文件名
+        String orgFileName = mFile.getOriginalFilename();
+//        String dateTimeStr = DateUtil.formatDate(new Date(), "yyyyMMddHHmmss");
+        StringBuilder path = new StringBuilder("D:\\新建文件夹\\adc\\");
+        path.append(orgFileName);
+        String filePath = path.toString();
+
+        File file1 = new File(filePath);
+        if (!file1.getParentFile().exists()) {
+            file1.getParentFile().mkdirs();
+        }
+        try {
+            mFile.transferTo(file1);
+            //把上传文件路径存进数据库
+
+        }  catch (IOException e) {
+            e.printStackTrace();
+            return CommonResult.getFaildResultData("上传失败");
+        }
+        return CommonResult.getSuccessResultData("上传成功");
+    }
+
 
 }
