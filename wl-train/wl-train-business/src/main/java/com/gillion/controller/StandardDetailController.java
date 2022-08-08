@@ -3,6 +3,7 @@ package com.gillion.controller;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.service.StandardDetailService;
 import com.gillion.train.api.model.vo.StandardDetailVO;
+import com.share.auth.api.StandardEntryInterface;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @Api(value = "规范细则控制器")
 public class StandardDetailController {
 
+    @Autowired
+    private StandardEntryInterface standardEntryInterface;
     @Autowired
     private StandardDetailService standardDetailService;
 

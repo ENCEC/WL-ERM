@@ -10,6 +10,7 @@ import com.gillion.model.querymodels.QStandardDetail;
 import com.gillion.model.querymodels.QStandardEntry;
 import com.gillion.service.StandardDetailService;
 import com.gillion.train.api.model.vo.StandardDetailVO;
+import com.gillion.train.api.model.vo.StandardEntryDTO;
 import com.share.support.result.CommonResult;
 import org.apache.commons.lang.StringUtils;
 import com.share.support.result.ResultHelper;
@@ -80,12 +81,21 @@ public class StandardDetailServiceImpl implements StandardDetailService {
     @Override
     public ResultHelper<StandardDetailVO> addStandardDetailVO(StandardDetailVO standardDetailVO) {
 
+        //查询
+        StandardEntry execute = QStandardEntry.standardEntry
+                .selectOne(QStandardEntry.standardEntry.fieldContainer())
+                .where(QStandardEntry.itemType.eq$(":itemType")
+                        .and(QStandardEntry.entryName.eq$(":entryName")))
+                .execute();
+
+        standardDetailVO.setStandardEntryId(execute.getStandardEntryId());
+
         //获取执行序号
         int actionSerialNum = standardDetailVO.getActionSerialNum();
         //获取最大的执行序号
         Integer max_actionSerialNum = this.maxActionSerialNum();
         //判断执行序号是否为null ，赋值1
-        if (Objects.isNull(actionSerialNum) && actionSerialNum<=0) {
+        if (Objects.isNull(actionSerialNum) && actionSerialNum <= 0) {
             actionSerialNum = 1;
         }
         //新增的执行序号<= 最大的执行序号
@@ -106,8 +116,8 @@ public class StandardDetailServiceImpl implements StandardDetailService {
             actionSerialNum = max_actionSerialNum + 1;
         }
 
-        if (Objects.isNull(standardDetailVO.getStatus())){
-             standardDetailVO.setStatus(true);
+        if (Objects.isNull(standardDetailVO.getStatus())) {
+            standardDetailVO.setStatus(true);
         }
         standardDetailVO.setActionSerialNum(actionSerialNum);
         standardDetailVO.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
@@ -115,6 +125,8 @@ public class StandardDetailServiceImpl implements StandardDetailService {
 
 
         //测试数据   后续调用父表的新增接口
+
+//        StandardEntryDTO standardEntryDTO = new StandardEntryDTO();
         StandardEntry standardEntry = new StandardEntry();
         standardEntry.setCreateTime(standardDetailVO.getCreateTime());
         standardEntry.setEntryName(standardDetailVO.getEntryName());
@@ -122,7 +134,12 @@ public class StandardDetailServiceImpl implements StandardDetailService {
         standardEntry.setActionSerialNum(standardDetailVO.getActionSerialNum());
         standardEntry.setStatus(standardDetailVO.getStatus());
         standardEntry.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+
+//        StandardEntryServiceImpl standardEntryService = new StandardEntryServiceImpl();
+//        standardEntryService.saveStandardEntry(standardEntryDTO);
+
         QStandardEntry.standardEntry.save(standardEntry);
+
 
         standardDetailVO.setStandardEntryId(standardEntry.getStandardEntryId());
         int rowStatus = QStandardDetail.standardDetail.save(standardDetailVO);
@@ -180,12 +197,10 @@ public class StandardDetailServiceImpl implements StandardDetailService {
         }
 
 
-        //先删除父表
-        //测试 后续调用父类的删除接口
-        StandardEntry standardEntry = new StandardEntry();
-        standardEntry.setRowStatus(RowStatusConstants.ROW_STATUS_DELETED);
-        standardEntry.setStandardEntryId(standardEntryId);
-        QStandardEntry.standardEntry.deleteById(standardEntry.getStandardEntryId());
+        //调用父类删除方法
+        StandardEntryServiceImpl standardEntryService = new StandardEntryServiceImpl();
+        standardEntryService.deleteStandardEntry(standardEntryId);
+
 
         standardDetail.setRowStatus(RowStatusConstants.ROW_STATUS_DELETED);
         int row = QStandardDetail.standardDetail.deleteById(standardDetailId);
@@ -273,7 +288,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
                 //前移位置(actionSerialNum) 到  (actionSerial-1)  往后移动一格
                 List<StandardDetail> standardDetailList = QStandardDetail.standardDetail
                         .select(QStandardDetail.standardDetail.fieldContainer())
-                        .where(QStandardDetail.actionSerialNum.between$(actionSerialNum,actionSerial-1))
+                        .where(QStandardDetail.actionSerialNum.between$(actionSerialNum, actionSerial - 1))
                         .execute();
                 for (int i = 0; i < standardDetailList.size(); i++) {
                     StandardDetail standardDetail1 = standardDetailList.get(i);
@@ -284,7 +299,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
             } else {
                 List<StandardDetail> standardDetailList = QStandardDetail.standardDetail
                         .select(QStandardDetail.standardDetail.fieldContainer())
-                        .where(QStandardDetail.actionSerialNum.between$(actionSerial+1,actionSerialNum))
+                        .where(QStandardDetail.actionSerialNum.between$(actionSerial + 1, actionSerialNum))
                         .execute();
                 for (int i = 0; i < standardDetailList.size(); i++) {
                     StandardDetail standardDetail1 = standardDetailList.get(i);
@@ -304,17 +319,26 @@ public class StandardDetailServiceImpl implements StandardDetailService {
 //        BeanUtils.copyProperties(standardDetail, standardDetailVO);
 
 
-        //先改父表后改子表    (测试  后续调用父表的修改接口)
-        StandardEntry standardEntry = new StandardEntry();
+        //先改父表后改子表
+        StandardEntryDTO standardEntryDTO = new StandardEntryDTO();
         //父表id
-        standardEntry.setStandardEntryId(standardDetail.getStandardEntryId());
+        standardEntryDTO.setStandardEntryId(standardDetail.getStandardEntryId());
         //条目类型
-        standardEntry.setItemType(standardDetailVO.getItemType());
+        standardEntryDTO.setItemType(standardDetailVO.getItemType());
         //规范条目
-        standardEntry.setEntryName(standardDetailVO.getEntryName());
-        standardEntry.setActionSerialNum(actionSerialNum);
-        standardEntry.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        int action = QStandardEntry.standardEntry.save(standardEntry);
+        standardEntryDTO.setEntryName(standardDetailVO.getEntryName());
+        standardEntryDTO.setActionSerialNum(actionSerialNum);
+        standardEntryDTO.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+
+        StandardEntryServiceImpl standardEntryService = new StandardEntryServiceImpl();
+        //调用父类编辑排序的方法
+        Integer actionSerialNumEntry = standardEntryService.updateActionSerialNum(standardEntryDTO);
+        if (actionSerialNumEntry == 0) {
+            return CommonResult.getFaildResultData("执行序号要为正整数");
+        }
+        standardEntryDTO.setActionSerialNum(actionSerialNumEntry);
+
+        int action = QStandardEntry.standardEntry.save(standardEntryDTO);
         if (action > 0) {
             standardDetail.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
             //更新时间
@@ -334,7 +358,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
 
 
     /**
-     *规范条目种类
+     * 规范条目种类
      *
      * @param
      * @return ResultHelper<?>
@@ -350,7 +374,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
                 .mapperTo(StandardEntry.class)
                 .execute();
         List list = new ArrayList();
-        for (int i = 0;i < standardEntryList.size();i++) {
+        for (int i = 0; i < standardEntryList.size(); i++) {
             StandardEntry standardEntry = standardEntryList.get(i);
             list.add(standardEntry.getEntryName());
         }
@@ -358,7 +382,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
     }
 
     /**
-     *条目类型  种类
+     * 条目类型  种类
      *
      * @param
      * @return ResultHelper<?>
@@ -373,7 +397,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
                 .mapperTo(StandardEntry.class)
                 .execute();
         List list = new ArrayList();
-        for (int i = 0;i < standardEntryList.size();i++) {
+        for (int i = 0; i < standardEntryList.size(); i++) {
             StandardEntry standardEntry = standardEntryList.get(i);
             list.add(standardEntry.getItemType());
         }
@@ -381,7 +405,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
     }
 
     /**
-     *查找id
+     * 查找id
      *
      * @param standardDetailId
      * @return
@@ -395,14 +419,14 @@ public class StandardDetailServiceImpl implements StandardDetailService {
                 .execute();
         if (standardDetailList.size() == 1) {
             return standardDetailList.get(0);
-        }else {
+        } else {
             return null;
         }
     }
 
 
     /**
-     *最大执行序号
+     * 最大执行序号
      *
      * @param
      * @return Integer
@@ -410,7 +434,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
      * @date 2022/8/3
      */
 
-    Integer maxActionSerialNum() {
+    private Integer maxActionSerialNum() {
         //获取最大的执行序号
         Integer max_actionSerialNum = DSContext
                 .customization("selectMax_actionSerialNum")
@@ -419,5 +443,5 @@ public class StandardDetailServiceImpl implements StandardDetailService {
                 .execute();
         return max_actionSerialNum;
     }
-
 }
+
