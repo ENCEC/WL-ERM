@@ -1,6 +1,7 @@
 package com.share.auth.service.impl;
 
 import cn.hutool.core.lang.Validator;
+import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.DaoServiceClient;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.saas.redis.SassRedisInterface;
@@ -8,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.share.auth.center.api.AuthCenterInterface;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.constants.GlobalConstant;
+import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.enums.GlobalEnum;
 import com.share.auth.model.entity.*;
@@ -859,6 +861,14 @@ public class UemUserServiceImpl implements UemUserService {
                 .selectOne()
                 .mapperTo(UemUserDto.class)
                 .byId(userInfoModel.getUemUserId());
+        if (userInfoModel != null) {
+            List<SysRoleDTO> sysRoleDTOList = DSContext
+                    .customization("WL-ERM_selectRoleByUser")
+                    .select()
+                    .mapperTo(SysRoleDTO.class)
+                    .execute(userInfoModel);
+            userInfoModel.setRoleList(sysRoleDTOList);
+        }
 //        if (Objects.nonNull(uemUserDto)) {
 //            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
 //            if (!userInfoModel.getRecordVersion().equals(uemUserDto.getRecordVersion())) {
