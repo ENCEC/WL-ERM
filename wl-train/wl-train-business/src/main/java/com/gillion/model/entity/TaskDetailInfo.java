@@ -118,9 +118,7 @@ private static final long serialVersionUID=1;
 
     /**统筹人ID*/
     @Column(name = "ordinator")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
-    private Long ordinator;
+    private String ordinator;
 
     /**计划完成日期*/
     @Column(name = "plan_end_date")
@@ -164,7 +162,7 @@ private static final long serialVersionUID=1;
     @Column(name = "start_date")
     private Date startDate;
 
-    /**完成状态（0：待完成 1：执行中 2：已完成）*/
+    /**完成状态（0：待完成 1：执行中 2：已完成 3：退回重做）*/
     @Column(name = "status")
     private Integer status;
 

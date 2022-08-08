@@ -131,7 +131,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             if (taskDetailInfo.getLeader() != null) {
                 taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
             }
-            taskDetailInfo.setOrdinator(Long.parseLong(standardDetailVo.getOrdinatorId()));
+            taskDetailInfo.setOrdinator(standardDetailVo.getOrdinatorId());
             taskDetailInfo.setStandardEntryId(standardDetailVo.getStandardEntryId());
             taskDetailInfo.setStandardEntryName(standardDetailVo.getEntryName());
             taskDetailInfo.setStandardDetailId(standardDetailVo.getStandardDetailId());
@@ -440,6 +440,27 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         int rowCount = QTaskDetailInfo.taskDetailInfo
                 .selective(QTaskDetailInfo.status, QTaskDetailInfo.resultAccess)
                 .update(taskDetailInfoList);
+        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo
+                .selectOne(QTaskDetailInfo.taskInfoId)
+                .byId(taskDetailInfoList.get(0).getTaskDetailId());
+        Long taskInfoId = taskDetailInfo.getTaskInfoId();
+        long finishCount = QTaskDetailInfo.taskDetailInfo
+                .selectCount(QTaskDetailInfo.taskInfoId.count())
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskDetailInfo.getTaskInfoId())
+                        .and(QTaskDetailInfo.status.eq$(2)))
+                .execute();
+        long totalCount = QTaskDetailInfo.taskDetailInfo
+                .selectCount(QTaskDetailInfo.taskInfoId.count())
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskDetailInfo.getTaskInfoId()))
+                .execute();
+        if (finishCount == totalCount) {
+            TaskInfo taskInfo = new TaskInfo();
+            taskInfo.setTaskInfoId(taskInfoId);
+            taskInfo.setStatus(2);
+            taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+            QTaskInfo.taskInfo.selective(QTaskInfo.status)
+                    .update(taskInfo);
+        }
         if (rowCount > 0) {
             return CommonResult.getSuccessResultData("更新成功");
         } else {
@@ -463,13 +484,14 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             return CommonResult.getFaildResultData("请先登录！");
         }
         String taskTitle = StrUtil.isEmpty(taskInfoDto.getTaskTitle()) ? "" : "%" + taskInfoDto.getTaskTitle() + "%";
+        String ordinator = "%" + userModelInfo.getUemUserId() + "%";
         List<Integer> status;
         if (Objects.isNull(taskInfoDto.getStatus())) {
             status = Arrays.asList(0,1,2);
         } else  {
             status = Arrays.asList(taskInfoDto.getStatus());
         }
-        params.put("ordinator", userModelInfo.getUemUserId());
+        params.put("ordinator", ordinator);
         params.put("taskTitle", taskTitle);
         params.put("status", status);
         Page<TaskInfoDto> taskInfoDtoPage = DSContext
