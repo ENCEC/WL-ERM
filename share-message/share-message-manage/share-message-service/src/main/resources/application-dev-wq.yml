@@ -1,0 +1,345 @@
+server:
+  port: 8085
+  tomcat:
+    uri-encoding: UTF-8
+logging:
+  file:
+    name: /tmp/log/message
+  config: classpath:log4j2-spring.xml
+
+mySwagger:
+  host: localhost:${server.port}
+
+mybaits:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+spring:
+  application:
+    name: share-message-wq
+    admin:
+      enabled: false
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+  ####数据源
+  datasource:
+    name: basicDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.16.0.23:3306/zhwl_lip_share_message?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    maxActive: 30
+    validationQuery: select 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    #### alibaba druid
+    minIdle: 10
+    initialSize: 5
+    ####dbcp druid common
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 300
+    removeAbandoned: true
+    filters: stat
+    maxWaitMillis: 30000
+    timeBetweenEvictionRunsMillis: 300000
+  mvc:
+    static-path-pattern:
+  http:
+    encoding:
+      charset: utf-8
+      enabled: true
+      force: true
+    multipart:
+      enabled: false
+  #i18n
+  messages:
+    basename: config.messages,org.springframework.security.messages
+    encoding: utf-8
+    always-use-message-format: true
+
+eureka:
+  client:
+    serviceUrl:
+      #eds的注册地址
+      defaultZone: http://dev.eds.lip.dps.gillion.com.cn/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    #lease-renewal-interval-in-seconds: 5
+    #lease-expiration-duration-in-seconds: 10
+
+
+####ec auto autoconfiguration
+ec:
+  debugger:
+    enable: false
+  validation:
+    enabled: true
+    staticDirPath:
+    entity:
+      package:
+        path:
+  ####i18n多语言 以下配置项可配可不配 默认就是 false
+  #  i18n:
+  #    enabled: false
+  ####以下配置项可配可不配 默认就是 false
+  #    interceptor:
+  #      dataPermission:
+  #        enabled: false
+  #      valueHandler:
+  #        enabled: false
+  #      optimistic:
+  #        enabled: false
+  ####缓存
+  cache:
+    enabled: true
+    redis:
+      enabled: true
+    ##密码
+    #password: f53af7e5f0993f37
+    ##redis地址(集群下多台使用,号隔开)
+    hostAndPort: 172.16.0.28:40070
+  ####文件上传 以下配置项可配可不配 默认就是 false
+  upload:
+    enabled: false
+  #####excel上传下载
+  excel:
+    io:
+      enabled: false
+  ####主键生成 以下配置项可配可不配 默认就是 false
+  identity:
+    generator:
+      numberInc:
+        enabled: false
+      snowFlake:
+        enabled: true
+      uuid:
+        enabled: false
+  ####地区控件
+  area:
+    enabled: false
+  rule-number:
+    server-name: supply-chain
+    path: rule-number
+# redis配置
+redis:
+  namespace: zj_dev
+  # redis连接地址，集群时用逗号分隔
+  hostAndPort: 172.16.0.28:40070
+  # 是否集群模式
+  cluster: false
+  # 连接超时时间2000
+  connectionTimeout: 2000
+  # 响应超时时间
+  soTimeout: 30000
+  # 密码
+  #  password: admin123
+  #password: f53af7e5f0993f37
+  # 最大失败重试次数
+  failTimes: 3
+  # 最大闲置连接
+  maxIdle: 50
+  # 最大连接数
+  maxTotal: 100
+
+####Spring Sceurity
+security:
+  basic:
+    enabled: false
+  login:
+    page: /login.html
+  index:
+    page: /index.html
+  noPermission:
+    page: /notAccess.html
+  loginPage: /login.html
+  indexPage: /index.html
+  noPermissionPage: /notAccess.html
+  max:
+    sessions: 1
+  messages:
+    notLoggedIn: 您当前未登陆，无法访问该资源，将为您跳转到登录页。
+    accessDenied:  对不起，您没有权限访问该资源。
+  error-if-maximum-exceeded: true
+  failedWhenResourceNotFound: false
+  everyResourceRequireLogin: true
+  isRedirectLastRequestPage: true
+  #开启用户在线日志
+  needOnLineLog: true
+
+role:
+  data:
+    Merge: true
+  permit:
+    #操作权限/授权权限保存是否递归子节点
+    isCascade: true
+    #使用设置默认角色功能
+  useDefaultRole: true
+
+resource:
+  background:
+    #是否需要后台服务权限控制，专门为FMS兼容错误数据使用
+    auth: false
+db:
+  chinese:
+    width: 1
+
+
+dao-service:
+  # 使用多数据源扫描用的
+  query-model-injector:
+    scan-path: "classpath*:com/share/**/service/impl/*.class"
+  enabled: true
+  logDatabaseId: 3
+  # 允许匿名⽤户操作, 后端MQ⽆登录信息
+  allowAnonymousUser: true
+  # 输出结果返回执⾏SQL, debug 启⽤
+  returnExecSql: true
+  # 输出结果去掉debugInfo的返回
+  debug-setting:
+    # http传输过程中加密 false:加密，true：不加密，对应前端也要开启
+    restfulPlainCodeArguments: true
+  # 管理端的配置项
+  manager-server:
+    # 管理端所使⽤的的数据服务引擎对应的数据库⽅⾔类型
+    dialect: MYSQL_GENERAL
+  nashornEngineConfig:
+    extendFilePath: 'classpath:DaoServiceNashornEngineExt.js'
+  # 数据服务指令的基础设置
+  basic-actions:
+    # 持久化指令设置项
+    saveOrUpdate:
+      # 是否⽀持层级对象持久化
+      enabled-cascaded: true
+    # 查询指令设置项
+    read:
+      # 分⻚对象的结构: ⾃定义分⻚输出时各项属性的字段名
+      page-schema:
+        records-field: data
+      throws-when-select-one-missing-result: false
+    # 多种操作类型通⽤的设置
+    common:
+      # 当⽤户未为指令显式设置 tag 时, 数据服务引擎是否⾃动为正执⾏的指定⾃动附加tag
+      enable-auto-tagging: true
+  # 内置引擎所使⽤的客户端组装所需配置项
+  clientAutoAssemble:
+    enabled: true
+    # 项⽬唯⼀键
+    project-key: "share_message_dev"
+    # 通常为 true, 为 false 使⽤HttpClient
+    useEmbedEngine: true
+    # 该数据源对应数据服务的数据源信息的名称
+    inside-dao-service-data-source-name: auth-mysql
+    # 该数据源对应数据服务的数据源所属 serviceCode 分组名称
+    inside-dao-service-data-source-service-code: 'devmsaeg'
+    # 该客户端所使⽤的数据源实例名称
+    embed-engine-data-source-bean-name: 'basicDataSource'
+  # 数据服务⾃身的项⽬配置的唯⼀键
+  itselfProjectKey: "dao-service-embed-model-graphs"
+  # XA事务的配置
+  gtx:
+    enableXA: true
+    enableTC: false
+    #单位秒
+    xaTimeout: 20
+    timerId: 1
+    #定期扫描间隔，秒
+    timerInterval: 5
+    enabled: true
+  datasource:
+    # 数据服务的数据库地址
+    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: zhwl_lip_daoservice
+    password: zhwl_lip_daoservice
+    driverClassName: com.mysql.cj.jdbc.Driver
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    testWhileIdle: true
+  # 导⼊导出配置项
+  inout:
+    enabled: true
+    output:
+      # LOCAL/CLOUD 导出文件使用本地保存或使用云端文件服务保存
+      storeType: 'LOCAL'
+      # uploaderStrategyId: '' # 导出文件保存到云端时需要配置上传策略编号(与 EC 文件服务对应)
+      # 导出文件会暂存此处
+      fileStorePath: '/tmp/daoServiceExportFiles/'
+      # ⼦域名造成跨域时才需要设置该项
+      renderPageDomain: 'localhost'
+
+### Ribbon 配置
+ribbon:
+  ConnectTimeout: 30000
+  ReadTimeout: 30000
+  eureka:
+    enabled: true
+### Feign 配置
+feign:
+  hystrix:
+    enabled: true
+### 断路器超时设置
+hystrix:
+  shareSecurityContext: true
+  command:
+    default:
+      circuitBreaker:
+        sleepWindowInMilliseconds: 100000
+        forceClosed: true
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 50000
+
+# spring boot安全检查
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+info:
+  version: @project.version@
+  groupId: @project.groupId@
+  artifactId: @project.artifactId@
+# 帆软
+fr:
+  # 工程路径
+  envpath: "D:\\develop\\FineReport_10.0\\webapps\\webroot\\WEB-INF\\"
+  # 生成的附件保存路径
+  export_file_path: "\\data\\mail\\attach\\"
+
+mail:
+  #邮箱配置密码加密秘钥
+  aes_secret_key: Lp3876jF4Ap7aG19
+
+#环境标识
+env: DEV
+sso:
+#  redirectUrl: http://dev.lip.share-message-ui.dps.gillion.com.cn/share-auth-center
+  redirectUrl: http://172.16.8.160:9542/share-auth-center
+
+# 各个系统服务名,api包feign的value值使用占位符获取
+application:
+  name:
+    auth: share-auth-wq
+    message: share-message-wq
+    file: share-file-wq
+    center: share-auth-center-wq
+
+portal:
+  applicationCode:
+    file: YYDM200014
+    message: YYDM200016
+    env: YYDM200015
