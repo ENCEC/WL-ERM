@@ -501,7 +501,7 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String authCode;
 
     /**
-     * 是否已经获取验证码
+     * 是否已经获取验证码1
      **/
     @ApiModelProperty("是否已经获取验证码")
     private Boolean authCodeFlag;
