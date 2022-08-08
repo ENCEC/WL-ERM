@@ -1,8 +1,6 @@
 package com.share.auth.center.credential.jwt;
 
-import cn.hutool.core.util.StrUtil;
 import com.gillion.ec.core.utils.CookieUtils;
-import com.gillion.ec.core.utils.StringUtils;
 import com.share.auth.center.constants.CodeFinal;
 import com.share.auth.center.constants.RedisMqConstant;
 import com.share.auth.center.credential.CredentialProcessor;
@@ -13,7 +11,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import io.jsonwebtoken.impl.TextCodec;
 import io.jsonwebtoken.lang.Strings;
-import io.netty.util.internal.StringUtil;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -93,7 +90,7 @@ public class JwtCredentialProcessor implements CredentialProcessor {
         if (Objects.nonNull(webDomain) && !CodeFinal.NULL.equals(webDomain)) {
             cookie.setDomain(webDomain);
         }
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setMaxAge(cookieExpireSeconds - 10);
         cookie.setSecure(false);
         response.addCookie(cookie);
@@ -186,7 +183,7 @@ public class JwtCredentialProcessor implements CredentialProcessor {
         if (Objects.nonNull(webDomain) && !CodeFinal.NULL.equals(webDomain)) {
             cookie.setDomain(webDomain);
         }
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setSecure(false);
         cookie.setMaxAge(0);
         response.addCookie(cookie);

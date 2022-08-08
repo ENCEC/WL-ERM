@@ -21,12 +21,12 @@ import java.util.Date;
  * @author DaoServiceGenerator
  */
 @SuppressWarnings("JpaDataSourceORMInspection")
-        @EqualsAndHashCode(callSuper = true)
-    @Data
-    @Entity
+@EqualsAndHashCode(callSuper = true)
+@Data
+@Entity
 @Table(name = "standard_entry")
 public class StandardEntry extends BaseModel implements Serializable{
-private static final long serialVersionUID=1;
+    private static final long serialVersionUID=1;
 
     /**规范条目ID*/
     @Id
@@ -88,10 +88,6 @@ private static final long serialVersionUID=1;
     @Column(name = "is_need")
     private Boolean isNeed;
 
-    /**条目类型*/
-    @Column(name = "item_type")
-    private String itemType;
-
     /**修改人id*/
     @Column(name = "modifier_id")
     @JsonSerialize(using = Long2String.class)
@@ -118,5 +114,7 @@ private static final long serialVersionUID=1;
     @Column(name = "status")
     private Boolean status;
 
-
+    /**条目类型*/
+    @Column(name = "status")
+    private String itemType;
 }

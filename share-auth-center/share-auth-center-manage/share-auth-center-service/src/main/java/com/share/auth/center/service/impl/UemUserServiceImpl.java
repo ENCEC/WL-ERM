@@ -13,7 +13,6 @@ import com.share.auth.center.constants.CodeFinal;
 import com.share.auth.center.constants.EsConstant;
 import com.share.auth.center.constants.RedisMqConstant;
 import com.share.auth.center.credential.CredentialProcessor;
-import com.share.auth.center.enums.GlobalEnum;
 import com.share.auth.center.model.dto.TokenModel;
 import com.share.auth.center.model.dto.UserDTO;
 import com.share.auth.center.model.entity.*;
@@ -24,7 +23,6 @@ import com.share.auth.center.queue.service.RedisDelayedQueue;
 import com.share.auth.center.service.UemUserService;
 import com.share.auth.center.util.EntityUtils;
 import com.share.auth.center.util.HttpsClientUtil;
-import com.share.auth.center.util.OauthClientUtils;
 import com.share.auth.center.util.RequestUtil;
 import com.share.support.model.User;
 import com.share.support.result.CommonResult;
@@ -109,6 +107,19 @@ public class UemUserServiceImpl implements UemUserService {
     private static final String GRANT_FAIL_MESSAGE = "获取授权失败，请重试";
 
     /**
+     * 查询用户
+     * @param username 用户名、邮箱、手机号
+     * @return com.share.auth.center.model.entity.UemUser
+     * @date 2022-08-02
+     */
+    private UemUser getUemUser(String username) {
+        return QUemUser.uemUser
+                .selectOne()
+                .where(QUemUser.account.eq$(username))
+                .execute();
+    }
+
+    /**
      * @Author:chenxf
      * @Description: 根据用户名查询登录用户信息，用户可以是普通用户，也可以是管理员
      * @Date: 11:48 2020/10/21
@@ -119,54 +130,27 @@ public class UemUserServiceImpl implements UemUserService {
     public UserDTO getByUsername(String username) {
         UserDTO userDTO = new UserDTO();
         // 查询用户是否存在
-        UemUser uemUser = QUemUser.uemUser.selectOne().where(
-                QUemUser.account.eq$(username)
-                        .or(QUemUser.mobile.eq$(username))
-                        .or(QUemUser.email.eq$(username))
-                        .and(QUemUser.isDeleted.eq$(false))
-        ).execute();
-        // 查询是否管理员登录
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().where(
-                QSysPlatformUser.account.eq$(username)
-                        .or(QSysPlatformUser.tel.eq$(username))
-                        .or(QSysPlatformUser.mail.eq$(username))
-        ).execute();
+        UemUser uemUser = getUemUser(username);
         // 既不是普通用户，也不是管理员
-        if (Objects.isNull(uemUser) && Objects.isNull(sysPlatformUser)) {
+        if (Objects.isNull(uemUser)) {
             log.error("用户{}不存在", username);
             throw new UsernameNotFoundException("用户名不存在 username => " + username);
         }
         // 校验用户锁定状态
-        boolean isLocked = this.validIsLocked(sysPlatformUser, uemUser);
-        // 用户是否锁定
-        if (isLocked) {
+        if (uemUser.getIsLocked()) {
             log.info("登录username：{}，账号已锁定", username);
             throw new LockedException(CodeFinal.ACCOUNT_LOCKED_MESSAGE);
         }
         List<GrantedAuthority> authorityList = Lists.newArrayList();
-        // 还可以加一些其他信息的判断，比如用户账号已停用等判断
-        if (Objects.nonNull(uemUser)) {
-            // 普通用户
-            if (Objects.nonNull(uemUser.getIsValid()) && Boolean.FALSE.equals(uemUser.getIsValid())) {
-                throw new LockedException("该用户已被禁用");
-            }
-
-            authorityList.add(new SimpleGrantedAuthority("USER"));
-            userDTO.setUsername(uemUser.getAccount());
-            userDTO.setPassword(uemUser.getPassword());
-            userDTO.setId(uemUser.getUemUserId());
-            userDTO.setStatus(uemUser.getIsValid());
-        } else {
-            // 管理员
-            if (Objects.nonNull(sysPlatformUser.getIsValid()) && Boolean.FALSE.equals(sysPlatformUser.getIsValid())) {
-                throw new LockedException("该用户已被禁用");
-            }
-            authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            userDTO.setUsername(sysPlatformUser.getAccount());
-            userDTO.setPassword(sysPlatformUser.getPassword());
-            userDTO.setId(sysPlatformUser.getSysPlatformUserId());
-            userDTO.setStatus(sysPlatformUser.getIsValid());
+        // 普通用户
+        if (Objects.nonNull(uemUser.getIsValid()) && Boolean.FALSE.equals(uemUser.getIsValid())) {
+            throw new LockedException("该用户已被禁用");
         }
+        authorityList.add(new SimpleGrantedAuthority("USER"));
+        userDTO.setUsername(uemUser.getAccount());
+        userDTO.setPassword(uemUser.getPassword());
+        userDTO.setId(uemUser.getUemUserId());
+        userDTO.setStatus(uemUser.getIsValid());
         userDTO.setRoles(authorityList);
         return userDTO;
     }
@@ -184,26 +168,14 @@ public class UemUserServiceImpl implements UemUserService {
         User userInfoModel = new User();
         // 查询用户
         UemUser uemUser = QUemUser.uemUser.selectOne().byId(uid);
-        // 查询管理员
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(uid);
         if (Objects.nonNull(uemUser)) {
             BeanUtils.copyProperties(uemUser, userInfoModel);
-        } else if (Objects.nonNull(sysPlatformUser)) {
-            BeanUtils.copyProperties(sysPlatformUser, userInfoModel);
         } else {
-            userInfoModel = null;
             return null;
-        }
-        // 查询绑定企业信息
-        if (Objects.nonNull(userInfoModel) && userInfoModel.getBlindCompanny() != null && Objects.nonNull(uemUser)) {
-            UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUser.getBlindCompanny());
-            if (Objects.nonNull(uemCompany)) {
-                userInfoModel.setCompanyName(uemCompany.getCompanyNameCn());
-            }
         }
         // 根据clientId查询应用id
         OauthClientDetails oauthClientDetail = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
-        if (Objects.nonNull(oauthClientDetail) && Objects.nonNull(uemUser)) {
+        if (Objects.nonNull(oauthClientDetail)) {
             // 根据应用id和用户id查询角色
             List<UemUserRole> uemUserRoleList = QUemUserRole.uemUserRole.select(
                     QUemUserRole.uemUserRole.fieldContainer()
@@ -224,14 +196,6 @@ public class UemUserServiceImpl implements UemUserService {
                     }
                 }
             }
-        }
-        if (Objects.nonNull(sysPlatformUser)) {
-            userInfoModel.setAccount(sysPlatformUser.getAccount());
-            userInfoModel.setUemUserId(sysPlatformUser.getSysPlatformUserId());
-            userInfoModel.setName(sysPlatformUser.getName());
-            userInfoModel.setSysRoleId(CodeFinal.DefaultRole.ADMIN_ROLE_ID);
-            userInfoModel.setSysRoleName(CodeFinal.DefaultRole.ADMIN_ROLE_NAME);
-            userInfoModel.setRoleCode(CodeFinal.DefaultRole.ADMIN_ROLE_CODE);
         }
         userInfoModel.setClientId(clientId);
         return userInfoModel;
@@ -269,12 +233,6 @@ public class UemUserServiceImpl implements UemUserService {
      * @Return:java.util.Map<java.lang.String,java.lang.Object>
      */
     private String validateAccount(String clientId, String account, String password, HttpServletRequest request, HttpServletResponse response) {
-        // 允许所有用户登录的客户端id
-        List<Long> allowAllClientIdList = OauthClientUtils.getAllowAllClientId();
-        // 只允许管理员登录的客户端id
-        List<Long> allowAdminClientIdList = OauthClientUtils.getAllowAdminClientId();
-        // 允许没有角色的账号登录
-        List<Long> allowNoRoleClientIdList = OauthClientUtils.getAllowNoRoleClientId();
         // 根据clientId查询应用id
         OauthClientDetails oauthClientDetails = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
         String cookieClientId = CookieUtil.getCookieByName(request, CodeFinal.CLIENT_ID);
@@ -299,76 +257,39 @@ public class UemUserServiceImpl implements UemUserService {
         }
         // 密码加密
         password = MD5EnCodeUtils.encryptionPassword(decPassword);
-
-        // 查询是否是平台管理员登录
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().where(QSysPlatformUser.account.eq$(account).or(QSysPlatformUser.tel.eq$(account)).or(QSysPlatformUser.mail.eq$(account))).execute();
-        // 查询是否是其他用户登录
-        UemUser user = QUemUser.uemUser.selectOne().where(QUemUser.account.eq$(account).or(QUemUser.mobile.eq$(account)).or(QUemUser.email.eq$(account))).execute();
+        // 查询用户信息
+        UemUser user = QUemUser.uemUser
+                .selectOne()
+                .where(QUemUser.account.eq$(account))
+                .execute();
         // 校验账号是否锁定
-//        boolean isLocked = this.validIsLocked(sysPlatformUser, user);
-//        // 账号已锁定
-//        if (isLocked) {
-//            return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
-//        }
-        // 平台客服登录
-        if (Objects.nonNull(sysPlatformUser) && Objects.equals(sysPlatformUser.getPassword(), password)) {
-            log.info("查询到登录管理员,管理员用户id：" + sysPlatformUser.getSysPlatformUserId());
-            // 校验账号启/禁用
-            if (sysPlatformUser.getIsValid() == null || !sysPlatformUser.getIsValid()) {
-                return ENABLED_MESSAGE;
-            }
-            // 登录账号系统跳转首页地址
-            if (allowAllClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
-                String returnUrl = CookieUtil.getCookieByName(request, CodeFinal.RETURN_URL);
-                if (StringUtils.isNotEmpty(returnUrl)) {
-                    returnUrl = returnUrl.replace("personal", "audit-manage");
-                    CookieUtil.addCookie(response, CodeFinal.RETURN_URL, returnUrl, "");
-                }
-            }
-            // 登录成功保存日志
-            this.saveLoginLog(null, sysPlatformUser, oauthClientDetails, account, request);
-            return null;
+        if (user.getIsLocked()) {
+            return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
         }
-        // 其他用户登录
-        if (Objects.nonNull(user) && Objects.equals(user.getPassword(), password)) {
+        // 用户登录
+        if (Objects.equals(user.getPassword(), password)) {
             log.info("查询到登录用户,用户id：" + user.getUemUserId());
             // 校验账号启/禁用
             if (user.getIsValid() == null || !user.getIsValid()) {
                 return ENABLED_MESSAGE;
             }
-            // 登陆的应用是否正确
-            if (allowAdminClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
-                return "非平台客服账号无法登录公共服务系统";
-            }
-            // 登录其他系统需要实名认证、绑定企业和角色
-//            if (clientId.equals(managerClient)) {
-//                String validRes = this.validUserCompanyRole(user, oauthClientDetails.getSysApplicationId());
-//                if (StringUtils.isNotBlank(validRes)) {
-//                    return validRes;
-//                }
-//            }
-            if (Objects.nonNull(user.getBlindCompanny())) {
-                UemCompany uemCompany = QUemCompany.uemCompany.selectOne().where(QUemCompany.uemCompanyId.eq$(user.getBlindCompanny())).execute();
-                if (Objects.nonNull(uemCompany) && !uemCompany.getIsValid()) {
-                    log.info("账号：{}，绑定的企业已禁用", user.getAccount());
-                    return "账号绑定的企业已被禁用！";
-                }
-            }
+            User userInfoModel = new User();
+            BeanUtils.copyProperties(user, userInfoModel);
+            String credential = credentialProcessor.createCredential(userInfoModel);
+            credentialProcessor.deliveryCredential(response, credential, user.getUemUserId().toString());
             // 保存登录日志
-            this.saveLoginLog(user, null, oauthClientDetails, account, request);
+            this.saveLoginLog(user, oauthClientDetails, account, request);
             return null;
         }
         // 设置用户锁定信息
-        this.setUserLockedInfo(sysPlatformUser, user);
+        this.setUserLockedInfo(user);
         // 校验账号是否锁定
-//        isLocked = this.validIsLocked(sysPlatformUser, user);
-//        // 账号已锁定
-//        if (isLocked) {
-//            return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
-//        }
+        if (user.getIsLocked()) {
+            return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
+        }
         Object obj = redisInterface.get(RedisMqConstant.ACCOUNT_LOCKED_KEY_PRE + account);
         if (Objects.nonNull(obj)) {
-            long errorSize = Long.valueOf(obj.toString());
+            long errorSize = Long.parseLong(obj.toString());
             long reTrySize = CodeFinal.ACCOUNT_LOCKED_PASSWORD_ERROR_TIMES - errorSize;
             return "密码错误，重试" + reTrySize + "次后将被锁定！";
         }
@@ -390,11 +311,9 @@ public class UemUserServiceImpl implements UemUserService {
         if (Boolean.FALSE.equals(sysApplication.getIsValid())) {
             return "该应用被禁用，无法登录";
         }
-        // 查询是否是平台管理员登录
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().where(QSysPlatformUser.account.eq$(account).or(QSysPlatformUser.tel.eq$(account)).or(QSysPlatformUser.mail.eq$(account))).execute();
         // 查询是否是其他用户登录
-        UemUser user = QUemUser.uemUser.selectOne().where(QUemUser.account.eq$(account).or(QUemUser.mobile.eq$(account)).or(QUemUser.email.eq$(account))).execute();
-        if (Objects.isNull(sysPlatformUser) && Objects.isNull(user)) {
+        UemUser user = this.getUemUser(account);
+        if (Objects.isNull(user)) {
             return "用户名不存在！";
         }
         return null;
@@ -417,12 +336,6 @@ public class UemUserServiceImpl implements UemUserService {
         // 验证码验证通过设置到session中，/login接口的拦截器中直接判断session中标志即可
         HttpSession session = request.getSession();
         session.setAttribute(checkDigitalId, true);
-        // 允许所有用户登录的客户端id
-        List<Long> allowAllClientIdList = OauthClientUtils.getAllowAllClientId();
-        // 只允许管理员登录的客户端id
-        List<Long> allowAdminClientIdList = OauthClientUtils.getAllowAdminClientId();
-        // 允许没有角色的账号登录
-        List<Long> allowNoRoleClientIdList = OauthClientUtils.getAllowNoRoleClientId();
         // 根据clientId查询应用id
         OauthClientDetails oauthClientDetails = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
         String cookieClientId = CookieUtil.getCookieByName(request, CodeFinal.CLIENT_ID);
@@ -444,92 +357,27 @@ public class UemUserServiceImpl implements UemUserService {
         }
         // 密码加密
         password = MD5EnCodeUtils.encryptionPassword(decPassword);
-
-        // 查询是否是平台管理员登录
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().where(QSysPlatformUser.account.eq$(account).or(QSysPlatformUser.tel.eq$(account)).or(QSysPlatformUser.mail.eq$(account))).execute();
-        // 查询是否是其他用户登录
-        UemUser user = QUemUser.uemUser.selectOne().where(QUemUser.account.eq$(account).or(QUemUser.mobile.eq$(account)).or(QUemUser.email.eq$(account))).execute();
+        // 查询用户
+        UemUser user = this.getUemUser(account);
         // 校验账号是否锁定
-        boolean isLocked = this.validIsLocked(sysPlatformUser, user);
-        // 账号已锁定
-        if (isLocked) {
+        if (user.getIsLocked()) {
             return CommonResult.getFaildResultData(CodeFinal.ACCOUNT_LOCKED_MESSAGE);
         }
-        // 平台客服登录
-        if (Objects.nonNull(sysPlatformUser) && Objects.equals(sysPlatformUser.getPassword(), password)) {
-            log.info("查询到登录管理员,管理员用户id：" + sysPlatformUser.getSysPlatformUserId());
-            // 校验账号启/禁用
-            if (sysPlatformUser.getIsValid() == null || !sysPlatformUser.getIsValid()) {
-                return CommonResult.getFaildResultData(ENABLED_MESSAGE);
-            }
-            // 登录账号系统跳转首页地址
-            if (allowAllClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
-                String returnUrl = CookieUtil.getCookieByName(request, CodeFinal.RETURN_URL);
-                if (StringUtils.isNotEmpty(returnUrl)) {
-                    returnUrl = returnUrl.replace("personal", "audit-manage");
-                    CookieUtil.addCookie(response, CodeFinal.RETURN_URL, returnUrl, "");
-                }
-            }
-            // 平台客服登录应急系统
-            Long loginkEmergency = 6742407760051060736L;
-            // 登陆的应用是否正确
-            boolean loginAppIsCorrect = allowAllClientIdList.contains(oauthClientDetails.getSysApplicationId())
-                    || allowAdminClientIdList.contains(oauthClientDetails.getSysApplicationId())
-                    || allowNoRoleClientIdList.contains(oauthClientDetails.getSysApplicationId())
-                    || Objects.equals(loginkEmergency, oauthClientDetails.getSysApplicationId());
-            if (!loginAppIsCorrect) {
-                return CommonResult.getFaildResultData("平台客服账号无法登录其它系统");
-            }
-            // 登录成功保存日志
-            this.saveLoginLog(null, sysPlatformUser, oauthClientDetails, account, request);
-            return CommonResult.getSuccessResultData();
-        }
-
-        // 校验用户来源：国家综合交通运输信息平台用户不允许使用国际物流供应链的登录功能
-        if (Objects.nonNull(user) && Objects.equals(user.getSource(), GlobalEnum.UserSource.NTIP.getCode())) {
-            return CommonResult.getFaildResultData("账号无法登陆，请联系管理员");
-        }
-        // 其他用户登录
-        if (Objects.nonNull(user) && Objects.equals(user.getPassword(), password)) {
+        // 用户登录
+        if (Objects.equals(user.getPassword(), password)) {
             log.info("查询到登录用户,用户id：" + user.getUemUserId());
             // 校验账号启/禁用
             if (user.getIsValid() == null || !user.getIsValid()) {
                 return CommonResult.getFaildResultData(ENABLED_MESSAGE);
             }
-            // 登陆的应用是否正确
-            if (allowAdminClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
-                return CommonResult.getFaildResultData("非平台客服账号无法登录公共服务系统");
-            }
-            // 判断用户是否登录的是账号权限系统，如果是，不需要校验角色，并设置跳转首页地址
-            if (allowAllClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
-                String returnUrl = CookieUtil.getCookieByName(request, CodeFinal.RETURN_URL);
-                if (StringUtils.isNotEmpty(returnUrl)) {
-                    returnUrl = returnUrl.replace("audit-manage", "personal");
-                }
-                CookieUtil.addCookie(response, CodeFinal.RETURN_URL, returnUrl, "");
-                // 保存登录日志
-                this.saveLoginLog(user, null, oauthClientDetails, account, request);
-                return CommonResult.getSuccessResultData();
-            }
-            // 国交管理员不允许登录其他系统
-            if (Objects.equals(user.getUserType(), GlobalEnum.UserType.IMPT_ADMIN.getCode())) {
-                return CommonResult.getFaildResultData("国交管理员不允许登录其他系统");
-            }
-            // 登录其他系统需要实名认证、绑定企业和角色
-            String validRes = this.validUserCompanyRole(user, oauthClientDetails.getSysApplicationId());
-            if (StringUtils.isNotBlank(validRes)) {
-                return CommonResult.getFaildResultData(validRes);
-            }
             // 保存登录日志
-            this.saveLoginLog(user, null, oauthClientDetails, account, request);
+            this.saveLoginLog(user,oauthClientDetails, account, request);
             return CommonResult.getSuccessResultData();
         }
         // 设置用户锁定信息
-        this.setUserLockedInfo(sysPlatformUser, user);
+        this.setUserLockedInfo(user);
         // 校验账号是否锁定
-        isLocked = this.validIsLocked(sysPlatformUser, user);
-        // 账号已锁定
-        if (isLocked) {
+        if (user.getIsLocked()) {
             return CommonResult.getFaildResultData(CodeFinal.ACCOUNT_LOCKED_MESSAGE);
         }
         return CommonResult.getFaildResultData("用户名或密码错误，请确认！");
@@ -608,62 +456,6 @@ public class UemUserServiceImpl implements UemUserService {
             }
         }
         return result;
-    }
-
-    /**
-     * 校验登录用户、用户所属公司、用户角色是否启用
-     *
-     * @param user             登录用户
-     * @param sysApplicationId 登录应用id
-     * @return 校验错误信息
-     */
-    private String validUserCompanyRole(UemUser user, Long sysApplicationId) {
-        if (user.getIsValid() == null || !user.getIsValid()) {
-            return ENABLED_MESSAGE;
-        }
-        if (!CodeFinal.ONE_STRING.equals(user.getAuditStatus())) {
-            return "该用户未完成实名认证，请先至用户中心实名认证。";
-        }
-        if (user.getBlindCompanny() == null) {
-            return "该用户未完成绑定企业，请先至用户中心完成企业绑定。";
-        }
-        UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(user.getBlindCompanny());
-        if (Objects.isNull(uemCompany) || uemCompany.getIsValid() == null || Boolean.FALSE.equals(uemCompany.getIsValid())) {
-            return "该用户绑定企业被禁用，无法登录系统。";
-        }
-        if ("0".equals(user.getUserType())) {
-            return "普通用户无登录后台权限，请至首页登录。";
-        }
-        log.info("查询到登录企业，企业id：" + uemCompany.getUemCompanyId());
-//        // 应用允许没有角色的用户登录
-//        List<Long> allowNoRoleClientIdList = OauthClientUtils.getAllowNoRoleClientId();
-//        if (allowNoRoleClientIdList.contains(sysApplicationId)) {
-//            return "";
-//        }
-        // 根据应用id和用户id查询角色
-//        List<UemUserRole> uemUserRoleList = QUemUserRole.uemUserRole
-//                .select(QUemUserRole.uemUserRole.fieldContainer())
-//                .where(QUemUserRole.uemUserId.eq$(user.getUemUserId())
-//                        .and(QUemUserRole.sysApplicationId.eq$(sysApplicationId))
-//                        .and(QUemUserRole.isValid.eq$(true)))
-//                .execute();
-//        if (CollectionUtils.isEmpty(uemUserRoleList)) {
-//            return "该用户在当前应用无角色";
-//        }
-//        List<UemUserRole> validUserRole = uemUserRoleList.stream().filter(UemUserRole::getIsValid).collect(Collectors.toList());
-//        if (CollectionUtils.isEmpty(validUserRole)) {
-//            return "该用户在当前应用角色被禁用";
-//        }
-//        List<Long> sysRoleIds = validUserRole.stream().map(UemUserRole::getSysRoleId).collect(Collectors.toList());
-//        List<SysRole> sysRoleList = QSysRole.sysRole
-//                .select(QSysRole.sysRole.fieldContainer())
-//                .where(QSysRole.sysRoleId.in$(sysRoleIds)
-//                        .and(QSysRole.isValid.eq$(true)))
-//                .execute();
-//        if (CollectionUtils.isEmpty(sysRoleList)) {
-//            return "该用户角色被禁用，无法登录";
-//        }
-        return null;
     }
 
     /**
@@ -818,27 +610,24 @@ public class UemUserServiceImpl implements UemUserService {
 
     @Override
     public void lockedUser(String userName) {
-        // 查询是否是平台管理员登录
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().where(QSysPlatformUser.account.eq$(userName).or(QSysPlatformUser.tel.eq$(userName)).or(QSysPlatformUser.mail.eq$(userName))).execute();
-        // 查询是否是其他用户登录
-        UemUser user = QUemUser.uemUser.selectOne().where(QUemUser.account.eq$(userName).or(QUemUser.mobile.eq$(userName)).or(QUemUser.email.eq$(userName))).execute();
+        // 查询用户
+        UemUser user = this.getUemUser(userName);
         // 设置用户锁定信息
-        this.setUserLockedInfo(sysPlatformUser, user);
+        this.setUserLockedInfo(user);
     }
 
     /**
      * 设置用户锁定信息
      *
-     * @param sysPlatformUser 平台客服
      * @param uemUser         用户
      */
-    private void setUserLockedInfo(SysPlatformUser sysPlatformUser, UemUser uemUser) {
+    private void setUserLockedInfo(UemUser uemUser) {
         // 判断用户是否存在，用户不存在不锁定账号
-        if (Objects.isNull(sysPlatformUser) && Objects.isNull(uemUser)) {
+        if (Objects.isNull(uemUser)) {
             return;
         }
         // 获取账号
-        String account = Objects.nonNull(uemUser) ? uemUser.getAccount() : sysPlatformUser.getAccount();
+        String account = uemUser.getAccount();
 //        redisInterface.del(RedisMqConstant.ACCOUNT_LOCKED_KEY_PRE + account);
         // 密码错误次数+1
         Long incr = redisInterface.incr(RedisMqConstant.ACCOUNT_LOCKED_KEY_PRE + account);
@@ -866,19 +655,10 @@ public class UemUserServiceImpl implements UemUserService {
             data.setAccount(account);
             // 延时十分钟解锁
             redisDelayedQueue.addQueue(data, RedisMqConstant.ACCOUNT_LOCKED_SECONDS, TimeUnit.SECONDS, UemUserUnlockListener.class.getSimpleName());
-
-            // 锁定平台客服
-            if (Objects.nonNull(sysPlatformUser)) {
-                sysPlatformUser.setIsLocked(true);
-                sysPlatformUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-                QSysPlatformUser.sysPlatformUser.save(sysPlatformUser);
-            }
-            // 锁定其他用户客服
-            if (Objects.nonNull(uemUser)) {
-                uemUser.setIsLocked(true);
-                uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-                QUemUser.uemUser.save(uemUser);
-            }
+            // 锁定用户
+            uemUser.setIsLocked(true);
+            uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+            QUemUser.uemUser.save(uemUser);
         }
     }
 
@@ -886,18 +666,9 @@ public class UemUserServiceImpl implements UemUserService {
     public void unlockedUser(String account) {
         // 清除密码错误次数
         redisInterface.del(RedisMqConstant.ACCOUNT_LOCKED_KEY_PRE + account);
-        // 查询是否是平台管理员
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().where(QSysPlatformUser.account.eq$(account)).execute();
-        // 解锁平台管理员
-        if (Objects.nonNull(sysPlatformUser)) {
-            sysPlatformUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-            sysPlatformUser.setIsLocked(Boolean.FALSE);
-            QSysPlatformUser.sysPlatformUser.save(sysPlatformUser);
-            return;
-        }
-        // 查询是否是其他用户
+        // 查询用户
         UemUser user = QUemUser.uemUser.selectOne().where(QUemUser.account.eq$(account)).execute();
-        // 解锁其他用户登录
+        // 解锁用户
         if (Objects.nonNull(user)) {
             user.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
             user.setIsLocked(Boolean.FALSE);
@@ -906,36 +677,14 @@ public class UemUserServiceImpl implements UemUserService {
     }
 
     /**
-     * 账号是否锁定
-     *
-     * @param sysPlatformUser 平台客服
-     * @param uemUser         用户
-     * @return true-锁定，false-未锁定
-     */
-    private boolean validIsLocked(SysPlatformUser sysPlatformUser, UemUser uemUser) {
-        // 平台客服是否锁定
-        if (Objects.nonNull(sysPlatformUser) && Objects.equals(sysPlatformUser.getIsLocked(), Boolean.TRUE)) {
-            log.info("账号：{}，已锁定", sysPlatformUser.getAccount());
-            return true;
-        }
-        // 其他用户是否锁定
-        if (Objects.nonNull(uemUser) && Objects.equals(uemUser.getIsLocked(), Boolean.TRUE)) {
-            log.info("账号：{}，已锁定", uemUser.getAccount());
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 保存登录日志
      *
-     * @param uemUser            企业/个人客户
-     * @param sysPlatformUser    平台客户
+     * @param uemUser            用户
      * @param oauthClientDetails 登录应用
      * @param username           登录账号
      * @param request            登录请求信息
      */
-    private void saveLoginLog(UemUser uemUser, SysPlatformUser sysPlatformUser, OauthClientDetails oauthClientDetails,
+    private void saveLoginLog(UemUser uemUser, OauthClientDetails oauthClientDetails,
                               String username, HttpServletRequest request) {
         // 登录日志
         UemLog uemLog = new UemLog();
@@ -948,50 +697,23 @@ public class UemUserServiceImpl implements UemUserService {
         uemLog.setResult(CodeFinal.ZERO_STRING);
         uemLog.setLoginType(CodeFinal.ZERO_STRING);
         uemLog.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        // 登录应用
-        uemLog.setApplicationId(oauthClientDetails.getSysApplicationId());
-
-        if (Objects.nonNull(uemUser)) {
-            // 登录方式
-            if (username.equals(uemUser.getAccount())) {
-                uemLog.setWay(CodeFinal.LOGIN_WAY_USERNAME);
-            } else if (username.equals(uemUser.getMobile())) {
-                uemLog.setWay(CodeFinal.LOGIN_WAY_PHONE);
-            } else if (username.equals(uemUser.getEmail())) {
-                uemLog.setWay(CodeFinal.LOGIN_WAY_EMAIL);
-            }
-            // 登录类型
-            if (username.equals(uemUser.getAccount())) {
-                uemLog.setLoginType(CodeFinal.LOGIN_WAY_USERNAME);
-            } else if (username.equals(uemUser.getMobile())) {
-                uemLog.setLoginType(CodeFinal.LOGIN_WAY_PHONE);
-            } else if (username.equals(uemUser.getEmail())) {
-                uemLog.setLoginType(CodeFinal.LOGIN_WAY_EMAIL);
-            }
-            // 用户id
-            uemLog.setUemUserId(uemUser.getUemUserId());
-            // 公司id
-            uemLog.setCompanyId(uemUser.getBlindCompanny());
-        } else {
-            // 登录方式
-            if (username.equals(sysPlatformUser.getAccount())) {
-                uemLog.setWay(CodeFinal.LOGIN_WAY_USERNAME);
-            } else if (username.equals(sysPlatformUser.getTel())) {
-                uemLog.setWay(CodeFinal.LOGIN_WAY_PHONE);
-            } else if (username.equals(sysPlatformUser.getMail())) {
-                uemLog.setWay(CodeFinal.LOGIN_WAY_EMAIL);
-            }
-            // 登录类型
-            if (username.equals(sysPlatformUser.getAccount())) {
-                uemLog.setLoginType(CodeFinal.LOGIN_WAY_USERNAME);
-            } else if (username.equals(sysPlatformUser.getTel())) {
-                uemLog.setLoginType(CodeFinal.LOGIN_WAY_PHONE);
-            } else if (username.equals(sysPlatformUser.getMail())) {
-                uemLog.setLoginType(CodeFinal.LOGIN_WAY_EMAIL);
-            }
-            // 用户id
-            uemLog.setUemUserId(sysPlatformUser.getSysPlatformUserId());
+        // 设置登录应用
+        if (Objects.nonNull(oauthClientDetails)) {
+            uemLog.setApplicationId(oauthClientDetails.getSysApplicationId());
         }
+        // 设置登录方式和登录类型
+        if (username.equals(uemUser.getAccount())) {
+            uemLog.setWay(CodeFinal.LOGIN_WAY_USERNAME);
+            uemLog.setLoginType(CodeFinal.LOGIN_WAY_USERNAME);
+        } else if (username.equals(uemUser.getMobile())) {
+            uemLog.setWay(CodeFinal.LOGIN_WAY_PHONE);
+            uemLog.setLoginType(CodeFinal.LOGIN_WAY_PHONE);
+        } else if (username.equals(uemUser.getEmail())) {
+            uemLog.setWay(CodeFinal.LOGIN_WAY_EMAIL);
+            uemLog.setLoginType(CodeFinal.LOGIN_WAY_EMAIL);
+        }
+        // 设置用户id
+        uemLog.setUemUserId(uemUser.getUemUserId());
         // 保存
         QUemLog.uemLog.save(uemLog);
     }
@@ -1036,42 +758,6 @@ public class UemUserServiceImpl implements UemUserService {
             return 0;
         }*/
         return 0;
-    }
-
-    /**
-     * 根据账号、密码查询平台管理员
-     *
-     * @param account  账号（用户名、手机号、邮箱）
-     * @param password 密码
-     * @return 平台管理员
-     */
-    private UemUser getUemUserByAccountAndPassword(String account, String password) {
-        return QUemUser.uemUser.selectOne().where(
-                QUemUser.password.eq$(password)
-                        .and(
-                                QUemUser.account.eq$(account)
-                                        .or(QUemUser.mobile.eq$(account))
-                                        .or(QUemUser.email.eq$(account))
-                        )
-        ).execute();
-    }
-
-    /**
-     * 根据账号、密码查询用户
-     *
-     * @param account  账号（用户名、手机号、邮箱）
-     * @param password 密码
-     * @return 用户
-     */
-    private SysPlatformUser getSysPlatformUserByAccountAndPassword(String account, String password) {
-        return QSysPlatformUser.sysPlatformUser.selectOne().where(
-                QSysPlatformUser.password.eq$(password)
-                        .and(
-                                QSysPlatformUser.account.eq$(account)
-                                        .or(QSysPlatformUser.tel.eq$(account))
-                                        .or(QSysPlatformUser.mail.eq$(account))
-                        )
-        ).execute();
     }
 
     @Override
