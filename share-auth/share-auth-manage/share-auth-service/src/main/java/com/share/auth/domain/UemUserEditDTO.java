@@ -1,9 +1,11 @@
 package com.share.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -84,8 +86,8 @@ public class UemUserEditDTO {
      */
     @ApiModelProperty("入职时间")
     @NotNull(message = "入职时间不能为空")
-//    @JsonSerialize(using = Date2StringSerializer.class)
-//    @JsonDeserialize(using = String2DateDeserializer.class)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date entryDate;
 
     /**
