@@ -34,7 +34,7 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<Date> modifyTime = taskDetailInfo.fieldOf("modifyTime", Date.class);
     public static final FieldExpression<String> offerRemark = taskDetailInfo.fieldOf("offerRemark", String.class);
     public static final FieldExpression<String> offerType = taskDetailInfo.fieldOf("offerType", String.class);
-    public static final FieldExpression<Long> ordinator = taskDetailInfo.fieldOf("ordinator", Long.class);
+    public static final FieldExpression<String> ordinator = taskDetailInfo.fieldOf("ordinator", String.class);
     public static final FieldExpression<Date> planEndDate = taskDetailInfo.fieldOf("planEndDate", Date.class);
     public static final FieldExpression<Date> planStartDate = taskDetailInfo.fieldOf("planStartDate", Date.class);
     public static final FieldExpression<String> progress = taskDetailInfo.fieldOf("progress", String.class);

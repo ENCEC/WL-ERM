@@ -11,7 +11,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -384,4 +383,7 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     @ApiModelProperty("修改密码")
     private String newPassword;
+
+    @ApiModelProperty("角色列表")
+    private List<SysRoleDTO> roleList;
 }

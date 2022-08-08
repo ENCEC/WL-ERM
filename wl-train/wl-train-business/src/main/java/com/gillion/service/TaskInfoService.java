@@ -1,6 +1,7 @@
 package com.gillion.service;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.gillion.model.domain.TaskDetailInfoDto;
 import com.gillion.model.domain.TaskInfoDto;
 import com.gillion.model.vo.StandardDetailVo;
 import com.share.support.result.ResultHelper;
@@ -96,6 +97,24 @@ public interface TaskInfoService {
     ResultHelper<Page<TaskInfoDto>> queryStaffTaskInfo(TaskInfoDto taskInfoDto);
 
     /**
+     * 查询员工任务详情信息
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-08
+     */
+    ResultHelper<Page<TaskDetailInfoDto>> queryStaffTaskDetail(TaskInfoDto taskInfoDto);
+
+    /**
+     * 更新任务进度
+     * @param taskDetailInfoDtoList 任务细则ID和进度数值
+     * @return com.share.support.result.ResultHelper<java.lang.String>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-08
+     */
+    ResultHelper<String> updateTaskDetailProgress(List<TaskDetailInfoDto> taskDetailInfoDtoList);
+
+    /**
      * 查询负责人任务信息
      * @param taskInfoDto 查询入参
      * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
@@ -103,6 +122,15 @@ public interface TaskInfoService {
      * @date 2022-08-05
      */
     ResultHelper<Page<TaskInfoDto>> queryLeaderTaskInfo(TaskInfoDto taskInfoDto);
+
+    /**
+     * 更新任务完成状态
+     * @param taskDetailInfoDtoList 查询入参
+     * @return com.share.support.result.ResultHelper<java.lang.String>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-08
+     */
+    ResultHelper<String> updateTaskDetailStatus(List<TaskDetailInfoDto> taskDetailInfoDtoList);
 
     /**
      * 查询统筹人任务信息
