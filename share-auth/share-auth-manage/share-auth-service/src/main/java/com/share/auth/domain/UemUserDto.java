@@ -386,4 +386,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     @ApiModelProperty("角色列表")
     private List<SysRoleDTO> roleList;
+
+    @ApiModelProperty("政治面貌")
+    private String politicalStatus;
+
 }

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 任务信息管理
@@ -131,10 +132,32 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             // 设置任务细则
             TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
             taskDetailInfo.setTaskInfoId(snowflakeId);
-            if (taskDetailInfo.getLeader() != null) {
-                taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
+            if (taskDetailInfoDto.getLeader() != null) {
+                ResultHelper<UemUserDto> leaderResult = uemUserInterface.getUemUser(taskDetailInfoDto.getLeader());
+                if (leaderResult.getSuccess() && leaderResult.getData() != null) {
+                    taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
+                    taskDetailInfo.setLeaderName(leaderResult.getData().getName());
+                }
+            }
+            // 查询统筹人姓名列表
+            List<Long> ordinatorIds = StrUtil
+                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
+                    .stream()
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            StringBuilder ordinatorNameBuilder = new StringBuilder();
+            for (Long ordinatorId : ordinatorIds) {
+                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                    String ordinatorName = ordinatorResult.getData().getName();
+                    if (ordinatorName != null) {
+                        ordinatorNameBuilder.append(ordinatorName);
+                        ordinatorNameBuilder.append(",");
+                    }
+                }
             }
             taskDetailInfo.setOrdinator(standardDetailVo.getOrdinatorId());
+            taskDetailInfo.setOrdinatorName(ordinatorNameBuilder.toString());
             taskDetailInfo.setStandardEntryId(standardDetailVo.getStandardEntryId());
             taskDetailInfo.setStandardEntryName(standardDetailVo.getEntryName());
             taskDetailInfo.setStandardDetailId(standardDetailVo.getStandardDetailId());
@@ -262,6 +285,27 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .paging(pageNo, pageSize)
                 .mapperTo(StandardDetailVo.class)
                 .execute(taskInfoDto);
+        List<StandardDetailVo> standardDetailVoList = standardDetailVoPage.getRecords();
+        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
+            // 查询统筹人姓名列表
+            List<Long> ordinatorIds = StrUtil
+                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
+                    .stream()
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            StringBuilder ordinatorNameBuilder = new StringBuilder();
+            for (Long ordinatorId : ordinatorIds) {
+                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                    String ordinatorName = ordinatorResult.getData().getName();
+                    if (ordinatorName != null) {
+                        ordinatorNameBuilder.append(ordinatorName);
+                        ordinatorNameBuilder.append(",");
+                    }
+                }
+            }
+            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
+        }
         return CommonResult.getSuccessResultData(standardDetailVoPage);
     }
 
@@ -270,12 +314,32 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
             return CommonResult.getFaildResultData("任务类型不能为空");
         }
-        List<StandardDetailVo> standardDetailVoPage = DSContext
+        List<StandardDetailVo> standardDetailVoList = DSContext
                 .customization("WL-ERM_selectNeedStandardDetailByTaskType")
                 .select()
                 .mapperTo(StandardDetailVo.class)
                 .execute(taskInfoDto);
-        return CommonResult.getSuccessResultData(standardDetailVoPage);
+        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
+            // 查询统筹人姓名列表
+            List<Long> ordinatorIds = StrUtil
+                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
+                    .stream()
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            StringBuilder ordinatorNameBuilder = new StringBuilder();
+            for (Long ordinatorId : ordinatorIds) {
+                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                    String ordinatorName = ordinatorResult.getData().getName();
+                    if (ordinatorName != null) {
+                        ordinatorNameBuilder.append(ordinatorName);
+                        ordinatorNameBuilder.append(",");
+                    }
+                }
+            }
+            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
+        }
+        return CommonResult.getSuccessResultData(standardDetailVoList);
     }
 
     @Override
@@ -291,6 +355,27 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .mapperTo(StandardDetailVo.class)
                 .paging(pageNo, pageSize)
                 .execute(taskInfoDto);
+        List<StandardDetailVo> standardDetailVoList = standardDetailVoPage.getRecords();
+        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
+            // 查询统筹人姓名列表
+            List<Long> ordinatorIds = StrUtil
+                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
+                    .stream()
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            StringBuilder ordinatorNameBuilder = new StringBuilder();
+            for (Long ordinatorId : ordinatorIds) {
+                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                    String ordinatorName = ordinatorResult.getData().getName();
+                    if (ordinatorName != null) {
+                        ordinatorNameBuilder.append(ordinatorName);
+                        ordinatorNameBuilder.append(",");
+                    }
+                }
+            }
+            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
+        }
         return CommonResult.getSuccessResultData(standardDetailVoPage);
     }
 

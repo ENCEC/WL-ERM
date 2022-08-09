@@ -1,5 +1,6 @@
-package com.gillion.model.entity;
+package com.gillion.train.api.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ds.entity.base.BaseModel;
@@ -7,27 +8,22 @@ import com.gillion.ec.core.annotations.Generator;
 import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
-
 /**
- * @author DaoServiceGenerator
- */
-@SuppressWarnings("JpaDataSourceORMInspection")
-        @EqualsAndHashCode(callSuper = true)
-    @Data
-    @Entity
-@Table(name = "task_detail_info")
-public class TaskDetailInfo extends BaseModel implements Serializable{
-private static final long serialVersionUID=1;
-
+ * @ClassName TaskDetailInfoDTO
+ * @Author weiq
+ * @Date 2022/8/8 19:54
+ * @Version 1.0
+ **/
+@Data
+public class TaskDetailInfoDTO extends BaseModel implements Serializable {
+    private static final long serialVersionUID=1;
     /**任务子表ID*/
     @Id
     @Column(name = "task_detail_id")
@@ -54,6 +50,8 @@ private static final long serialVersionUID=1;
 
     /**审批日期*/
     @Column(name = "approval_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date approvalDate;
 
     /**审批人ID*/
@@ -61,10 +59,6 @@ private static final long serialVersionUID=1;
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long approver;
-
-    /**审批人姓名*/
-    @Column(name = "approver_name")
-    private String approverName;
 
     /**创建时间*/
     @Column(name = "create_time")
@@ -98,10 +92,6 @@ private static final long serialVersionUID=1;
     @JsonDeserialize(using = String2Long.class)
     private Long leader;
 
-    /**责任人姓名*/
-    @Column(name = "leader_name")
-    private String leaderName;
-
     /**修改人id*/
     @Column(name = "modifier_id")
     @JsonSerialize(using = Long2String.class)
@@ -124,13 +114,11 @@ private static final long serialVersionUID=1;
     @Column(name = "offer_type")
     private String offerType;
 
-    /**统筹人ID列表*/
+    /**统筹人ID*/
     @Column(name = "ordinator")
-    private String ordinator;
-
-    /**统筹人姓名列表*/
-    @Column(name = "ordinator_name")
-    private String ordinatorName;
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long ordinator;
 
     /**计划完成日期*/
     @Column(name = "plan_end_date")
@@ -174,7 +162,7 @@ private static final long serialVersionUID=1;
     @Column(name = "start_date")
     private Date startDate;
 
-    /**完成状态（0：待完成 1：执行中 2：已完成 3：退回重做）*/
+    /**完成状态（0：待完成 1：执行中 2：已完成）*/
     @Column(name = "status")
     private Integer status;
 
@@ -187,5 +175,16 @@ private static final long serialVersionUID=1;
     /**任务名称*/
     @Column(name = "task_name")
     private String taskName;
+
+    /**申请人id*/
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long uemUserId;
+
+    /**申请人姓名*/
+    private String uemUserName;
+
+    /**离职理由*/
+    private String leaveReason;
 
 }

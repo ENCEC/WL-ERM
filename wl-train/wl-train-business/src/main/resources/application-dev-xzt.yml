@@ -13,7 +13,7 @@ logging:
 spring:
   #重要，spring cloud服务名称
   application:
-    name: wl-train-wq
+    name: wl-train-xzt
   profiles:
     active: dev
   main:
@@ -199,7 +199,7 @@ feign:
     config:
       default:
         connectTimeout: 10000
-        readTimeout: 60000
+        readTimeout: 10000
 
 
 dao-service:
@@ -220,9 +220,9 @@ dao-service:
   nashornEngineConfig:
     extendFilePath: 'classpath:DaoServiceNashornEngineExt.js'
   data-permission:
-    enabled: true
+    enabled: false
   datasource:
-    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
     username: zhwl_lip_daoservice
     password: zhwl_lip_daoservice
     driverClassName: com.mysql.jdbc.Driver
@@ -290,11 +290,13 @@ redis:
   # 最大连接数
   maxTotal: 100
 
+web_domain: null
+
 # 各个系统服务名,api包feign的value值使用占位符获取
 application:
   name:
-    auth: share-auth-wq
-    message: share-message-wq
-    file: share-file-wq
-    portal: share-portal-wq
-    center: share-auth-center-wq
+    auth: share-auth-xzt
+    message: share-message-xzt
+    file: share-file-xzt
+    portal: share-portal-xzt
+    center: share-auth-center-xzt
