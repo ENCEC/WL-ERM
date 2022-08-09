@@ -57,17 +57,21 @@ public class TaskDetailInfoDto implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long approver;
 
+    /**审批人姓名*/
+    @ApiModelProperty("审批人姓名")
+    private String approverName;
+
     /**实际完成日期*/
     @ApiModelProperty("实际完成日期")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date endDate;
 
-    /**执行人ID*/
-    @ApiModelProperty("执行人ID")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
-    private Long executor;
+//    /**执行人ID*/
+//    @ApiModelProperty("执行人ID")
+//    @JsonSerialize(using = Long2String.class)
+//    @JsonDeserialize(using = String2Long.class)
+//    private Long executor;
 
     /**面谈评语*/
     @ApiModelProperty("面谈评语")
@@ -85,6 +89,10 @@ public class TaskDetailInfoDto implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long leader;
 
+    /**责任人姓名*/
+    @ApiModelProperty("责任人姓名")
+    private String leaderName;
+
     /**转正评语*/
     @ApiModelProperty("转正评语")
     private String offerRemark;
@@ -95,9 +103,11 @@ public class TaskDetailInfoDto implements Serializable {
 
     /**统筹人ID*/
     @ApiModelProperty("统筹人ID")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
     private String ordinator;
+
+    /**统筹人姓名*/
+    @ApiModelProperty("统筹人姓名")
+    private String ordinatorName;
 
     /**计划完成日期*/
     @ApiModelProperty("计划完成日期")

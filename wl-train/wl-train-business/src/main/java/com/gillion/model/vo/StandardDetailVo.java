@@ -67,6 +67,9 @@ public class StandardDetailVo {
     @Column(name = "ordinator_id")
     private String ordinatorId;
 
+    /**统筹人姓名*/
+    private String ordinatorName;
+
     /**规范细则ID*/
     @Column(name = "standard_detail_id")
     @JsonSerialize(using = Long2String.class)
