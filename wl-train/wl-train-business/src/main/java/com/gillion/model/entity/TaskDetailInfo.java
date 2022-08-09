@@ -62,6 +62,10 @@ private static final long serialVersionUID=1;
     @JsonDeserialize(using = String2Long.class)
     private Long approver;
 
+    /**审批人姓名*/
+    @Column(name = "approver_name")
+    private String approverName;
+
     /**创建时间*/
     @Column(name = "create_time")
     private Date createTime;
@@ -94,6 +98,10 @@ private static final long serialVersionUID=1;
     @JsonDeserialize(using = String2Long.class)
     private Long leader;
 
+    /**责任人姓名*/
+    @Column(name = "leader_name")
+    private String leaderName;
+
     /**修改人id*/
     @Column(name = "modifier_id")
     @JsonSerialize(using = Long2String.class)
@@ -116,9 +124,13 @@ private static final long serialVersionUID=1;
     @Column(name = "offer_type")
     private String offerType;
 
-    /**统筹人ID*/
+    /**统筹人ID列表*/
     @Column(name = "ordinator")
     private String ordinator;
+
+    /**统筹人姓名列表*/
+    @Column(name = "ordinator_name")
+    private String ordinatorName;
 
     /**计划完成日期*/
     @Column(name = "plan_end_date")
