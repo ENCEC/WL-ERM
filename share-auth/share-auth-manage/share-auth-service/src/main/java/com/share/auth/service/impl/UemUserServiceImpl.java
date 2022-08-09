@@ -867,7 +867,7 @@ public class UemUserServiceImpl implements UemUserService {
                     .select()
                     .mapperTo(SysRoleDTO.class)
                     .execute(userInfoModel);
-            userInfoModel.setRoleList(sysRoleDTOList);
+            uemUserDto.setRoleList(sysRoleDTOList);
         }
 //        if (Objects.nonNull(uemUserDto)) {
 //            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
