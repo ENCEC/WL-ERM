@@ -446,15 +446,4 @@ public class UemUserManageController {
     public ResultHelper<Object> saveDismissInfo(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.saveDismissInfo(uemUserDto);
     }
-
-    /**
-     * 上传文件
-     * @param mFile
-     * @return
-     */
-    @PostMapping ("/upload")
-    public ResultHelper<?> uploadFile(MultipartFile mFile) {
-        return uemUserManageService.uploadFile(mFile);
-    }
-
 }
