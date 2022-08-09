@@ -384,4 +384,8 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     @ApiModelProperty("修改密码")
     private String newPassword;
+
+    @ApiModelProperty("政治面貌")
+    private String politicalStatus;
+
 }

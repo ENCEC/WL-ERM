@@ -85,6 +85,7 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> positiveComments = uemUser.fieldOf("positiveComments", String.class);
     public static final FieldExpression<Date> dismissDate = uemUser.fieldOf("dismissDate", Date.class);
     public static final FieldExpression<String> dismissReason = uemUser.fieldOf("dismissReason", String.class);
+    public static final FieldExpression<String> politicalStatus = uemUser.fieldOf("politicalStatus", String.class);
 
     public static final BaseModelExpression<UemDept, Long> uemDept = new QUemDept(uemUser, "uemDept");
 

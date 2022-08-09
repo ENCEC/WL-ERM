@@ -1,6 +1,7 @@
 package com.share.auth.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.nacos.common.util.ClassUtils;
 import com.fr.web.core.A.C;
@@ -884,35 +885,86 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     }
 
     /**
-     *上传文件
-     * @param mFile
+     * 保存员工信息
+     * @param uemUserDto
      * @return
      */
     @Override
-    public ResultHelper<?> uploadFile(MultipartFile mFile) {
-        if (mFile.getSize() < 1) {
-            return CommonResult.getFaildResultData("文件为空");
+    public ResultHelper<?> preservationUemUser(UemUserDto uemUserDto) {
+        if (StrUtil.isEmpty(uemUserDto.getIdCard())
+                ||StrUtil.isEmpty(uemUserDto.getEmail())
+                ||Objects.isNull(uemUserDto.getEducation())
+                ||StrUtil.isEmpty(uemUserDto.getGraduateSchool())
+                ||StrUtil.isEmpty(uemUserDto.getSpeciality())) {
+            return CommonResult.getFaildResultData("必填项不能为空");
         }
-        //获取文件名
-        String orgFileName = mFile.getOriginalFilename();
-//        String dateTimeStr = DateUtil.formatDate(new Date(), "yyyyMMddHHmmss");
-        StringBuilder path = new StringBuilder("D:\\新建文件夹\\adc\\");
-        path.append(orgFileName);
-        String filePath = path.toString();
+        Long uemUserId = uemUserDto.getUemUserId();
+        String account = uemUserDto.getAccount();
+        String name = uemUserDto.getName();
+        Boolean sex = uemUserDto.getSex();
+        String date = uemUserDto.getBirthday();
+        Long jobStatus = uemUserDto.getJobStatus();
+        String idCard = uemUserDto.getIdCard();
+        String mobile = uemUserDto.getMobile();
+        String address = uemUserDto.getAddress();
+        String sourceAddress = uemUserDto.getSourceAddress();
+        Long maritalStatus = uemUserDto.getMaritalStatus();
+        String politicalStatus = uemUserDto.getPoliticalStatus();
+        String email = uemUserDto.getEmail();
+        BigDecimal seniority = uemUserDto.getSeniority();
+        Long education = uemUserDto.getEducation();
+        Date graduateDate = uemUserDto.getGraduateDate();
+        String graduateSchool = uemUserDto.getGraduateSchool();
+        String speciality = uemUserDto.getSpeciality();
+        Date entryDate = uemUserDto.getEntryDate();
+        String technicalName = uemUserDto.getTechnicalName();
+        String staffDuty = uemUserDto.getStaffDuty();
+        String projectName = uemUserDto.getProjectName();
+        //根据id查询出对应的员工信息，避免空字段
+        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        uemUser.setUemUserId(uemUserId);
+        uemUser.setAccount(account);
+        uemUser.setSex(sex);
+        uemUser.setBirthday(date);
+        uemUser.setJobStatus(jobStatus);
+        uemUser.setIdCard(idCard);
+        uemUser.setName(name);
+        uemUser.setMobile(mobile);
+        uemUser.setAddress(address);
+        uemUser.setSourceAddress(sourceAddress);
+        uemUser.setMaritalStatus(maritalStatus);
+        uemUser.setPoliticalStatus(politicalStatus);
+        uemUser.setEmail(email);
+        uemUser.setSeniority(seniority);
+        uemUser.setEducation(education);
+        uemUser.setGraduateDate(graduateDate);
+        uemUser.setGraduateSchool(graduateSchool);
+        uemUser.setSpeciality(speciality);
+        uemUser.setEntryDate(entryDate);
+        uemUser.setTechnicalName(technicalName);
+        uemUser.setStaffDuty(staffDuty);
+        uemUser.setProjectName(projectName);
+        QUemUser.uemUser.save(uemUser);
+        return CommonResult.getSuccessResultData("保存成功!");
+    }
 
-        File file1 = new File(filePath);
-        if (!file1.getParentFile().exists()) {
-            file1.getParentFile().mkdirs();
+    /**
+     * 添加离职理由
+     * @param uemUserDto
+     * @return
+     */
+    @Override
+    public ResultHelper<?> updateLeaveReason(UemUserDto uemUserDto) {
+        UemUser uemUser = QUemUser.uemUser.selectOne().where(QUemUser.name.eq$(uemUserDto.getName())).execute();
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        uemUser.setLeaveReason(uemUserDto.getLeaveReason());
+        int count = QUemUser.uemUser.save(uemUser);
+        if (count == 1) {
+            return CommonResult.getSuccessResultData("更新成功");
+        } else {
+            return CommonResult.getFaildResultData("更新失败");
         }
-        try {
-            mFile.transferTo(file1);
-            //把上传文件路径存进数据库
-
-        }  catch (IOException e) {
-            e.printStackTrace();
-            return CommonResult.getFaildResultData("上传失败");
-        }
-        return CommonResult.getSuccessResultData("上传成功");
     }
 
 

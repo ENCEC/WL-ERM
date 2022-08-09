@@ -464,4 +464,10 @@ public class UemUser extends BaseModel implements Serializable {
     @Column(name = "positive_comments")
     private String positiveComments;
 
+    /**
+     * 政治面貌
+     */
+    @Column(name = "political_status")
+    private String politicalStatus;
+
 }

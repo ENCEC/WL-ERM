@@ -58,4 +58,12 @@ public interface StandardEntryInterface {
     @PostMapping("/sysDictType/querySysDictType")
     @ResponseBody
     ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto);
+
+    /**
+     * 添加离职理由
+     * @param uemUserDto
+     * @return
+     */
+    @PostMapping("/updateLeaveReason")
+    ResultHelper<?> updateLeaveReason(@RequestBody UemUserDto uemUserDto);
 }
