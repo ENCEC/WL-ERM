@@ -373,7 +373,7 @@ hystrix:
           enabled: true
         isolation:
           thread:
-            timeoutInMilliseconds: 50000
+            timeoutInMilliseconds: 10000
 
 # spring boot安全检查
 management:
