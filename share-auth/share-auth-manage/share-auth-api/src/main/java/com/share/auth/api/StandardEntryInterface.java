@@ -59,6 +59,9 @@ public interface StandardEntryInterface {
     @ResponseBody
     ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto);
 
+    @GetMapping("/queryStaffById")
+    UemUserDto queryStaffById(@RequestParam Long uemUserId);
+
     /**
      * 添加离职理由
      * @param uemUserDto
