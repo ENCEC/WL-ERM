@@ -69,6 +69,7 @@ public class TaskDetailInfoDto implements Serializable {
     @ApiModelProperty("审批人姓名")
     private String approverName;
 
+
     /**实际完成日期*/
     @ApiModelProperty("实际完成日期")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

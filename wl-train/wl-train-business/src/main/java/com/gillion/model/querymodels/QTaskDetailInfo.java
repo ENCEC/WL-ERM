@@ -23,6 +23,7 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<Date> approvalDate = taskDetailInfo.fieldOf("approvalDate", Date.class);
     public static final FieldExpression<Long> approver = taskDetailInfo.fieldOf("approver", Long.class);
     public static final FieldExpression<String> approverName = taskDetailInfo.fieldOf("approverName", String.class);
+    public static final FieldExpression<String> approvalRemark = taskDetailInfo.fieldOf("approvalRemark", String.class);
     public static final FieldExpression<Date> createTime = taskDetailInfo.fieldOf("createTime", Date.class);
     public static final FieldExpression<Long> creatorId = taskDetailInfo.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = taskDetailInfo.fieldOf("creatorName", String.class);
