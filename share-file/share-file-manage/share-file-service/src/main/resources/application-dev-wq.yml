@@ -340,7 +340,7 @@ fastdfs:
 
 #上传附件地址
 upFileURL:
-  homeDirectory: C:\Users\Lenovo\Desktop\物联员工项目\
+  homeDirectory: D:\新建文件夹\adc
   subdirectory: 项目上传附件
   lookHomeDirectory: http://dev.lip.wifi.gillion.com.cn:9546/share-file/images/
   lookHomeDirectoryUrl: file:C:/Users/Lenovo/Desktop/物联员工项目/项目上传附件/
