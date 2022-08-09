@@ -10,10 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -150,5 +147,29 @@ public class TaskInfoController {
             taskInfoDto.setPageSize(10);
         }
         return taskInfoService.queryOrdinatorTaskInfo(taskInfoDto);
+    }
+
+    @GetMapping("/queryPositiveApply")
+    @ApiOperation("根据任务id查询该申请人的转正申请")
+    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(@RequestParam Long taskInfoId) {
+        return taskInfoService.queryPositiveApply(taskInfoId);
+    }
+
+    @PostMapping("/queryAllStandardDetail")
+    @ApiOperation("查出规范条目所对应的规范细则 用作转正程序")
+    public ResultHelper<List<StandardDetailVo>> queryAllStandardDetail() {
+        return taskInfoService.queryAllStandardDetail();
+    }
+
+    @PostMapping("/savePositiveInfo")
+    @ApiOperation("我的任务（项目经历初次审核） 添加基本转正信息")
+    public ResultHelper<Object> savePositiveInfo(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
+        return taskInfoService.savePositiveInfo(taskDetailInfoDto);
+    }
+
+    @PostMapping("/saveLeaveInfo")
+    @ApiOperation("我的任务（项目经历初次审核） 添加离职基本信息")
+    public ResultHelper<Object> saveLeaveInfo(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
+        return taskInfoService.savePositiveInfo(taskDetailInfoDto);
     }
 }
