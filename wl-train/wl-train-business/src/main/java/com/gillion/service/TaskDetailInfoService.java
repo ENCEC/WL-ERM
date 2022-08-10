@@ -35,7 +35,7 @@ public interface TaskDetailInfoService {
      * @param dispatchers
      * @return
      */
-    List queryOffer(Long dispatchers);
+    List queryOffer(Long dispatchers,String name);
 
 
 }

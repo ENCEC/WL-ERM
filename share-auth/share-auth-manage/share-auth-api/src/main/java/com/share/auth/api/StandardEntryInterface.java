@@ -67,7 +67,11 @@ public interface StandardEntryInterface {
     @RequestMapping("/uemUserManage/queryOfferInfo")
     UemUserDto queryOfferInfo(@RequestParam(value = "uemUserId") Long uemUserId);
 
-
-    @PostMapping("/uemUserManage/updateLeaveReason")
+    /**
+     * 离职申请添加离职理由
+     * @param
+     * @return
+     */
+    @GetMapping("/uemUserManage/updateLeaveReason")
     ResultHelper<?> updateLeaveReason(@RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason);
 }
