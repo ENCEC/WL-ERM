@@ -176,4 +176,16 @@ private static final long serialVersionUID=1;
     @Column(name = "task_name")
     private String taskName;
 
+    /**面谈人ID*/
+    @Column(name = "interviewer_id")
+    private Long interviewerId;
+
+    /**面谈人姓名*/
+    @Column(name = "interviewer_name")
+    private String interviewerName;
+
+    /**审批人姓名*/
+    @Column(name = "approver_name")
+    private String approverName;
+
 }

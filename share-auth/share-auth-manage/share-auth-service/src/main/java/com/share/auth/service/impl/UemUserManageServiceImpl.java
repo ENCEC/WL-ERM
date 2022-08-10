@@ -831,13 +831,14 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
     }
 
+
     /**
-     * 查看转正评语
+     * 查看转正评语部分信息
      * @param uemUserId
      * @return
      */
     @Override
-    public ResultHelper<UemUserDto> queryOfferInfo(Long uemUserId) {
+    public UemUserDto queryOfferInfo(Long uemUserId) {
         UemUserDto execute = QUemUser.uemUser.selectOne(
                 QUemUser.uemUserId,
                 QUemUser.name,
@@ -848,20 +849,13 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 QUemUser.staffDuty,
                 QUemUser.offerDate,
                 QUemUser.positiveType,
-                QUemUser.defenseScore,
-                QUemUser.interviewComments,
-                QUemUser.positiveComments,
-                QUemUser.createTime,
-                QUemUser.creatorName
+                QUemUser.defenseScore
         )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
-        if (execute == null) {
-            return CommonResult.getFaildResultData("对象信息为空!查询失败");
-        } else {
-            return CommonResult.getSuccessResultData(execute);
-        }
+        
+        return execute;
     }
 
     /**
@@ -986,15 +980,18 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     }
 
     /**
-     * 添加离职理由
-     * @param uemUserDto
+     * 离职申请添加离职理由
+     * @param
      * @return
      */
     @Override
-    public ResultHelper<?> updateLeaveReason(UemUserDto uemUserDto) {
-        UemUser uemUser = QUemUser.uemUser.selectOne().where(QUemUser.name.eq$(uemUserDto.getName())).execute();
+    public ResultHelper<?> updateLeaveReason(Long uemUserId,String leaveReason) {
+//        if (StrUtil.isEmpty(uemUserDto.getLeaveReason())) {
+//            return CommonResult.getFaildResultData("必填项不能为空");
+//        }
+        UemUser uemUser = QUemUser.uemUser.selectOne().where(QUemUser.uemUserId.eq$(uemUserId)).execute();
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUser.setLeaveReason(uemUserDto.getLeaveReason());
+        uemUser.setLeaveReason(leaveReason);
         int count = QUemUser.uemUser.save(uemUser);
         if (count == 1) {
             return CommonResult.getSuccessResultData("更新成功");
