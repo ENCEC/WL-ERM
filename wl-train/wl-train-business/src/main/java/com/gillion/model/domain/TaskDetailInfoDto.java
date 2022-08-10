@@ -27,7 +27,15 @@ public class TaskDetailInfoDto implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long taskDetailId;
 
-    /**执行周期*/
+    @ApiModelProperty("审批人id-来自user表")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long uemUserId;
+
+
+    /**
+     * 执行周期
+     */
     @ApiModelProperty("执行周期")
     private Integer actionPeriod;
 
@@ -57,6 +65,11 @@ public class TaskDetailInfoDto implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long approver;
 
+    /**审批人姓名*/
+    @ApiModelProperty("审批人姓名")
+    private String approverName;
+
+
     /**实际完成日期*/
     @ApiModelProperty("实际完成日期")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -79,13 +92,47 @@ public class TaskDetailInfoDto implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date faceTime;
 
-    /**责任人ID*/
+    /**
+     * 答辩成绩
+     */
+    @ApiModelProperty("答辩成绩")
+    private String faceScore;
+
+    /**
+     * 审批意见
+     */
+    @ApiModelProperty("审批意见")
+    private String approvalRemark;
+
+    /**
+     * 责任人ID
+     */
     @ApiModelProperty("责任人ID")
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long leader;
+    /**
+     * 分配人ID
+     */
+    @ApiModelProperty("分配人id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long dispatchers;
+
+    /**责任人姓名*/
+    @ApiModelProperty("责任人姓名")
+    private String leaderName;
 
     /**转正评语*/
+    /**
+     * 分配人姓名
+     */
+    @ApiModelProperty("分配人id")
+    private String dispatchersName;
+
+    /**
+     * 转正评语
+     */
     @ApiModelProperty("转正评语")
     private String offerRemark;
 
@@ -98,6 +145,10 @@ public class TaskDetailInfoDto implements Serializable {
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private String ordinator;
+
+    /**统筹人姓名*/
+    @ApiModelProperty("统筹人姓名")
+    private String ordinatorName;
 
     /**计划完成日期*/
     @ApiModelProperty("计划完成日期")

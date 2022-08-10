@@ -265,11 +265,18 @@ public interface UemUserManageService {
     ResultHelper<UemUserDto> queryDismissInfo(Long uemUserId);
 
     /**
-     * 上传文件
-     * @param mFile
+     * 保存员工信息
+     * @param uemUserDto
      * @return
      */
-    ResultHelper<?> uploadFile(MultipartFile mFile);
+    ResultHelper<?> preservationUemUser(UemUserDto uemUserDto);
+
+    /**
+     * 添加离职理由
+     * @param uemUserDto
+     * @return
+     */
+    ResultHelper<?> updateLeaveReason(UemUserDto uemUserDto);
 
 
 }

@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * 任务信息服务
+ *
  * @author xuzt <xuzt@gillion.com.cn>
  * @date 2022/8/1
  */
@@ -17,8 +18,9 @@ public interface TaskInfoService {
 
     /**
      * 查询任务信息列表
+     *
      * @param taskInfoDto 查询入参
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-03
      */
@@ -26,6 +28,7 @@ public interface TaskInfoService {
 
     /**
      * 新增任务信息和任务细则
+     *
      * @param taskInfoDto 任务信息
      * @return com.share.support.result.ResultHelper<java.lang.Object>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -35,6 +38,7 @@ public interface TaskInfoService {
 
     /**
      * 更新任务信息和任务细则
+     *
      * @param taskInfoDto 任务信息
      * @return com.share.support.result.ResultHelper<java.lang.Object>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -44,6 +48,7 @@ public interface TaskInfoService {
 
     /**
      * 获取任务细节和任务信息
+     *
      * @param taskInfoId 任务ID
      * @return com.share.support.result.ResultHelper<com.gillion.model.domain.TaskInfoDto>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -53,6 +58,7 @@ public interface TaskInfoService {
 
     /**
      * 删除任务细节和任务信息
+     *
      * @param taskInfoId 任务ID
      * @return com.share.support.result.ResultHelper<java.lang.Object>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -62,8 +68,9 @@ public interface TaskInfoService {
 
     /**
      * 根据任务类型分页查询完整规范细则
+     *
      * @param taskInfoDto 任务信息
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.vo.StandardDetailVo>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-03
      */
@@ -71,8 +78,9 @@ public interface TaskInfoService {
 
     /**
      * 根据任务类型查询全部必须的完整规范细则
+     *
      * @param taskInfoDto 任务信息
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.vo.StandardDetailVo>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
@@ -80,8 +88,9 @@ public interface TaskInfoService {
 
     /**
      * 根据任务类型分页查询非必须的完整规范细则
+     *
      * @param taskInfoDto 任务信息
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.vo.StandardDetailVo>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
@@ -89,8 +98,9 @@ public interface TaskInfoService {
 
     /**
      * 查询员工任务信息
+     *
      * @param taskInfoDto 查询入参
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
@@ -98,8 +108,9 @@ public interface TaskInfoService {
 
     /**
      * 查询员工任务详情信息
+     *
      * @param taskInfoDto 查询入参
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-08
      */
@@ -107,6 +118,7 @@ public interface TaskInfoService {
 
     /**
      * 更新任务进度
+     *
      * @param taskDetailInfoDtoList 任务细则ID和进度数值
      * @return com.share.support.result.ResultHelper<java.lang.String>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -116,8 +128,9 @@ public interface TaskInfoService {
 
     /**
      * 查询负责人任务信息
+     *
      * @param taskInfoDto 查询入参
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
@@ -125,6 +138,7 @@ public interface TaskInfoService {
 
     /**
      * 更新任务完成状态
+     *
      * @param taskDetailInfoDtoList 查询入参
      * @return com.share.support.result.ResultHelper<java.lang.String>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -134,10 +148,46 @@ public interface TaskInfoService {
 
     /**
      * 查询统筹人任务信息
+     *
      * @param taskInfoDto 查询入参
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
     ResultHelper<Page<TaskInfoDto>> queryOrdinatorTaskInfo(TaskInfoDto taskInfoDto);
+
+
+    /**
+     * 我的任务（项目经历初次审核） 根据任务id查询所分配的执行人
+     *
+     * @param taskInfoId 查询入参
+     * @author wzr
+     * @date 2022-08-09
+     */
+    ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId);
+
+    /**
+     * 我的任务（项目经历初次审核） 查出规范条目所对应的规范细则 用作转正程序
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+    ResultHelper<List<StandardDetailVo>> queryAllStandardDetail();
+
+    /**
+     * 我的任务（项目经历初次审核） 添加基本转正信息
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+    ResultHelper<Object> savePositiveInfo(TaskDetailInfoDto taskDetailInfoDto);
+
+    /**
+     * 我的任务（项目经历初次审核） 添加离职申请基本信息
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+    ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto);
+
 }

@@ -28,9 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 任务信息管理
+ *
  * @author xuzt <xuzt@gillion.com.cn>
  * @date 2022/8/1
  */
@@ -39,6 +41,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     @Autowired
     private UemUserInterface uemUserInterface;
+
 
     @Autowired
     private AuthCenterInterface authCenterInterface;
@@ -72,6 +75,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 校验新增修改任务信息的参数
+     *
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
@@ -85,7 +89,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
             return "在职状态不能为空";
         }
-        if (Objects.isNull(taskInfoDto.getTaskDetailInfoDtoList()) || taskInfoDto.getTaskDetailInfoDtoList().size() <= 0)  {
+        if (Objects.isNull(taskInfoDto.getTaskDetailInfoDtoList()) || taskInfoDto.getTaskDetailInfoDtoList().size() <= 0) {
             return "任务细则列表不能为空";
         }
         return null;
@@ -128,10 +132,32 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             // 设置任务细则
             TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
             taskDetailInfo.setTaskInfoId(snowflakeId);
-            if (taskDetailInfo.getLeader() != null) {
-                taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
+            if (taskDetailInfoDto.getLeader() != null) {
+                ResultHelper<UemUserDto> leaderResult = uemUserInterface.getUemUser(taskDetailInfoDto.getLeader());
+                if (leaderResult.getSuccess() && leaderResult.getData() != null) {
+                    taskDetailInfo.setLeader(taskDetailInfoDto.getLeader());
+                    taskDetailInfo.setLeaderName(leaderResult.getData().getName());
+                }
+            }
+            // 查询统筹人姓名列表
+            List<Long> ordinatorIds = StrUtil
+                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
+                    .stream()
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            StringBuilder ordinatorNameBuilder = new StringBuilder();
+            for (Long ordinatorId : ordinatorIds) {
+                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                    String ordinatorName = ordinatorResult.getData().getName();
+                    if (ordinatorName != null) {
+                        ordinatorNameBuilder.append(ordinatorName);
+                        ordinatorNameBuilder.append(",");
+                    }
+                }
             }
             taskDetailInfo.setOrdinator(standardDetailVo.getOrdinatorId());
+            taskDetailInfo.setOrdinatorName(ordinatorNameBuilder.toString());
             taskDetailInfo.setStandardEntryId(standardDetailVo.getStandardEntryId());
             taskDetailInfo.setStandardEntryName(standardDetailVo.getEntryName());
             taskDetailInfo.setStandardDetailId(standardDetailVo.getStandardDetailId());
@@ -259,6 +285,27 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .paging(pageNo, pageSize)
                 .mapperTo(StandardDetailVo.class)
                 .execute(taskInfoDto);
+        List<StandardDetailVo> standardDetailVoList = standardDetailVoPage.getRecords();
+        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
+            // 查询统筹人姓名列表
+            List<Long> ordinatorIds = StrUtil
+                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
+                    .stream()
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            StringBuilder ordinatorNameBuilder = new StringBuilder();
+            for (Long ordinatorId : ordinatorIds) {
+                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                    String ordinatorName = ordinatorResult.getData().getName();
+                    if (ordinatorName != null) {
+                        ordinatorNameBuilder.append(ordinatorName);
+                        ordinatorNameBuilder.append(",");
+                    }
+                }
+            }
+            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
+        }
         return CommonResult.getSuccessResultData(standardDetailVoPage);
     }
 
@@ -267,12 +314,32 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
             return CommonResult.getFaildResultData("任务类型不能为空");
         }
-        List<StandardDetailVo> standardDetailVoPage = DSContext
+        List<StandardDetailVo> standardDetailVoList = DSContext
                 .customization("WL-ERM_selectNeedStandardDetailByTaskType")
                 .select()
                 .mapperTo(StandardDetailVo.class)
                 .execute(taskInfoDto);
-        return CommonResult.getSuccessResultData(standardDetailVoPage);
+        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
+            // 查询统筹人姓名列表
+            List<Long> ordinatorIds = StrUtil
+                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
+                    .stream()
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            StringBuilder ordinatorNameBuilder = new StringBuilder();
+            for (Long ordinatorId : ordinatorIds) {
+                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                    String ordinatorName = ordinatorResult.getData().getName();
+                    if (ordinatorName != null) {
+                        ordinatorNameBuilder.append(ordinatorName);
+                        ordinatorNameBuilder.append(",");
+                    }
+                }
+            }
+            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
+        }
+        return CommonResult.getSuccessResultData(standardDetailVoList);
     }
 
     @Override
@@ -288,6 +355,27 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .mapperTo(StandardDetailVo.class)
                 .paging(pageNo, pageSize)
                 .execute(taskInfoDto);
+        List<StandardDetailVo> standardDetailVoList = standardDetailVoPage.getRecords();
+        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
+            // 查询统筹人姓名列表
+            List<Long> ordinatorIds = StrUtil
+                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
+                    .stream()
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            StringBuilder ordinatorNameBuilder = new StringBuilder();
+            for (Long ordinatorId : ordinatorIds) {
+                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                    String ordinatorName = ordinatorResult.getData().getName();
+                    if (ordinatorName != null) {
+                        ordinatorNameBuilder.append(ordinatorName);
+                        ordinatorNameBuilder.append(",");
+                    }
+                }
+            }
+            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
+        }
         return CommonResult.getSuccessResultData(standardDetailVoPage);
     }
 
@@ -393,8 +481,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         String taskTitle = StrUtil.isEmpty(taskInfoDto.getTaskTitle()) ? "" : "%" + taskInfoDto.getTaskTitle() + "%";
         List<Integer> status;
         if (Objects.isNull(taskInfoDto.getStatus())) {
-            status = Arrays.asList(0,1,2,3);
-        } else  {
+            status = Arrays.asList(0, 1, 2, 3);
+        } else {
             status = Arrays.asList(taskInfoDto.getStatus());
         }
         params.put("leader", userModelInfo.getUemUserId());
@@ -487,8 +575,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         String ordinator = "%" + userModelInfo.getUemUserId() + "%";
         List<Integer> status;
         if (Objects.isNull(taskInfoDto.getStatus())) {
-            status = Arrays.asList(0,1,2);
-        } else  {
+            status = Arrays.asList(0, 1, 2);
+        } else {
             status = Arrays.asList(taskInfoDto.getStatus());
         }
         params.put("ordinator", ordinator);
@@ -501,5 +589,92 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .mapperTo(TaskInfoDto.class)
                 .execute(params);
         return CommonResult.getSuccessResultData(taskInfoDtoPage);
+    }
+
+    /**
+     * 我的任务（项目经历初次审核） 根据任务id查询所分配的执行人
+     *
+     * @param taskInfoId 查询入参
+     * @author wzr
+     * @date 2022-08-09
+     */
+    @Override
+    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId) {
+        Map<String, Long> parms = new HashMap<>(1);
+        parms.put("taskInfoId", taskInfoId);
+        TaskDetailInfoDto result = DSContext.customization("WL-ERM_queryPositiveApply")
+                .selectOne().mapperTo(TaskDetailInfoDto.class)
+                .execute(parms);
+        return CommonResult.getSuccessResultData(result);
+    }
+
+    /**
+     * 我的任务（项目经历初次审核） 查出规范条目所对应的规范细则 用作转正程序
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+    @Override
+    public ResultHelper<List<StandardDetailVo>> queryAllStandardDetail() {
+        List<StandardDetailVo> result = DSContext.customization("WL-ERM_queryAllStandard")
+                .select().mapperTo(StandardDetailVo.class).execute();
+        return CommonResult.getSuccessResultData(result);
+    }
+
+    /**
+     * 我的任务（项目经历初次审核） 添加基本转正信息
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+    @Override
+    public ResultHelper<Object> savePositiveInfo(TaskDetailInfoDto taskDetailInfoDto) {
+        Long uemUserId = taskDetailInfoDto.getUemUserId();
+        Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
+        Date faceTime = taskDetailInfoDto.getFaceTime();
+        String resultAccess = taskDetailInfoDto.getResultAccess();
+        String faceScore = taskDetailInfoDto.getFaceScore();
+        String faceRemark = taskDetailInfoDto.getFaceRemark();
+        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne(QTaskDetailInfo.taskDetailInfo.fieldContainer()).byId(taskDetailId);
+        taskDetailInfo.setApprover(uemUserId);
+        taskDetailInfo.setFaceTime(faceTime);
+        taskDetailInfo.setResultAccess(resultAccess);
+        taskDetailInfo.setFaceScore(faceScore);
+        taskDetailInfo.setFaceRemark(faceRemark);
+        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int reslut = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+        if (reslut > 0) {
+            return CommonResult.getSuccessResultData("添加成功");
+        } else {
+            return CommonResult.getFaildResultData("添加失败!");
+        }
+    }
+
+    /**
+     * 我的任务（项目经历初次审核） 添加离职申请基本信息
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+    @Override
+    public ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto) {
+        Long uemUserId = taskDetailInfoDto.getUemUserId();
+        Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
+        Date approvalDate = taskDetailInfoDto.getApprovalDate();
+        String resultAccess = taskDetailInfoDto.getResultAccess();
+        String approvalRemark = taskDetailInfoDto.getApprovalRemark();
+        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo
+                .selectOne(QTaskDetailInfo.taskDetailInfo.fieldContainer()).byId(taskDetailId);
+        taskDetailInfo.setApprover(uemUserId);
+        taskDetailInfo.setApprovalDate(approvalDate);
+        taskDetailInfo.setApprovalRemark(approvalRemark);
+        taskDetailInfo.setResultAccess(resultAccess);
+        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int reslut = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+        if (reslut > 0) {
+            return CommonResult.getSuccessResultData("添加成功");
+        } else {
+            return CommonResult.getFaildResultData("添加失败!");
+        }
     }
 }

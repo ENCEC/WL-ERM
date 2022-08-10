@@ -446,4 +446,54 @@ public class UemUserManageController {
     public ResultHelper<Object> saveDismissInfo(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.saveDismissInfo(uemUserDto);
     }
+
+    /**
+     * 查看转正评语
+     * @param uemUserId
+     * @return
+     */
+    @GetMapping("/queryOfferInfo")
+    public ResultHelper<UemUserDto> queryOfferInfo(Long uemUserId) {
+        return uemUserManageService.queryOfferInfo(uemUserId);
+    }
+
+    /**
+     * 查看离职原因
+     * @param uemUserId
+     * @return
+     */
+    @GetMapping("/queryLeaveInfo")
+    public ResultHelper<UemUserDto> queryLeaveInfo(Long uemUserId) {
+        return  uemUserManageService.queryLeaveInfo(uemUserId);
+    }
+
+    /**
+     * 查看辞退原因
+     * @param uemUserId
+     * @return
+     */
+    @GetMapping("/queryDismissInfo")
+    public ResultHelper<UemUserDto> queryDismissInfo(Long uemUserId) {
+        return uemUserManageService.queryDismissInfo(uemUserId);
+    }
+
+    /**
+     * 保存员工信息
+     * @param uemUserDto
+     * @return
+     */
+    @PostMapping("/preservationUemUser")
+    public ResultHelper<?> preservationUemUser(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.preservationUemUser(uemUserDto);
+    }
+
+    /**
+     * 添加离职理由
+     * @param uemUserDto
+     * @return
+     */
+    @PostMapping("/updateLeaveReason")
+    public ResultHelper<?> updateLeaveReason(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.updateLeaveReason(uemUserDto);
+    }
 }

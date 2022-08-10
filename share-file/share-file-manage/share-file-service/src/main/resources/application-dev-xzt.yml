@@ -16,7 +16,7 @@ mybaits:
 
 spring:
   application:
-    name: share-file-wq
+    name: share-file-xzt
     admin:
       enabled: false
   profiles:
@@ -329,9 +329,13 @@ info:
   artifactId: @project.artifactId@
 
 
+#feignClient:
+#  apiGate:
+#    url: http://eds-engine.logink.dp.gillion.com.cn/api/share-gateway
+
 feignClient:
   apiGate:
-    url: http://eds-engine.logink.dp.gillion.com.cn/api/share-gateway
+    url: http://172.16.7.146
 
 #fastdfs
 fastdfs:
@@ -340,7 +344,7 @@ fastdfs:
 
 #上传附件地址
 upFileURL:
-  homeDirectory: D:\新建文件夹\adc
+  homeDirectory: C:\Users\Lenovo\Desktop\物联员工项目\
   subdirectory: 项目上传附件
   lookHomeDirectory: http://dev.lip.wifi.gillion.com.cn:9546/share-file/images/
   lookHomeDirectoryUrl: file:C:/Users/Lenovo/Desktop/物联员工项目/项目上传附件/
@@ -354,7 +358,7 @@ sso:
 # 各个系统服务名,api包feign的value值使用占位符获取
 application:
   name:
-    auth: share-auth-wq
-    message: share-message-wq
-    file: share-file-wq
-    center: share-auth-center-wq
+    auth: share-auth-xzt
+    message: share-message-xzt
+    file: share-file-xzt
+    center: share-auth-center-xzt

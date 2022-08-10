@@ -1,10 +1,10 @@
 server:
-  port: 8083
+  port: 8085
   tomcat:
     uri-encoding: UTF-8
 logging:
   file:
-    name: /tmp/log/file
+    name: /tmp/log/message
   config: classpath:log4j2-spring.xml
 
 mySwagger:
@@ -16,7 +16,7 @@ mybaits:
 
 spring:
   application:
-    name: share-file-wq
+    name: share-message-xzt
     admin:
       enabled: false
   profiles:
@@ -27,9 +27,9 @@ spring:
   datasource:
     name: basicDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://172.16.0.23:3306/zhwl_lip_share_file?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
-    username: root
-    password: root
+    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_share_message?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: zhwl_lip_share_message
+    password: zhwl_lip_share_message
     type: com.alibaba.druid.pool.DruidDataSource
     maxActive: 30
     validationQuery: select 1 FROM DUAL
@@ -48,29 +48,18 @@ spring:
     timeBetweenEvictionRunsMillis: 300000
   mvc:
     static-path-pattern:
-    hiddenmethod:
-      filter:
-        enabled: true
   http:
     encoding:
       charset: utf-8
       enabled: true
       force: true
     multipart:
-      enabled: true
+      enabled: false
   #i18n
   messages:
     basename: config.messages,org.springframework.security.messages
     encoding: utf-8
     always-use-message-format: true
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 10MB
-      max-request-size: 20MB
-
-#  resources:
-#    static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file://C:/Users/Lenovo/Desktop/长沙新项目/项目上传附件/
 
 eureka:
   client:
@@ -88,7 +77,7 @@ eureka:
 ####ec auto autoconfiguration
 ec:
   debugger:
-    enable: true
+    enable: false
   validation:
     enabled: true
     staticDirPath:
@@ -135,18 +124,15 @@ ec:
   area:
     enabled: false
   rule-number:
-    server-name: supply-chain-cxf
+    server-name: supply-chain
     path: rule-number
-
 # redis配置
 redis:
-  namespace: lip_dev
+  namespace: zj_dev
   # redis连接地址，集群时用逗号分隔
   hostAndPort: 172.16.0.28:40070
   # 是否集群模式
   cluster: false
-  # 重定向的最大数量，集群使用
-  maxRedirects: 8
   # 连接超时时间2000
   connectionTimeout: 2000
   # 响应超时时间
@@ -203,6 +189,7 @@ db:
   chinese:
     width: 1
 
+
 dao-service:
   # 使用多数据源扫描用的
   query-model-injector:
@@ -243,7 +230,7 @@ dao-service:
   clientAutoAssemble:
     enabled: true
     # 项⽬唯⼀键
-    project-key: "share_file_dev"
+    project-key: "share_message_dev"
     # 通常为 true, 为 false 使⽤HttpClient
     useEmbedEngine: true
     # 该数据源对应数据服务的数据源信息的名称
@@ -287,7 +274,6 @@ dao-service:
       # ⼦域名造成跨域时才需要设置该项
       renderPageDomain: 'localhost'
 
-
 ### Ribbon 配置
 ribbon:
   ConnectTimeout: 30000
@@ -308,7 +294,7 @@ hystrix:
         forceClosed: true
       execution:
         timeout:
-          enabled: true
+          enabled: false
         isolation:
           thread:
             timeoutInMilliseconds: 50000
@@ -327,34 +313,37 @@ info:
   version: @project.version@
   groupId: @project.groupId@
   artifactId: @project.artifactId@
+# 帆软
+fr:
+  # 工程路径
+  envpath: "D:\\develop\\FineReport_10.0\\webapps\\webroot\\WEB-INF\\"
+  # 生成的附件保存路径
+  export_file_path: "\\data\\mail\\attach\\"
 
+mail:
+  #邮箱配置密码加密秘钥
+  aes_secret_key: Lp3876jF4Ap7aG19
 
 feignClient:
   apiGate:
-    url: http://eds-engine.logink.dp.gillion.com.cn/api/share-gateway
+    url: http://172.16.7.146
 
-#fastdfs
-fastdfs:
-  config:
-    name: fastdfs-client-dev.properties
-
-#上传附件地址
-upFileURL:
-  homeDirectory: D:\新建文件夹\adc
-  subdirectory: 项目上传附件
-  lookHomeDirectory: http://dev.lip.wifi.gillion.com.cn:9546/share-file/images/
-  lookHomeDirectoryUrl: file:C:/Users/Lenovo/Desktop/物联员工项目/项目上传附件/
-  deleteFileUrl: C:\Users\Lenovo\Desktop\物联员工项目\项目上传附件\
 #环境标识
 env: DEV
 sso:
-  #redirectUrl: http://172.16.3.156:9544/share-auth-center
-  redirectUrl: http://172.16.8.160:9544/share-auth-center
+  #  redirectUrl: http://dev.lip.share-message-ui.dps.gillion.com.cn/share-auth-center
+  redirectUrl: http://172.16.8.160:9542/share-auth-center
 
 # 各个系统服务名,api包feign的value值使用占位符获取
 application:
   name:
-    auth: share-auth-wq
-    message: share-message-wq
-    file: share-file-wq
-    center: share-auth-center-wq
+    auth: share-auth-xzt
+    message: share-message-xzt
+    file: share-file-xzt
+    center: share-auth-center-xzt
+
+portal:
+  applicationCode:
+    file: YYDM200014
+    message: YYDM200016
+    env: YYDM200015
