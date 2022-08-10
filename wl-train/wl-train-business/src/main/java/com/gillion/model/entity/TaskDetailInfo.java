@@ -277,8 +277,5 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
     @Column(name = "interviewer_name")
     private String interviewerName;
 
-    /**审批人姓名*/
-    @Column(name = "approver_name")
-    private String approverName;
 
 }

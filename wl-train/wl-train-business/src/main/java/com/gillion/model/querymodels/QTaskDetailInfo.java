@@ -57,7 +57,6 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<String> taskName = taskDetailInfo.fieldOf("taskName", String.class);
     public static final FieldExpression<Long> interviewerId = taskDetailInfo.fieldOf("interviewerId", Long.class);
     public static final FieldExpression<String> interviewerName = taskDetailInfo.fieldOf("interviewerName", String.class);
-    public static final FieldExpression<String> approverName = taskDetailInfo.fieldOf("approverName", String.class);
 
     public QTaskDetailInfo() {
         super("TaskDetailInfo", TaskDetailInfo.class);
