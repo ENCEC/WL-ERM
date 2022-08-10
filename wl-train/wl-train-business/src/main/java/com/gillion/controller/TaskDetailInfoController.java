@@ -59,14 +59,14 @@ private StandardEntryInterface standardEntryInterface;
         return taskDetailInfoService.queryOffer(dispatchers);
     }
 
-    /**
-     * 离职申请添加离职理由到用户表
-     * @param uemUserId
-     * @param leaveReason
-     * @return
-     */
-    @PostMapping("/uemUserManage/updateLeaveReason")
-    public ResultHelper<?> updateLeaveReason(@RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
-        return standardEntryInterface.updateLeaveReason(uemUserId, leaveReason);
-    }
+//    /**
+//     * 离职申请添加离职理由到用户表
+//     * @param uemUserId
+//     * @param leaveReason
+//     * @return
+//     */
+//    @PostMapping("/uemUserManage/updateLeaveReason")
+//    public ResultHelper<?> updateLeaveReason(@RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
+//        return standardEntryInterface.updateLeaveReason(uemUserId, leaveReason);
+//    }
 }
