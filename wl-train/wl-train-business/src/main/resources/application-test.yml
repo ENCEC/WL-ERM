@@ -1,0 +1,298 @@
+# web service 配置
+server:
+  port: 8080
+# 安全配置
+security:
+  basic:
+    enabled: false
+logging:
+  config: classpath:log4j2-spring.xml
+# spring 配置
+spring:
+  #重要，spring cloud服务名称
+  application:
+    name: wl-train
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    name: dataSource
+    ## 172.16.0.23 root/root
+    url: jdbc:mysql://172.16.0.23:3306/zhwl_wl_erm?Unicode=true&useSSL=true
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    maxActive: 100
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 6
+    validationQuery: select 'x'
+    validationQueryTimeout: 1
+    timeBetweenEvictionRunsMillis: 30000
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    numTestsPerEvictionRun: 20
+    logAbandoned: true
+    removeAbandoned: true
+    removeAbandonedTimeout: 1800
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 300
+    maxWaitMillis: 30000
+  #CharacterEncodingFilter配置：编码转换，解决乱码问题
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+mySwagger:
+  host: localhost:${server.port}
+
+#EC相关配置
+ec:
+  scheduler:
+    supervisor:
+      # supervisor开放端口，需要给woker进行调度
+      port: 19999
+    worker:
+      # supervisor节点列表
+      supervisors:
+        - 127.0.0.1:19999
+
+  mq:
+    defaultMqName: rocketmq
+    config_server:
+      basePath: /
+      serverName: demo-business
+
+    producer:
+      maxFailureTimes: 5
+      maxRetryCount: 1000
+      retryInterval: 10
+      maxPersistentCountPerTimes: 1000
+
+    connections:
+      rocketmq:
+        namesrvAddr: 172.16.0.26:9876
+        cloudChannel: true
+        accessKey: xxxx
+        secretKey: xxx
+        producerGroupName: ddd
+        producer:
+          maxMessageSize: 4194304
+
+  debugger:
+    enable: true
+
+  rule-number:
+    server-name: dao
+    context-path: /dao
+  #area有用到缓存模块
+  area:
+    enabled: false
+  #批量更新或新增
+  batch:
+    executor:
+      type: mysql
+      jdbcTemplateName: jdbcTemplate
+      scanPath: "classpath*:com/gillion/service/**/*.class"
+  cache:
+    enabled: true
+    ##密码
+    password:
+    ##redis地址(集群下多台使用,号隔开)
+    hostAndPort: 172.16.0.28:20123
+    redis:
+      enabled: true
+  grid:
+    enabled: true
+  i18n:
+    enabled: true
+  staticResourceVersion:
+    enabled: true
+    cookieDomain:
+    version: 20180615000
+  #异常全局拦截需要显示地写出来了。默认打开。
+  exception:
+    enabled: true
+  #结果返回Map格式。默认打开。
+  controller:
+    result:
+      enabled: false
+    feign:
+      enabled: false
+  #权限控制
+  security:
+    enabled: false
+    ignoreUrl: "/error,/users/login,/users/logout,/areas/allAreas,/system/security/getSessionAttrsAndNoPermits"
+    failedWhenResourceNotFound: false
+    everyResourceRequireLogin: false
+    isRedirectLastRequestPage: true
+    login:
+      page: "/html/login"
+    index:
+      page: "/html/index"
+    messages:
+      notLoggedIn: "您当前未登陆，或没有权限访问该资源"
+      accessDenied: "对不起，您没有权限访问该资源"
+    default:
+      controller:
+        enabled: true
+  identity:
+    generator:
+      numberInc:
+        enabled: true
+      snowFlake:
+        enabled: true
+      uuid:
+        enabled: true
+  mybatis:
+    mapper:
+      locations: "classpath*:com/gillion/entity/**/*.xml"
+    interceptor:
+      optimistic:
+        enabled: true
+      valueHandler:
+        enabled: true
+      dataPermission:
+        enabled: true
+        allowFullTableQuery: student,waybill_info
+  validation:
+    enabled: true
+    staticDirPath:
+    i18n:
+      messages:
+        datasource:
+          name:
+    entity:
+      package:
+        path: "classpath*:com/gillion/entity/model/*.class"
+  upload:
+    enabled: true
+    uploadResponseDomain:
+    jdbcTemplateName: jdbcTemplate
+    #local和oss不能同时打开，CloudBucketProvider会产生冲突
+    local:
+      enabled: true
+      uploadDirPath: /tmp
+    oss:
+      enabled: false
+      endpoint: http://oss-cn-hangzhou.aliyuncs.com
+      accessKey: 0S1m6dsfWIp7O1PY
+      secretKey: mrs93dfsfgMRBC52znVbxznELHiioLY
+
+eureka:
+  client:
+    serviceUrl:
+      #eds的注册地址
+      defaultZone: http://dev.eds.lip.dps.gillion.com.cn/eureka/
+  instance:
+    # 优先使用IP地址方式进行注册服务
+    prefer-ip-address: true
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 10000
+        readTimeout: 10000
+
+
+dao-service:
+  enabled: true
+  httpService: true
+  enableCascade: true
+  logDatabaseId: 3
+  # 允许匿名用户操作, 后端MQ无登录信息
+  allowAnonymousUser: true
+  # 输出结果返回执行SQL
+  returnExecSql: true
+  basic-actions:
+    saveOrUpdate:
+      enabled: true
+      needRowStatus: true
+      rowStatusFieldName: rowStatus
+      enabled-cascaded: true
+  nashornEngineConfig:
+    extendFilePath: 'classpath:DaoServiceNashornEngineExt.js'
+  data-permission:
+    enabled: false
+  datasource:
+    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: zhwl_lip_daoservice
+    password: zhwl_lip_daoservice
+    driverClassName: com.mysql.jdbc.Driver
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    testWhileIdle: true
+  clientAutoAssemble:
+    enabled: true
+    project-key: "zhwl_wl_erm_project"
+    useEmbedEngine: true
+    dataSourceName: "zhwl_wl_erm"
+    embedEngineDataSourceBeanName: 'basicDataSource'
+
+  debug-setting:
+    print-executed-sql: true
+  # 数据服务自身的项目配置的唯一键
+  itselfProjectKey: dao-service-embed-model-graphs
+  gtx:
+    enabled: true
+    enableXA: true
+    enableTC: false
+    xaTimeout: 12000
+  inout:
+    enabled: true
+    output:
+      storeType: 'LOCAL' # LOCAL/CLOUD 导出文件使用本地保存或使用云端文件服务保存
+      # uploaderStrategyId: '' # 导出文件保存到云端时需要配置上传策略编号(与 EC 文件服务对应)
+      fileStorePath: '/tmp/daoServiceExportFiles/' # 导出文件会暂存此处
+      renderPageDomain: 'localhost'
+      fileDatetimeSuffixPattern: "yyyyMMddHHmm"
+    excel-styles:
+      # 是否为空白行设置行样式
+      enable-empty-row-styles: true
+      # 边框样式, ⽀持的样式请参考 org.apache.poi.ss.usermodel.BorderStyle
+      border-style: dotted
+      # ⽀持 DEFAULT(数据⾏有边框), EMPTY(⽆任何样式), 或⾃定义样式的 BeanName
+      sheet-cell-style-provider-service-bean: DEFAULT
+  locale:
+    #资源文件位置(数据服务异常国际化资源路径已默认添加)
+    resource-bundle-paths: [ "classpath:message/exception" ]
+    #是否使用默认校验配置（默认为true）
+    enable-validation-default: true
+    #缓存时间，分钟（默认为60）
+    cache-seconds: 1
+  manager-server:
+    dialect: MYSQL_GENERAL
+# redis配置
+redis:
+  # redis连接地址，集群时用逗号分隔
+  hostAndPort: 172.16.0.28:20123
+  # 是否集群模式
+  cluster: false
+  # 连接超时时间
+  connectionTimeout: 2000
+  # 响应超时时间
+  soTimeout: 30000
+  # 密码
+  password:
+  # 最大失败重试次数
+  failTimes: 3
+  # 最大闲置连接
+  maxIdle: 50
+  # 最大连接数
+  maxTotal: 100
+
+# 各个系统服务名,api包feign的value值使用占位符获取
+application:
+  name:
+    auth: share-auth
+    message: share-message
+    file: share-file
+    portal: share-portal
+    center: share-auth-center
