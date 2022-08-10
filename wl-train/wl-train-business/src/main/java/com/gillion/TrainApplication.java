@@ -9,6 +9,12 @@ import com.gillion.ec.rule.number.generator.client.protocol.EnableFeignRuleNumbe
 import com.gillion.ec.scheduler.EnableSchedulerSupervisor;
 import com.gillion.ec.scheduler.controller.EnableSchedulerDashboard;
 import com.gillion.ec.scheduler.worker.EnableSchedulerWorker;
+import com.gillion.eds.client.authentication.HttpRequestJWTUserProvider;
+import com.gillion.eds.client.authentication.JWTEdsUserInfoCollector;
+import com.gillion.eds.client.authentication.RpcRequestJWTUserProvider;
+import com.gillion.eds.sso.IUser;
+import com.gillion.eds.sso.session.DefaultSessionIdentityParser;
+import com.share.support.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringApplication;
@@ -65,6 +71,26 @@ public class TrainApplication {
         return transactionManager;
     }
 
+    /**
+     * 秘钥
+     */
+    public static final String SECRET_KEY = "DfEqd%AvjY1!pFEx*4g$E%hL77b#ecjR";
 
+    @Bean
+    HttpRequestJWTUserProvider httpRequestJWTUserProvider() {
+        return new HttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
+    }
+
+    @Bean
+    RpcRequestJWTUserProvider rpcRequestJWTUserProvider() {
+        return new RpcRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
+    }
+
+    @Bean
+    JWTEdsUserInfoCollector jwtEdsUserInfoCollector(HttpRequestJWTUserProvider httpRequestJWTUserProvider,
+                                                    RpcRequestJWTUserProvider rpcRequestJWTUserProvider) {
+        return new JWTEdsUserInfoCollector(httpRequestJWTUserProvider, rpcRequestJWTUserProvider, IUser.class, null, new DefaultSessionIdentityParser());
+
+    }
 }
 

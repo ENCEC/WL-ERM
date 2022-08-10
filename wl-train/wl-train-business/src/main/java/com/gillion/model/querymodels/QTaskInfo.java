@@ -3,7 +3,9 @@ package com.gillion.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
+import com.gillion.model.entity.TaskDetailInfo;
 import com.gillion.model.entity.TaskInfo;
+import javafx.concurrent.Task;
 
 import java.util.Date;
 
@@ -38,7 +40,7 @@ public class QTaskInfo extends BaseModelExpression<TaskInfo, Long> {
     public static final FieldExpression<String> taskTitle = taskInfo.fieldOf("taskTitle", String.class);
     public static final FieldExpression<String> taskType = taskInfo.fieldOf("taskType", String.class);
 
-
+    public static final BaseModelExpression<TaskDetailInfo, Long> taskDetailInfo = new QTaskDetailInfo(taskInfo, "taskDetailInfo");
     public QTaskInfo() {
         super("TaskInfo", TaskInfo.class);
     }

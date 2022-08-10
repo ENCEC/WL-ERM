@@ -22,3 +22,17 @@ DELETE http://localhost:8080/ec-demo/delete1/22
 
 ### get请求
 GET http://127.0.0.1:8080/users/roles?username=wengms
+
+
+### post请求
+POST http://127.0.0.1:8080/taskDetailInfo/saveOffer
+Content-Type: application/json
+
+{
+  "uemUserName": "小陈",
+  "applyDate": "2022-08-01",
+  "offerType": "www",
+  "approver": 10,
+  "standardDetailId": 11,
+  "standardEntryId": 12
+}

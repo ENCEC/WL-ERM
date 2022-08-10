@@ -142,8 +142,6 @@ public class TaskDetailInfoDto implements Serializable {
 
     /**统筹人ID*/
     @ApiModelProperty("统筹人ID")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
     private String ordinator;
 
     /**统筹人姓名*/

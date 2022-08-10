@@ -448,12 +448,12 @@ public class UemUserManageController {
     }
 
     /**
-     * 查看转正评语
+     * 查看转正评语部分信息
      * @param uemUserId
      * @return
      */
-    @GetMapping("/queryOfferInfo")
-    public ResultHelper<UemUserDto> queryOfferInfo(Long uemUserId) {
+    @RequestMapping("/queryOfferInfo")
+    public UemUserDto queryOfferInfo(@RequestParam(value = "uemUserId") Long uemUserId) {
         return uemUserManageService.queryOfferInfo(uemUserId);
     }
 
@@ -488,12 +488,13 @@ public class UemUserManageController {
     }
 
     /**
-     * 添加离职理由
-     * @param uemUserDto
+     * 离职申请添加离职理由
+     * @param
      * @return
      */
-    @PostMapping("/updateLeaveReason")
-    public ResultHelper<?> updateLeaveReason(@RequestBody UemUserDto uemUserDto) {
-        return uemUserManageService.updateLeaveReason(uemUserDto);
+    @GetMapping("/updateLeaveReason")
+    public ResultHelper<?> updateLeaveReason(
+            @RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
+        return uemUserManageService.updateLeaveReason(uemUserId,leaveReason);
     }
 }
