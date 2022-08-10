@@ -35,6 +35,19 @@
             <version>1.2020.001-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.gillion.devops</groupId>
+            <artifactId>g-authentication-centre-session</artifactId>
+            <version>1.0.0.3.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gillion.eds.client</groupId>
+            <artifactId>eds-client-authentication-support</artifactId>
+            <version>4.0.1.RELEASE</version>
+            <classifier>pg</classifier>
+        </dependency>
+
         <!--daoservice-->
         <dependency>
             <groupId>com.gillion.ds</groupId>
