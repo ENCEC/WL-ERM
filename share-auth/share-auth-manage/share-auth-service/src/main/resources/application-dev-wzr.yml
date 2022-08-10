@@ -1,0 +1,559 @@
+server:
+  port: 8082
+tomcat:
+  uri-encoding: UTF-8
+logging:
+  file:
+    name: /tmp/log/auth
+  config: classpath:log4j2-spring.xml
+
+#http://127.0.0.1:8082/swagger-ui.html
+mySwagger:
+  host: localhost:${server.port}
+elasticsearch:
+  enable: false
+  cluster:
+    name: my-application
+  host: 172.16.0.25
+  port: 9300
+
+mybaits:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+spring:
+  application:
+    name: share-auth-wzr
+    admin:
+      enabled: false
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+  elasticsearch:
+    rest:
+      uris: http://172.16.0.25:9200
+  ####数据源
+  datasource:
+    name: basicDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://172.16.0.23:3306/zhwl_lip_share_auth?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    maxActive: 30
+    validationQuery: select 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    #### alibaba druid
+    minIdle: 10
+    initialSize: 5
+    ####dbcp druid common
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 300
+    removeAbandoned: true
+    filters: stat
+    maxWaitMillis: 30000
+    timeBetweenEvictionRunsMillis: 300000
+  slave-datasource:
+    name: slaveDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://172.16.0.23:3306/zhwl_lip_logink_portal?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    maxActive: 30
+    validationQuery: select 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    #### alibaba druid
+    minIdle: 10
+    initialSize: 5
+    ####dbcp druid common
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 300
+    removeAbandoned: true
+    filters: stat
+    maxWaitMillis: 30000
+    timeBetweenEvictionRunsMillis: 300000
+  mvc:
+    static-path-pattern:
+    hiddenmethod:
+      filter:
+        enabled: true
+  http:
+    encoding:
+      charset: utf-8
+      enabled: true
+      force: true
+    multipart:
+      enabled: true
+  #i18n
+  messages:
+    basename: config.messages,org.springframework.security.messages
+    encoding: utf-8
+    always-use-message-format: true
+  redis:
+    database: 0 			# Redis数据库索引（默认为0）
+    host: 172.16.0.28	# Redis服务器地址
+    #    host: 127.0.0.1
+    port: 40070	 			# Redis服务器连接端口
+    #    port: 6379
+    #password: f53af7e5f0993f37
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  resources:
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/,\
+      classpath:/static/,classpath:/public/,file:${prop.upload-folder}
+eureka:
+  client:
+    #register-with-eureka: false
+    #fetch-registry: false
+    serviceUrl:
+      #eds的注册地址
+      defaultZone: http://dev.eds.lip.dps.gillion.com.cn/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    #lease-renewal-interval-in-seconds: 5
+    #lease-expiration-duration-in-seconds: 10
+
+
+####ec auto autoconfiguration
+ec:
+  debugger:
+    enable: false
+  validation:
+    enabled: true
+    staticDirPath:
+    entity:
+      package:
+        path:
+
+
+  ####i18n多语言 以下配置项可配可不配 默认就是 false
+  #  i18n:
+  #    enabled: false
+  ####以下配置项可配可不配 默认就是 false
+  #    interceptor:
+  #      dataPermission:
+  #        enabled: false
+  #      valueHandler:
+  #        enabled: false
+  #      optimistic:
+  #        enabled: false
+  ####缓存
+  cache:
+    enabled: true
+    redis:
+      enabled: true
+    ##密码
+    #password: f53af7e5f0993f37
+    ##redis地址(集群下多台使用,号隔开)
+    hostAndPort: 172.16.0.28:40070
+  #    hostAndPort: 127.0.0.1:6379
+  ####文件上传 以下配置项可配可不配 默认就是 false
+  upload:
+    enabled: false
+  #####excel上传下载
+  excel:
+    io:
+      enabled: false
+  ####主键生成 以下配置项可配可不配 默认就是 false
+  identity:
+    generator:
+      numberInc:
+        enabled: false
+      snowFlake:
+        enabled: false
+      uuid:
+        enabled: true
+  ####地区控件
+  area:
+    enabled: false
+  rule-number:
+    server-name: supply-chain
+    path: rule-number
+  mybatis:
+    interceptor:
+      dataPermission:
+        allowFullTableQuery: "uem_user,sys_application,sys_dict_type,uem_id_card,md_country"
+# redis配置
+redis:
+  namespace: zj_dev
+  # redis连接地址，集群时用逗号分隔
+  hostAndPort: 172.16.0.28:40070
+  #  hostAndPort: 127.0.0.1:6379
+  # 是否集群模式
+  cluster: false
+  # 重定向的最大数量，集群使用
+  maxRedirects: 8
+  # 连接超时时间2000
+  connectionTimeout: 2000
+  # 响应超时时间
+  soTimeout: 30000
+  # 密码
+  # password: foobared
+  #password: f53af7e5f0993f37
+  # 最大失败重试次数
+  failTimes: 3
+  # 最大闲置连接
+  maxIdle: 50
+  # 最大连接数
+  maxTotal: 100
+  key:
+    prefix:
+      authCode: "portal:authCode:"
+    expire:
+      authCode: 300
+
+####Spring Sceurity
+security:
+#  basic:
+#    enabled: false
+#  login:
+#    page: /login.html
+#  index:
+#    page: /index.html
+#  noPermission:
+#    page: /notAccess.html
+#  loginPage: /login.html
+#  indexPage: /index.html
+#  noPermissionPage: /notAccess.html
+#  max:
+#    sessions: 1
+#  messages:
+#    notLoggedIn: 您当前未登陆，无法访问该资源，将为您跳转到登录页。
+#    accessDenied:  对不起，您没有权限访问该资源。
+#  error-if-maximum-exceeded: true
+#  failedWhenResourceNotFound: false
+#  everyResourceRequireLogin: true
+#  isRedirectLastRequestPage: true
+#  #开启用户在线日志
+#  needOnLineLog: true
+#  oauth2:
+#    client:
+#      client-id: test
+#      client-secret: user123
+#      access-token-uri: http://localhost:8000/oauth/token
+#      user-authorization-uri: http://localhost:8000/oauth/authorize
+#    resource:
+#      jwt:
+#        key-value: share
+#        #key-uri: http://localhost:8000/oauth/token_key
+#        tokenPrefix: share
+role:
+  data:
+    Merge: true
+  permit:
+    #操作权限/授权权限保存是否递归子节点
+    isCascade: true
+    #使用设置默认角色功能
+  useDefaultRole: true
+
+resource:
+  background:
+    #是否需要后台服务权限控制，专门为FMS兼容错误数据使用
+    auth: false
+db:
+  chinese:
+    width: 1
+
+dao-service:
+  # 使用多数据源扫描用的
+  query-model-injector:
+    scan-path: "classpath*:com/share/**/service/impl/*.class"
+  enabled: true
+  logDatabaseId: 3
+  # 允许匿名⽤户操作, 后端MQ⽆登录信息
+  allowAnonymousUser: true
+  # 输出结果返回执⾏SQL, debug 启⽤
+  returnExecSql: true
+  # 输出结果去掉debugInfo的返回
+  debug-setting:
+    # http传输过程中加密 false:加密，true：不加密，对应前端也要开启
+    restfulPlainCodeArguments: false
+  # 管理端的配置项
+  manager-server:
+    # 管理端所使⽤的的数据服务引擎对应的数据库⽅⾔类型
+    dialect: MYSQL_GENERAL
+  nashornEngineConfig:
+    extendFilePath: 'classpath:DaoServiceNashornEngineExt.js'
+  # 数据服务指令的基础设置
+  basic-actions:
+    # 持久化指令设置项
+    saveOrUpdate:
+      # 是否⽀持层级对象持久化
+      enabled-cascaded: true
+    # 查询指令设置项
+    read:
+      # 分⻚对象的结构: ⾃定义分⻚输出时各项属性的字段名
+      page-schema:
+        records-field: data
+      throws-when-select-one-missing-result: false
+    # 多种操作类型通⽤的设置
+    common:
+      # 当⽤户未为指令显式设置 tag 时, 数据服务引擎是否⾃动为正执⾏的指定⾃动附加tag
+      enable-auto-tagging: true
+  # 内置引擎所使⽤的客户端组装所需配置项
+  clientAutoAssemble:
+    enabled: true
+    # 项⽬唯⼀键
+    project-key: "zhwl_lip_auth_train_project"
+    # 通常为 true, 为 false 使⽤HttpClient
+    useEmbedEngine: true
+    # 该数据源对应数据服务的数据源信息的名称
+    inside-dao-service-data-source-name: zhwl_lip_share_auth
+    # 该数据源对应数据服务的数据源所属 serviceCode 分组名称
+    inside-dao-service-data-source-service-code: 'devmsaeg'
+    # 该客户端所使⽤的数据源实例名称
+    embed-engine-data-source-bean-name: 'basicDataSource'
+  # 数据服务⾃身的项⽬配置的唯⼀键
+  itselfProjectKey: "dao-service-embed-model-graphs"
+  # XA事务的配置
+  gtx:
+    enableXA: true
+    enableTC: false
+    #单位秒
+    xaTimeout: 20
+    timerId: 1
+    #定期扫描间隔，秒
+    timerInterval: 5
+    enabled: true
+  datasource:
+    # 数据服务的数据库地址
+    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: zhwl_lip_daoservice
+    password: zhwl_lip_daoservice
+    #    url: jdbc:mysql://117.149.228.150:10066/daoservice?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8&serverTimezone=UTC
+    #    username: developer
+    #    password: Gjwl2020#
+    driverClassName: com.mysql.jdbc.Driver
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    testWhileIdle: true
+  # 导⼊导出配置项
+  inout:
+    enabled: true
+    output:
+      # LOCAL/CLOUD 导出文件使用本地保存或使用云端文件服务保存
+      storeType: 'LOCAL'
+      # uploaderStrategyId: '' # 导出文件保存到云端时需要配置上传策略编号(与 EC 文件服务对应)
+      # 导出文件会暂存此处
+      fileStorePath: '/tmp/daoServiceExportFiles/'
+      # ⼦域名造成跨域时才需要设置该项
+      renderPageDomain: 'localhost'
+### Ribbon 配置
+ribbon:
+  ConnectTimeout: 30000
+  ReadTimeout: 30000
+  eureka:
+    enabled: true
+### Feign 配置
+feign:
+  hystrix:
+    enabled: true
+### 断路器超时设置
+hystrix:
+  shareSecurityContext: true
+  command:
+    default:
+      circuitBreaker:
+        sleepWindowInMilliseconds: 100000
+        forceClosed: true
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 50000
+
+# spring boot安全检查
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+info:
+  version: @project.version@
+  groupId: @project.groupId@
+  artifactId: @project.artifactId@
+
+feignClient:
+  apiGate:
+    url: http://172.16.2.16
+
+msg:
+  systemCode: YYDM200013
+  #  httpUrl: http://117.149.228.171:10003  #开发环境代理的ip
+  httpUrl: http://dev.lip.share-auth-center.dps.gillion.com.cn  #开发环境代理的ip
+  sms:
+    template:
+      review_success: share_auth_review_success
+      review_failed: share_auth_review_failed
+      register: share_register
+      change_mobile: share_change_moblie
+      retrieve_password: share_retrieve_password
+      manage_add_user: share_manage_add_user
+      blind_company: DXMB210048
+      # 短信模板-平台客服-注册成功
+      user_regist_success: DXMB210043
+      # 短信模板-平台客服-实名认证
+      modify_audit_realname: DXMB210044
+      # 短信模板-平台客服-企业资质审核
+      modify_audit_company: DXMB210045
+      # 短信模板-平台客服-企业管理员审核
+      modify_audit_company_manager: DXMB210046
+      # 短信模版-企业管理员-用户绑定企业审核
+      modify_audit_company_user: DXMB210047
+      # 权限审核通过短信模板编码
+      permission_audit_pass: DXMB210061
+      # 权限审核拒绝短信模板编码
+      permission_audit_reject: DXMB210062
+      # 权限分配短信模板编码
+      permission_distribute: DXMB210063
+      # 短信模板-平台客服-用户管理-用户详情-重置密码
+      platform_user_reset_user_password: DXMB210072
+      # 短信模板-平台客服-用户管理-新增用户
+      platform_user_add_user: DXMB210073
+  email:
+    template:
+      find_back_pwd: FIND_BACK_PWD
+      binding_emil: BINDING_EMAIL
+      change_email: CHANGE_EMAIL
+#定时中午十二点
+task:
+  send:
+    uemUser: 0 0 12 * * ?
+# 认证权限地址
+sso:
+  #  getUserInfo: http://172.16.3.156:9540/share-auth-center
+  #  redirectUrl: http://172.16.3.156:9540/share-auth-center
+  getUserInfo: http://172.16.7.254:9540/share-auth-center
+  redirectUrl: http://172.16.7.254:9540/share-auth-center
+  allow:
+    all: 6726670753768472580
+    admin: 6726670753768472581,6726670753768472582,6726670753768472583
+    noRole: 6726670753768472578,6796311794549669888,6813391622029328384
+  applicationId:
+    supply-chain: 6726670753768472579
+#配置密码加密秘钥
+aes_secret_key: c1953a7wPB234x6l
+#网站域名
+web_domain: null
+# 后端资源权限配置
+authentication:
+  credentialExpireSeconds: 3000
+  cookieExpireSeconds: 3000
+  #刷新凭证的时间
+  millisMinuteTen: 1000
+  ignorePathPatterns:
+    - /auth-redirect
+    - /register
+    - /registAndBind
+    - /validateAccount
+    - /findPwd
+    - /findPwdByPhone
+    - /findPwdByEmailBefore
+    - /findPwdByEmail
+    - /scanCodeLogin
+    - /authentication/*
+    - /oauth/*
+    - /oauth/auth/*
+    - /system/security/getSessionAttrsAndNoPermits
+    - /share_portal_dev/auto-api/PubEnvironment/list/devmsaeg/DS_share_portal_dev_PubEnvironment_list
+    - /user/getAuthCode
+    - /user/verifyAuthCode
+    - /user/register
+    - /user/updatePassword
+    - /user/findPasswordByMail
+    - /user/queryUemUserByCompanyId
+    - /user/queryUemUserByUserId
+    - /user/getUserAllInfo
+    - /user/queryUemUserCompany
+    - /user/validateAccount
+    - /user/validatePassword
+    - /user/updateUemUserInfo
+    - /user/queryUserByRoleCode
+    - /qqLogin/qq
+    - /loginUserInfo/getCurrentLoginUser
+    - /dictCode/getDictCodeByCode
+    - /number/*
+    - /rule-number/*
+    - /number-home/*
+    - /numbers/*
+    - /numbers
+    - /getToken
+    - /oauth2/auth/authentication
+    - /ssoLogout
+    - /getImageVerifyCode
+    - /getImageVerifyCodeRe
+    - /validateUnlock
+    - /oauthSSO/*
+    - /api/uemCompany/operate
+    - /api/uemUser/operate
+    - /api/*
+    - /actuator/*
+    - /information/getCurrentLoginUser
+    - /emergency/getCurrentLoginUser
+    - /channelWarning/queryHomePageWarningInfo
+    - /share_auth_dev/auto-api/SysDictType/list/devmsaeg/getStaffDutyOptions
+
+# 各个系统服务名,api包feign的value值使用占位符获取
+application:
+  name:
+    auth: share-auth-wzr
+    message: share-message-wzr
+    file: share-file-wzr
+    portal: share-portal-wzr
+    center: share-auth-center-wzr
+
+# 验证码图片路径
+imgPath: /image/picture/*.jpg
+imgPathRe: /image/pictureRe/*.jpg
+tempImgPath: /image/temp/temp1.png
+
+# 日志配置
+log:
+  # 定时清理配置
+  clean-cron: 0 0 * * * ?
+  # 保留天数
+  retain-days: 180
+
+# 用户信息
+user:
+  # 模板
+  template:
+    managerFile: D:/user/企业管理员申请公函.doc
+  # 默认信息
+  default:
+    # 身份证正面图片地址
+    cardPositiveFilePath: D:/user/身份证正面.png
+    # 身份证反面图片地址
+    cardBackFilePath: D:/user/身份证反面.png
+    # 管理员认证函文件地址
+    managerFilePath: D:/user/系统管理员申请公函.doc
+# 用户信息
+#user:
+#  # 模板
+#  template:
+#    managerFile: /data/tempalte/企业管理员申请公函.doc
+#  # 默认信息
+#  default:
+#    # 身份证正面图片地址
+#    cardPositiveFilePath: /data/template/user/身份证正面.png
+#    # 身份证反面图片地址
+#    cardBackFilePath: /data/template/user/身份证反面.png
+#    # 管理员认证函文件地址
+#    managerFilePath: /data/template/user/系统管理员申请公函.doc
