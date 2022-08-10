@@ -5,6 +5,9 @@ import com.gillion.model.domain.TaskDetailInfoDto;
 import com.gillion.model.domain.TaskInfoDto;
 import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
+import com.share.auth.api.TaskInfoInterface;
+import com.share.auth.domain.UemUserDto;
+import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -12,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,6 +30,9 @@ public class TaskInfoController {
 
     @Autowired
     private TaskInfoService taskInfoService;
+
+    @Autowired
+    private TaskInfoInterface taskInfoInterface;
 
     @PostMapping("/queryTaskInfoPage")
     @ApiOperation("查询任务信息")
@@ -172,4 +179,35 @@ public class TaskInfoController {
     public ResultHelper<Object> saveLeaveInfo(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
         return taskInfoService.savePositiveInfo(taskDetailInfoDto);
     }
+
+    @GetMapping("/queryLeaveInfo")
+    @ApiOperation("我的任务（项目经历初次审核） 查询员工离职原因")
+    public ResultHelper<UemUserDto> queryDismissInfo(@RequestParam(value = "uemUserId") Long uemUserId) {
+        ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(uemUserId);
+        return CommonResult.getSuccessResultData(uemUserDtoResultHelper);
+    }
+
+    @PostMapping("/savePositiveInfoByLeader")
+    @ApiOperation("我的任务（部门领导最终审核）添加转正基本信息")
+    public ResultHelper<Object> savePositiveInfoByLeader(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
+        return taskInfoService.savePositiveInfoByLeader(taskDetailInfoDto);
+    }
+
+    @GetMapping("/queryLeaveInfoByLeader")
+    @ApiOperation("我的任务（部门领导最终审核）查看离职信息以及基本信息")
+    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long uemUserId) {
+        List list = new ArrayList();
+        ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId);
+        ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(uemUserId);
+        list.add(taskDetailInfoDtoResultHelper);
+        list.add(uemUserDtoResultHelper);
+        return CommonResult.getSuccessResultData(list);
+    }
+
+    @PostMapping("/saveLeaveInfoByLeader")
+    @ApiOperation("我的任务（部门领导最终审核）添加离职基本信息")
+    public ResultHelper<Object> saveLeaveInfoByLeader(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
+        return taskInfoService.saveLeaveInfoByLeader(taskDetailInfoDto);
+    }
+
 }

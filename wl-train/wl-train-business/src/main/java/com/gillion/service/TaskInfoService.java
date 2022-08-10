@@ -158,7 +158,7 @@ public interface TaskInfoService {
 
 
     /**
-     * 我的任务（项目经历初次审核） 根据任务id查询所分配的执行人
+     * 我的任务（项目经理初次审核） 根据任务id查询所分配的执行人
      *
      * @param taskInfoId 查询入参
      * @author wzr
@@ -167,7 +167,7 @@ public interface TaskInfoService {
     ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId);
 
     /**
-     * 我的任务（项目经历初次审核） 查出规范条目所对应的规范细则 用作转正程序
+     * 我的任务（项目经理初次审核） 查出规范条目所对应的规范细则 用作转正程序
      *
      * @author wzr
      * @date 2022-08-09
@@ -175,7 +175,7 @@ public interface TaskInfoService {
     ResultHelper<List<StandardDetailVo>> queryAllStandardDetail();
 
     /**
-     * 我的任务（项目经历初次审核） 添加基本转正信息
+     * 我的任务（项目经理初次审核） 添加基本转正信息
      *
      * @author wzr
      * @date 2022-08-09
@@ -190,4 +190,19 @@ public interface TaskInfoService {
      */
     ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto);
 
+    /**
+     * 我的任务（部门领导最终审核） 添加转正基本信息
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+    ResultHelper<Object> savePositiveInfoByLeader(TaskDetailInfoDto taskDetailInfoDto);
+
+    /**
+     * 我的任务（部门领导最终审核） 添加离职信息
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+    ResultHelper<Object> saveLeaveInfoByLeader(TaskDetailInfoDto taskDetailInfoDto);
 }

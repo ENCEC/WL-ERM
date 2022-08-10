@@ -592,7 +592,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     }
 
     /**
-     * 我的任务（项目经历初次审核） 根据任务id查询所分配的执行人
+     * 我的任务（项目经理初次审核--部门领导初次审核） 根据任务id查询所分配的执行人所需要的信息
      *
      * @param taskInfoId 查询入参
      * @author wzr
@@ -609,7 +609,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     }
 
     /**
-     * 我的任务（项目经历初次审核） 查出规范条目所对应的规范细则 用作转正程序
+     * 我的任务（项目经理初次审核） 查出规范条目所对应的规范细则 用作转正程序
      *
      * @author wzr
      * @date 2022-08-09
@@ -622,7 +622,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     }
 
     /**
-     * 我的任务（项目经历初次审核） 添加基本转正信息
+     * 我的任务（项目经理初次审核） 添加基本转正信息
      *
      * @author wzr
      * @date 2022-08-09
@@ -651,7 +651,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     }
 
     /**
-     * 我的任务（项目经历初次审核） 添加离职申请基本信息
+     * 我的任务（项目经理初次审核） 添加离职申请基本信息
      *
      * @author wzr
      * @date 2022-08-09
@@ -660,11 +660,12 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     public ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
+        Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
         Date approvalDate = taskDetailInfoDto.getApprovalDate();
         String resultAccess = taskDetailInfoDto.getResultAccess();
         String approvalRemark = taskDetailInfoDto.getApprovalRemark();
-        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo
-                .selectOne(QTaskDetailInfo.taskDetailInfo.fieldContainer()).byId(taskDetailId);
+        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
         taskDetailInfo.setApprover(uemUserId);
         taskDetailInfo.setApprovalDate(approvalDate);
         taskDetailInfo.setApprovalRemark(approvalRemark);
@@ -677,4 +678,54 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             return CommonResult.getFaildResultData("添加失败!");
         }
     }
+
+    /**
+     * 我的任务（部门领导最终审核） 添加转正申请基本信息
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+
+    @Override
+    public ResultHelper<Object> savePositiveInfoByLeader(TaskDetailInfoDto taskDetailInfoDto) {
+        Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
+        Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
+        Date approvalDate = taskDetailInfoDto.getApprovalDate();
+        String resultAccess = taskDetailInfoDto.getResultAccess();
+        String offerRemark = taskDetailInfoDto.getOfferRemark();
+        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+        taskDetailInfo.setApprovalDate(approvalDate);
+        taskDetailInfo.setResultAccess(resultAccess);
+        taskDetailInfo.setOfferRemark(offerRemark);
+        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+        if (result > 0) {
+            return CommonResult.getSuccessResultData("添加成功");
+        } else {
+            return CommonResult.getFaildResultData("添加失败");
+        }
+    }
+
+    @Override
+    public ResultHelper<Object> saveLeaveInfoByLeader(TaskDetailInfoDto taskDetailInfoDto) {
+        Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
+        Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
+        Date approvalDate = taskDetailInfoDto.getApprovalDate();
+        String resultAccess = taskDetailInfoDto.getResultAccess();
+        String approvalRemark = taskDetailInfoDto.getApprovalRemark();
+        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+        taskDetailInfo.setApprovalDate(approvalDate);
+        taskDetailInfo.setResultAccess(resultAccess);
+        taskDetailInfoDto.setApprovalRemark(approvalRemark);
+        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+        if (result > 0) {
+            return CommonResult.getSuccessResultData("添加成功");
+        } else {
+            return CommonResult.getFaildResultData("添加失败");
+        }
+    }
+
 }
