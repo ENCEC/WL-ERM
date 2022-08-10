@@ -492,8 +492,9 @@ public class UemUserManageController {
      * @param
      * @return
      */
-    @PostMapping("/updateLeaveReason")
-    public ResultHelper<?> updateLeaveReason(@RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
+    @GetMapping("/updateLeaveReason")
+    public ResultHelper<?> updateLeaveReason(
+            @RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
         return uemUserManageService.updateLeaveReason(uemUserId,leaveReason);
     }
 }

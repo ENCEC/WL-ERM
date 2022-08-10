@@ -24,8 +24,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/taskDetailInfo")
 public class TaskDetailInfoController {
-@Autowired
-private StandardEntryInterface standardEntryInterface;
+
     @Autowired
     private TaskDetailInfoService taskDetailInfoService;
 
@@ -55,18 +54,8 @@ private StandardEntryInterface standardEntryInterface;
      * @return
      */
     @RequestMapping ("/queryOffer")
-    public List queryOffer(Long dispatchers) {
-        return taskDetailInfoService.queryOffer(dispatchers);
+    public List queryOffer(Long dispatchers,String name) {
+        return taskDetailInfoService.queryOffer(dispatchers,name);
     }
 
-//    /**
-//     * 离职申请添加离职理由到用户表
-//     * @param uemUserId
-//     * @param leaveReason
-//     * @return
-//     */
-//    @PostMapping("/uemUserManage/updateLeaveReason")
-//    public ResultHelper<?> updateLeaveReason(@RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
-//        return standardEntryInterface.updateLeaveReason(uemUserId, leaveReason);
-//    }
 }

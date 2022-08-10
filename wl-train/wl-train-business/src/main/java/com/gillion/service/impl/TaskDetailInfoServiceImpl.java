@@ -6,11 +6,8 @@ import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.model.domain.TaskInfoDto;
 import com.gillion.model.entity.TaskDetailInfo;
 import com.gillion.model.entity.TaskInfo;
-import com.gillion.model.querymodels.QStandardDetail;
-import com.gillion.model.querymodels.QStudent;
 import com.gillion.model.querymodels.QTaskDetailInfo;
 import com.gillion.model.querymodels.QTaskInfo;
-import com.gillion.service.StandardDetailService;
 import com.gillion.service.TaskDetailInfoService;
 import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.api.StandardEntryInterface;
@@ -102,10 +99,11 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
      * @return
      */
     @Override
-    public List queryOffer(Long dispatchers) {
+    public List queryOffer(Long dispatchers,String name) {
+        String taskTitle = name+"转正申请";
         TaskInfoDto taskInfoDto = QTaskInfo.taskInfo.selectOne(
                 QTaskInfo.taskInfoId)
-                .where(QTaskInfo.dispatchers.eq$(dispatchers))
+                .where(QTaskInfo.dispatchers.eq$(dispatchers).and(QTaskInfo.taskTitle.eq$(taskTitle)))
                 .mapperTo(TaskInfoDto.class)
                 .execute();
         TaskDetailInfo execute = QTaskDetailInfo.taskDetailInfo.selectOne().where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId())).execute();
