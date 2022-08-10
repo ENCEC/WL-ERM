@@ -466,7 +466,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     @Override
     public ResultHelper<Page<SysDictTypeDto>> querySysDictType(SysDictTypeDto sysDictTypeDto) {
         Page<SysDictTypeDto> pages = QSysDictType.sysDictType.select(QSysDictType.sysDictType.fieldContainer())
-                .where(QSysDictType.dictTypeCode._like$_(sysDictTypeDto.getDictTypeCode()).and(QSysDictType.dictTypeName._like$_(sysDictTypeDto.getDictTypeName())))
+                .where(QSysDictType.dictTypeCode._like$_(sysDictTypeDto.getDictTypeCode()).and(QSysDictType.dictTypeName._like$_(sysDictTypeDto.getDictTypeName())).and(QSysDictType.sysDictTypeId.goe$(1L)))
                 .paging(sysDictTypeDto.getCurrentPage(), sysDictTypeDto.getPageSize())
                 .sorting(QSysDictType.createTime.desc())
                 .mapperTo(SysDictTypeDto.class)

@@ -4,6 +4,7 @@ import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.gillion.model.entity.TaskDetailInfo;
+import com.gillion.model.entity.TaskInfo;
 
 import java.util.Date;
 
@@ -54,7 +55,9 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<Long> taskDetailId = taskDetailInfo.fieldOf("taskDetailId", Long.class);
     public static final FieldExpression<Long> taskInfoId = taskDetailInfo.fieldOf("taskInfoId", Long.class);
     public static final FieldExpression<String> taskName = taskDetailInfo.fieldOf("taskName", String.class);
-
+    public static final FieldExpression<Long> interviewerId = taskDetailInfo.fieldOf("interviewerId", Long.class);
+    public static final FieldExpression<String> interviewerName = taskDetailInfo.fieldOf("interviewerName", String.class);
+    public static final FieldExpression<String> approverName = taskDetailInfo.fieldOf("approverName", String.class);
 
     public QTaskDetailInfo() {
         super("TaskDetailInfo", TaskDetailInfo.class);

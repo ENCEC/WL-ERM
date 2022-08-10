@@ -244,11 +244,11 @@ public interface UemUserManageService {
     ResultHelper<Object> saveDismissInfo(UemUserDto uemUserDto);
 
     /**
-     * 查看转正评语
+     * 查看转正评语部分信息
      * @param uemUserId
      * @return
      */
-    ResultHelper<UemUserDto> queryOfferInfo(Long uemUserId);
+    UemUserDto queryOfferInfo(Long uemUserId);
 
     /**
      * 查看离职原因
@@ -272,11 +272,11 @@ public interface UemUserManageService {
     ResultHelper<?> preservationUemUser(UemUserDto uemUserDto);
 
     /**
-     * 添加离职理由
-     * @param uemUserDto
+     * 离职申请添加离职理由
+     * @param
      * @return
      */
-    ResultHelper<?> updateLeaveReason(UemUserDto uemUserDto);
+    ResultHelper<?> updateLeaveReason(Long uemUserId,String leaveReason);
 
 
 }

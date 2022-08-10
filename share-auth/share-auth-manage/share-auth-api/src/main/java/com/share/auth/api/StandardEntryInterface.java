@@ -59,14 +59,15 @@ public interface StandardEntryInterface {
     @ResponseBody
     ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto);
 
-    @GetMapping("/queryStaffById")
-    UemUserDto queryStaffById(@RequestParam Long uemUserId);
-
     /**
-     * 添加离职理由
-     * @param uemUserDto
+     * 查看转正评语部分信息
+     * @param uemUserId
      * @return
      */
-    @PostMapping("/updateLeaveReason")
-    ResultHelper<?> updateLeaveReason(@RequestBody UemUserDto uemUserDto);
+    @RequestMapping("/uemUserManage/queryOfferInfo")
+    UemUserDto queryOfferInfo(@RequestParam(value = "uemUserId") Long uemUserId);
+
+
+    @PostMapping("/uemUserManage/updateLeaveReason")
+    ResultHelper<?> updateLeaveReason(@RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason);
 }
