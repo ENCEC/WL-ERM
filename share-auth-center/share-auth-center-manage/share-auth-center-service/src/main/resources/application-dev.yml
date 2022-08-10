@@ -311,7 +311,7 @@ sso:
 #配置密码加密秘钥
 aes_secret_key: c1953a7wPB234x6l
 #网站域名
-web_domain: gillion.com.cn
+web_domain: null
 # 后端资源权限配置
 authentication:
   anonymousRoleId: ba98c88eb2f14632948d189cd41e4518
