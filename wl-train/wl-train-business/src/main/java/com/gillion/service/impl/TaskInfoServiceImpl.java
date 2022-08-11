@@ -186,6 +186,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         retTaskInfo.setDispatchersName(dispatchersUemUserDto.getName());
         retTaskInfo.setPlanStartDate(planStartDate);
         retTaskInfo.setPlanEndDate(planEndDate);
+        retTaskInfo.setPublishDate(new Date());
         retTaskInfo.setStatus(0);
         retTaskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         return null;
