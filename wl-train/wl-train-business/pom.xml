@@ -483,6 +483,17 @@
             <version>2.9.0</version>
         </dependency>
 
+        <!-- spring-session start-->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+        </dependency>
+        <!-- spring-session end-->
+
         <!--spring -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
