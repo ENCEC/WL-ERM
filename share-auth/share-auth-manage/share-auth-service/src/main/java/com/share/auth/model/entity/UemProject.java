@@ -1,19 +1,23 @@
 package com.share.auth.model.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gillion.ds.entity.base.BaseModel;
-import com.gillion.ec.core.annotations.Generator;
-import com.gillion.ec.core.utils.Long2String;
-import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import com.gillion.ec.core.annotations.Generator;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gillion.ec.core.utils.Long2String;
+import com.gillion.ec.core.utils.String2Long;
+import com.gillion.ds.entity.base.BaseModel;
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
+import javax.persistence.Version;
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.String;
 import java.util.Date;
 
 
@@ -136,6 +140,10 @@ private static final long serialVersionUID=1;
     @Column(name = "plan_start_time")
     private Date planStartTime;
 
+    /**负责名称*/
+    @Column(name = "project_name")
+    private String projectName;
+
     /**版本号*/
     @Column(name = "record_version")
     private Integer recordVersion;
@@ -153,9 +161,5 @@ private static final long serialVersionUID=1;
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long uemDeptId;
-
-    /**项目名称*/
-    @Column(name = "project_name")
-    private String projectName;
 
 }

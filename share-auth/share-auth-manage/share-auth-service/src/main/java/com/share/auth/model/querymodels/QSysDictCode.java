@@ -5,8 +5,14 @@ import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.SysDictCode;
 
+import java.lang.Boolean;
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.String;
 import java.util.Date;
 
+import com.share.auth.model.entity.SysDictType;
+import com.share.auth.model.querymodels.QSysDictType;
 
 /**
 * @author daoServiceGenerator
@@ -32,6 +38,7 @@ public class QSysDictCode extends BaseModelExpression<SysDictCode, Long> {
     public static final FieldExpression<Long> sysDictCodeId = sysDictCode.fieldOf("sysDictCodeId", Long.class);
     public static final FieldExpression<Long> sysDictTypeId = sysDictCode.fieldOf("sysDictTypeId", Long.class);
 
+    public static final BaseModelExpression<SysDictType, Long> sysDictType = new QSysDictType(sysDictCode, "sysDictType");
 
     public QSysDictCode() {
         super("SysDictCode", SysDictCode.class);

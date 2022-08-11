@@ -12,7 +12,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
@@ -57,7 +60,7 @@ public class SysResourceServiceImpl implements SysResourceService{
         List<SysResource> resourceList = QSysResource.sysResource.select(QSysResource.resourceUrl).where(
                 QSysResource.isValid.eq$(true)
                 .and(QSysResource.resourceType.eq$(resourceType))
-                .and(QSysResource.sysRoleResource.chain(QSysRoleResource.sysRoleId).eq$(Long.valueOf(roleId)))
+                .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).eq$(Long.valueOf(roleId)))
         ).execute();
         return resourceList.stream().map(SysResource::getResourceUrl).collect(toSet());
     }
@@ -76,7 +79,7 @@ public class SysResourceServiceImpl implements SysResourceService{
                 QSysResource.isValid.eq$(true)
                         .and(QSysResource.resourceType.eq$(GlobalEnum.ResourceTypeEnum.INTERFACE.getCode()))
                 .and(QSysResource.sysApplicationId.eq$(Long.valueOf(sysApplicationId)))
-                .and(QSysResource.sysRoleResource.chain(QSysRoleResource.sysRoleId).eq$(Long.valueOf(sysRoleId)))
+                .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).eq$(Long.valueOf(sysRoleId)))
         ).execute();
         return resourceList.stream().map(SysResource::getResourceUrl).collect(toSet());
     }

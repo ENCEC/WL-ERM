@@ -1,13 +1,10 @@
-package com.share.auth.model.querymodels;
+package com.share.auth.center.model.querymodels;
 
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
-import com.share.auth.model.entity.UemDept;
+import com.share.auth.center.model.entity.UemDept;
 
-import java.lang.Integer;
-import java.lang.Long;
-import java.lang.String;
 import java.util.Date;
 
 

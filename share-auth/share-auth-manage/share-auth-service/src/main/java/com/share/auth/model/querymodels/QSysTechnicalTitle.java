@@ -3,13 +3,14 @@ package com.share.auth.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
-import com.share.auth.model.entity.SysPost;
 import com.share.auth.model.entity.SysTechnicalTitle;
 
 import java.lang.Long;
 import java.lang.String;
 import java.util.Date;
 
+import com.share.auth.model.entity.SysPost;
+import com.share.auth.model.querymodels.QSysPost;
 
 /**
 * @author daoServiceGenerator
@@ -31,6 +32,7 @@ public class QSysTechnicalTitle extends BaseModelExpression<SysTechnicalTitle, L
     public static final FieldExpression<Date> updateTime = sysTechnicalTitle.fieldOf("updateTime", Date.class);
 
     public static final BaseModelExpression<SysPost, Long> sysPost = new QSysPost(sysTechnicalTitle, "sysPost");
+
     public QSysTechnicalTitle() {
         super("SysTechnicalTitle", SysTechnicalTitle.class);
     }

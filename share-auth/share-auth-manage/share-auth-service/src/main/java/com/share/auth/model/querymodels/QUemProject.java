@@ -4,9 +4,14 @@ import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.UemProject;
-import com.share.auth.model.entity.UemUser;
 
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.String;
 import java.util.Date;
+
+import com.share.auth.model.entity.UemUser;
+import com.share.auth.model.querymodels.QUemUser;
 
 /**
 * @author daoServiceGenerator
@@ -38,12 +43,12 @@ public class QUemProject extends BaseModelExpression<UemProject, Long> {
     public static final FieldExpression<Date> modifyTime = uemProject.fieldOf("modifyTime", Date.class);
     public static final FieldExpression<Date> planEndTime = uemProject.fieldOf("planEndTime", Date.class);
     public static final FieldExpression<Date> planStartTime = uemProject.fieldOf("planStartTime", Date.class);
+    public static final FieldExpression<String> projectName = uemProject.fieldOf("projectName", String.class);
     public static final FieldExpression<Integer> recordVersion = uemProject.fieldOf("recordVersion", Integer.class);
     public static final FieldExpression<Integer> status = uemProject.fieldOf("status", Integer.class);
     public static final FieldExpression<Integer> totalNum = uemProject.fieldOf("totalNum", Integer.class);
     public static final FieldExpression<Long> uemDeptId = uemProject.fieldOf("uemDeptId", Long.class);
     public static final FieldExpression<Long> uemProjectId = uemProject.fieldOf("uemProjectId", Long.class);
-    public static final FieldExpression<String> projectName = uemProject.fieldOf("projectName", String.class);
 
     public static final BaseModelExpression<UemUser, Long> uemUser = new QUemUser(uemProject, "uemUser");
 

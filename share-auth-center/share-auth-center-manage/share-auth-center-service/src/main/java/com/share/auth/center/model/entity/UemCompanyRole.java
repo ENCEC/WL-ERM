@@ -13,7 +13,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Version;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -71,7 +70,6 @@ private static final long serialVersionUID=1;
 
     /**版本号*/
     @Column(name = "record_version")
-    @Version
     private Integer recordVersion;
 
     /**应用系统id*/

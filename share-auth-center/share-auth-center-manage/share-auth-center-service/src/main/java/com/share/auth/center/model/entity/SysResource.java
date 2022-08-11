@@ -9,7 +9,10 @@ import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -36,6 +39,7 @@ private static final long serialVersionUID=1;
     @Column(name = "component")
     private String component;
 
+    /**组件名称*/
     @Column(name = "component_name")
     private String componentName;
 
@@ -57,6 +61,10 @@ private static final long serialVersionUID=1;
     @Column(name = "invalid_time")
     private Date invalidTime;
 
+    /**逻辑删除标识（0-未删除，1-已删除），默认0*/
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     /**是否禁用(0禁用,1启用)*/
     @Column(name = "is_valid")
     private Boolean isValid;
@@ -77,7 +85,6 @@ private static final long serialVersionUID=1;
 
     /**版本号*/
     @Column(name = "record_version")
-    @Version
     private Integer recordVersion;
 
     /**菜单图标*/

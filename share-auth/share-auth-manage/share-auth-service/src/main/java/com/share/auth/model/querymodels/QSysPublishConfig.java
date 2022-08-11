@@ -3,10 +3,14 @@ package com.share.auth.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
-import com.share.auth.model.entity.SysApplication;
 import com.share.auth.model.entity.SysPublishConfig;
 
+import java.lang.Boolean;
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.String;
 import java.util.Date;
+
 
 /**
 * @author daoServiceGenerator
@@ -33,7 +37,6 @@ public class QSysPublishConfig extends BaseModelExpression<SysPublishConfig, Lon
     public static final FieldExpression<Long> sysPublishConfigId = sysPublishConfig.fieldOf("sysPublishConfigId", Long.class);
     public static final FieldExpression<String> times = sysPublishConfig.fieldOf("times", String.class);
 
-    public static final BaseModelExpression<SysApplication, Long> SYSPublishConfig = new QSysApplication(sysPublishConfig, "SYSPublishConfig");
 
     public QSysPublishConfig() {
         super("SysPublishConfig", SysPublishConfig.class);

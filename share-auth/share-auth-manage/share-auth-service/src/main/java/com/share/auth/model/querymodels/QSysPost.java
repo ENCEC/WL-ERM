@@ -10,11 +10,14 @@ import java.lang.Long;
 import java.lang.String;
 import java.util.Date;
 
+import com.share.auth.model.entity.UemDept;
+import com.share.auth.model.querymodels.QUemDept;
 
 /**
 * @author daoServiceGenerator
 * @version 1.0.0.0
 */
+@SuppressWarnings({"AlibabaConstantFieldShouldBeUpperCase", "unused", "AlibabaClassNamingShouldBeCamel"})
 public class QSysPost extends BaseModelExpression<SysPost, Long> {
 
     public static final BaseModelExpression<SysPost, Long> sysPost = new QSysPost();
@@ -29,6 +32,7 @@ public class QSysPost extends BaseModelExpression<SysPost, Long> {
     public static final FieldExpression<String> updateBy = sysPost.fieldOf("updateBy", String.class);
     public static final FieldExpression<Date> updateTime = sysPost.fieldOf("updateTime", Date.class);
 
+    public static final BaseModelExpression<UemDept, Long> uemDept = new QUemDept(sysPost, "uemDept");
 
     public QSysPost() {
         super("SysPost", SysPost.class);

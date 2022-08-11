@@ -1,16 +1,24 @@
 package com.share.auth.model.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gillion.ds.entity.base.BaseModel;
-import com.gillion.ec.core.annotations.Generator;
-import com.gillion.ec.core.utils.Long2String;
-import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import com.gillion.ec.core.annotations.Generator;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gillion.ec.core.utils.Long2String;
+import com.gillion.ec.core.utils.String2Long;
+import com.gillion.ds.entity.base.BaseModel;
 import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Version;
+import java.lang.Boolean;
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.String;
 import java.util.Date;
 
 
@@ -95,7 +103,6 @@ private static final long serialVersionUID=1;
 
     /**版本号*/
     @Column(name = "record_version")
-    @Version
     private Integer recordVersion;
 
     /**时间段*/
