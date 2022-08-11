@@ -203,7 +203,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                     .where(QUemUser.mobile.eq$(uemUserEditDto.getMobile()))
                     .execute();
             if (CollectionUtils.isNotEmpty(uemUserList)) {
-                return CommonResult.getSuccessResultData("该手机号已经被占用！");
+                return CommonResult.getFaildResultData("该手机号已经被占用！");
             }
         }
         // 更新用户信息
@@ -265,7 +265,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .where(QUemUser.account.eq$(uemUserEditDTO.getAccount()))
                 .execute();
         if (CollectionUtils.isNotEmpty(accountUser)) {
-            return CommonResult.getSuccessResultData("该用户名已注册过！");
+            return CommonResult.getFaildResultData("该用户名已注册过！");
         }
         // 手机号是否可用
         List<UemUser> uemUserList = QUemUser.uemUser
@@ -273,7 +273,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .where(QUemUser.mobile.eq$(uemUserEditDTO.getMobile()))
                 .execute();
         if (CollectionUtils.isNotEmpty(uemUserList)) {
-            return CommonResult.getSuccessResultData("该手机号已注册过！");
+            return CommonResult.getFaildResultData("该手机号已注册过！");
         }
         // 设置字段
         UemUser uemUser = new UemUser();
