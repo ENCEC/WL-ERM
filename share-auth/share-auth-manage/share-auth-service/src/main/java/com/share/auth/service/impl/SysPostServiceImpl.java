@@ -50,8 +50,6 @@ public class SysPostServiceImpl implements SysPostService {
         SysPost sysPost = new SysPost();
         BeanUtils.copyProperties(sysPostDTO,sysPost);
         sysPost.setStatus("0");
-        sysPost.setCreateBy("系统管理员");
-        sysPost.setCreateTime(new DateTime());
         sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         int row = QSysPost.sysPost.save(sysPost);
 
@@ -185,8 +183,6 @@ public class SysPostServiceImpl implements SysPostService {
         //更新信息
         BeanUtils.copyProperties(sysPostDTO, sysPost);
         sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        //更新时间
-        sysPost.setUpdateTime(new DateTime());
         int row = QSysPost.sysPost.save(sysPost);
 
         if (row > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {

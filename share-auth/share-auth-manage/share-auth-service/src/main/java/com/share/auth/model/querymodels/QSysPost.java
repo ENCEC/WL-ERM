@@ -18,7 +18,7 @@ import java.util.Date;
 public class QSysPost extends BaseModelExpression<SysPost, Long> {
 
     public static final BaseModelExpression<SysPost, Long> sysPost = new QSysPost();
-    public static final FieldExpression<String> createBy = sysPost.fieldOf("createBy", String.class);
+    public static final FieldExpression<String> creatorName = sysPost.fieldOf("creatorName", String.class);
     public static final FieldExpression<Date> createTime = sysPost.fieldOf("createTime", Date.class);
     public static final FieldExpression<String> postCode = sysPost.fieldOf("postCode", String.class);
     public static final FieldExpression<Long> postId = sysPost.fieldOf("postId", Long.class);
@@ -26,9 +26,10 @@ public class QSysPost extends BaseModelExpression<SysPost, Long> {
     public static final FieldExpression<Integer> postSort = sysPost.fieldOf("postSort", Integer.class);
     public static final FieldExpression<String> remark = sysPost.fieldOf("remark", String.class);
     public static final FieldExpression<String> status = sysPost.fieldOf("status", String.class);
-    public static final FieldExpression<String> updateBy = sysPost.fieldOf("updateBy", String.class);
-    public static final FieldExpression<Date> updateTime = sysPost.fieldOf("updateTime", Date.class);
-
+    public static final FieldExpression<String> modifierName = sysPost.fieldOf("modifierName", String.class);
+    public static final FieldExpression<Date> modifyTime = sysPost.fieldOf("modifyTime", Date.class);
+    public static final FieldExpression<Long> modifierId = sysPost.fieldOf("modifierId", Long.class);
+    public static final FieldExpression<Long> creatorId = sysPost.fieldOf("creatorId", Long.class);
 
     public QSysPost() {
         super("SysPost", SysPost.class);

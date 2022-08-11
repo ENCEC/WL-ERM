@@ -41,7 +41,7 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
      */
     @Override
     public ResultHelper<Page<SysTechnicalTitleAndPostVO>> queryByTechnicalTitleName(SysTechnicalTitleAndPostVO sysTechnicalTitleAndPostVO) {
-        Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.createBy, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
+        Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.creatorName, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
                 .where(
                         QSysTechnicalTitle.technicalTitleId.goe$(1L).and(QSysTechnicalTitle.technicalName._like$_(sysTechnicalTitleAndPostVO.getTechnicalName())).and(QSysTechnicalTitle.sysPost.chain(QSysPost.postName).eq$(sysTechnicalTitleAndPostVO.getPostName())).and(QSysTechnicalTitle.status.eq$(sysTechnicalTitleAndPostVO.getStatus())))
                 .paging(sysTechnicalTitleAndPostVO.getCurrentPage(), sysTechnicalTitleAndPostVO.getPageSize())
@@ -73,9 +73,7 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
         sysTechnicalTitle.setTechnicalName(sysTechnicalTitleAndPostVO.getTechnicalName());
         sysTechnicalTitle.setSeniority(sysTechnicalTitleAndPostVO.getSeniority());
         sysTechnicalTitle.setPostId(sysPost.getPostId());
-        sysTechnicalTitle.setCreateBy("系统管理员");
         sysTechnicalTitle.setStatus("0");
-        sysTechnicalTitle.setCreateTime(new DateTime());
         QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
         return CommonResult.getSuccessResultData("新增成功");
     }

@@ -21,8 +21,13 @@ public class SysPostVO extends BaseModel implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long postId;
 
+    /**创建者id*/
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long creatorId;
+
     /**创建者*/
-    private String createBy;
+    private String creatorName;
 
     /**创建时间*/
     private Date createTime;
@@ -42,9 +47,14 @@ public class SysPostVO extends BaseModel implements Serializable {
     /**状态（0正常 1停用）*/
     private String status;
 
+    /**更新者id*/
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long modifierId;
+
     /**更新者*/
-    private String updateBy;
+    private String modifierName;
 
     /**更新时间*/
-    private Date updateTime;
+    private Date modifyTime;
 }

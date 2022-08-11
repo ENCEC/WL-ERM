@@ -49,9 +49,15 @@ private static final long serialVersionUID=1;
     @Generator("snowFlakeGenerator")
     private Long postId;
 
+    /**创建者id*/
+    @Column(name = "creator_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long creatorId;
+
     /**创建者*/
-    @Column(name = "create_by")
-    private String createBy;
+    @Column(name = "creator_name")
+    private String creatorName;
 
     /**创建时间*/
     @Column(name = "create_time")
@@ -77,12 +83,18 @@ private static final long serialVersionUID=1;
     @Column(name = "status")
     private String status;
 
+    /**更新者id*/
+    @Column(name = "modifier_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long modifierId;
+
     /**更新者*/
-    @Column(name = "update_by")
-    private String updateBy;
+    @Column(name = "modifier_name")
+    private String modifierName;
 
     /**更新时间*/
-    @Column(name = "update_time")
-    private Date updateTime;
+    @Column(name = "modify_time")
+    private Date modifyTime;
 
 }

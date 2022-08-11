@@ -99,8 +99,6 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
         }
         standardEntry.setActionSerialNum(saveActionSerialNum);
         standardEntry.setStatus(Boolean.TRUE);
-        standardEntry.setCreateTime(new DateTime());
-        standardEntry.setCreatorName("系统管理员");
         QStandardEntry.standardEntry.save(standardEntry);
 
         return CommonResult.getSuccessResultData("新增成功");

@@ -842,8 +842,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 QUemUser.sex,
                 QUemUser.entryDate,
                 QUemUser.jobStatus,
-                QUemUser.deptName,
-                QUemUser.staffDuty,
+                QUemUser.deptCode,
+                QUemUser.staffDutyCode,
                 QUemUser.offerDate,
                 QUemUser.positiveType,
                 QUemUser.defenseScore
@@ -868,8 +868,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 QUemUser.sex,
                 QUemUser.entryDate,
                 QUemUser.jobStatus,
-                QUemUser.deptName,
-                QUemUser.staffDuty,
+                QUemUser.deptCode,
+                QUemUser.staffDutyCode,
                 QUemUser.leaveDate,
                 QUemUser.leaveReason
         )
@@ -896,8 +896,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 QUemUser.sex,
                 QUemUser.entryDate,
                 QUemUser.jobStatus,
-                QUemUser.deptName,
-                QUemUser.staffDuty,
+                QUemUser.deptCode,
+                QUemUser.staffDutyCode,
                 QUemUser.dismissDate,
                 QUemUser.dismissReason
         )
@@ -944,9 +944,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         String graduateSchool = uemUserDto.getGraduateSchool();
         String speciality = uemUserDto.getSpeciality();
         Date entryDate = uemUserDto.getEntryDate();
-        String technicalName = uemUserDto.getTechnicalName();
-        String staffDuty = uemUserDto.getStaffDuty();
-        String projectName = uemUserDto.getProjectName();
+        Long technicalTitleId = uemUserDto.getTechnicalTitleId();
+        String staffDutyCode = uemUserDto.getStaffDutyCode();
+        Long projectId = uemUserDto.getProjectId();
         //根据id查询出对应的员工信息，避免空字段
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
@@ -969,9 +969,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setGraduateSchool(graduateSchool);
         uemUser.setSpeciality(speciality);
         uemUser.setEntryDate(entryDate);
-        uemUser.setTechnicalName(technicalName);
-        uemUser.setStaffDuty(staffDuty);
-        uemUser.setProjectName(projectName);
+        uemUser.setTechnicalTitleId(technicalTitleId);
+        uemUser.setStaffDutyCode(staffDutyCode);
+        uemUser.setProjectId(projectId);
         QUemUser.uemUser.save(uemUser);
         return CommonResult.getSuccessResultData("保存成功!");
     }
@@ -983,9 +983,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     public ResultHelper<?> updateLeaveReason(Long uemUserId,String leaveReason) {
-//        if (StrUtil.isEmpty(uemUserDto.getLeaveReason())) {
-//            return CommonResult.getFaildResultData("必填项不能为空");
-//        }
         UemUser uemUser = QUemUser.uemUser.selectOne().where(QUemUser.uemUserId.eq$(uemUserId)).execute();
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         uemUser.setLeaveReason(leaveReason);
