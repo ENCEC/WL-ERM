@@ -296,3 +296,14 @@ application:
     file: share-file-cec
     portal: share-portal-cec
     center: share-auth-center-cec
+
+# 后端资源权限配置
+authentication:
+  credentialExpireSeconds: 3000
+  cookieExpireSeconds: 3000
+  #刷新凭证的时间
+  millisMinuteTen: 1000
+  ignorePathPatterns:
+    - /register
+    - /authentication/*
+    - /oauth/*
