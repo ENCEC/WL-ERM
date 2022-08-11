@@ -5,6 +5,10 @@ import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.OauthClientDetails;
 
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.String;
+
 
 /**
 * @author daoServiceGenerator

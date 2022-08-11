@@ -3,11 +3,10 @@ package com.share.auth.center.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
-import com.share.auth.center.model.entity.SysApplication;
-import com.share.auth.center.model.entity.SysRole;
 import com.share.auth.center.model.entity.UemUserRole;
 
 import java.util.Date;
+
 
 /**
 * @author daoServiceGenerator
@@ -31,8 +30,6 @@ public class QUemUserRole extends BaseModelExpression<UemUserRole, Long> {
     public static final FieldExpression<Long> uemUserId = uemUserRole.fieldOf("uemUserId", Long.class);
     public static final FieldExpression<Long> uemUserRoleId = uemUserRole.fieldOf("uemUserRoleId", Long.class);
 
-    public static final BaseModelExpression<SysRole, Long> sysRole = new QSysRole(uemUserRole, "sysRole");
-    public static final BaseModelExpression<SysApplication, Long> sysApplication = new QSysApplication(uemUserRole, "sysApplication");
 
     public QUemUserRole() {
         super("UemUserRole", UemUserRole.class);

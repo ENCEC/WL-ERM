@@ -1,6 +1,7 @@
 package com.share.auth.service.impl;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.share.auth.constants.CodeFinal;
@@ -91,9 +92,34 @@ public class UemProjectServiceImpl implements UemProjectService {
      */
     @Override
     public ResultHelper<UemProjectDTO> addUemProject(UemProjectDTO uemProjectDTO) {
-
+        if (StrUtil.isEmpty(uemProjectDTO.getProjectName())) {
+            return CommonResult.getFaildResultData("项目名称不能为空");
+        }
+        if (StrUtil.isEmpty(uemProjectDTO.getCustomer())) {
+            return CommonResult.getFaildResultData("客户名称不能为空");
+        }
+        if (Objects.isNull(uemProjectDTO.getFcy())) {
+            return CommonResult.getFaildResultData("项目金额不能为空");
+        }
+        if (Objects.isNull(uemProjectDTO.getStatus())) {
+            return CommonResult.getFaildResultData("项目进行状态不能为空");
+        }
+        if (StrUtil.isEmpty(uemProjectDTO.getDutyName())) {
+            return CommonResult.getFaildResultData("项目经理不能为空");
+        }
+        if (StrUtil.isEmpty(uemProjectDTO.getGenDemandUsers())) {
+            return CommonResult.getFaildResultData("需求组员不能为空");
+        }
+        if (StrUtil.isEmpty(uemProjectDTO.getGenDevUsers())) {
+            return CommonResult.getFaildResultData("开发组员不能为空");
+        }
+        if (Objects.isNull(uemProjectDTO.getPlanStartTime())) {
+            return CommonResult.getFaildResultData("计划开始时间不能为空");
+        }
+        if (Objects.isNull(uemProjectDTO.getPlanEndTime())) {
+            return CommonResult.getFaildResultData("计划结束时间不能为空");
+        }
         uemProjectDTO.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        uemProjectDTO.setCreateTime(new DateTime());
         QUemProject.uemProject.save(uemProjectDTO);
         return CommonResult.getSuccessResultData("项目新增成功");
     }

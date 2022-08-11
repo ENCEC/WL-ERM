@@ -5,6 +5,9 @@ import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.share.auth.model.entity.AppNodes;
 
+import java.lang.Integer;
+import java.lang.String;
+
 
 /**
 * @author daoServiceGenerator

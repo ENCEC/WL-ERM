@@ -3,10 +3,10 @@ package com.share.auth.center.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
-import com.share.auth.center.model.entity.SysDictCode;
 import com.share.auth.center.model.entity.SysDictType;
 
 import java.util.Date;
+
 
 /**
 * @author daoServiceGenerator
@@ -30,7 +30,6 @@ public class QSysDictType extends BaseModelExpression<SysDictType, Long> {
     public static final FieldExpression<String> remark = sysDictType.fieldOf("remark", String.class);
     public static final FieldExpression<Long> sysDictTypeId = sysDictType.fieldOf("sysDictTypeId", Long.class);
 
-    public static final BaseModelExpression<SysDictCode, Long> sysDictCode = new QSysDictCode(sysDictType, "sysDictCode");
 
     public QSysDictType() {
         super("SysDictType", SysDictType.class);

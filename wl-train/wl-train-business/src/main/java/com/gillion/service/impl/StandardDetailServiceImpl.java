@@ -12,8 +12,8 @@ import com.gillion.service.StandardDetailService;
 import com.gillion.train.api.model.vo.StandardDetailVO;
 import com.gillion.train.api.model.vo.StandardEntryDTO;
 import com.share.support.result.CommonResult;
-import org.apache.commons.lang.StringUtils;
 import com.share.support.result.ResultHelper;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -121,7 +121,6 @@ public class StandardDetailServiceImpl implements StandardDetailService {
         }
         standardDetailVO.setActionSerialNum(actionSerialNum);
         standardDetailVO.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        standardDetailVO.setCreateTime(new DateTime());
 
 
         //测试数据   后续调用父表的新增接口

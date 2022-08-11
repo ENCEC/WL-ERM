@@ -3,6 +3,7 @@ package com.share.auth.center.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
+import com.share.auth.center.model.entity.UemDept;
 import com.share.auth.center.model.entity.UemUser;
 
 import java.math.BigDecimal;
@@ -29,14 +30,18 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<Date> createTime = uemUser.fieldOf("createTime", Date.class);
     public static final FieldExpression<Long> creatorId = uemUser.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = uemUser.fieldOf("creatorName", String.class);
+    public static final FieldExpression<Long> defenseScore = uemUser.fieldOf("defenseScore", Long.class);
     public static final FieldExpression<String> deptCode = uemUser.fieldOf("deptCode", String.class);
     public static final FieldExpression<String> deptName = uemUser.fieldOf("deptName", String.class);
+    public static final FieldExpression<Date> dismissDate = uemUser.fieldOf("dismissDate", Date.class);
+    public static final FieldExpression<String> dismissReason = uemUser.fieldOf("dismissReason", String.class);
     public static final FieldExpression<Long> education = uemUser.fieldOf("education", Long.class);
     public static final FieldExpression<String> email = uemUser.fieldOf("email", String.class);
     public static final FieldExpression<Date> entryDate = uemUser.fieldOf("entryDate", Date.class);
     public static final FieldExpression<Date> graduateDate = uemUser.fieldOf("graduateDate", Date.class);
     public static final FieldExpression<String> graduateSchool = uemUser.fieldOf("graduateSchool", String.class);
     public static final FieldExpression<String> idCard = uemUser.fieldOf("idCard", String.class);
+    public static final FieldExpression<String> interviewComments = uemUser.fieldOf("interviewComments", String.class);
     public static final FieldExpression<Date> invalidTime = uemUser.fieldOf("invalidTime", Date.class);
     public static final FieldExpression<Boolean> isAgreemeent = uemUser.fieldOf("isAgreemeent", Boolean.class);
     public static final FieldExpression<Boolean> isDeleted = uemUser.fieldOf("isDeleted", Boolean.class);
@@ -56,6 +61,9 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> offerReason = uemUser.fieldOf("offerReason", String.class);
     public static final FieldExpression<Long> oriApplication = uemUser.fieldOf("oriApplication", Long.class);
     public static final FieldExpression<String> password = uemUser.fieldOf("password", String.class);
+    public static final FieldExpression<String> politicalStatus = uemUser.fieldOf("politicalStatus", String.class);
+    public static final FieldExpression<String> positiveComments = uemUser.fieldOf("positiveComments", String.class);
+    public static final FieldExpression<Long> positiveType = uemUser.fieldOf("positiveType", Long.class);
     public static final FieldExpression<Long> projectId = uemUser.fieldOf("projectId", Long.class);
     public static final FieldExpression<String> projectName = uemUser.fieldOf("projectName", String.class);
     public static final FieldExpression<String> qqId = uemUser.fieldOf("qqId", String.class);
@@ -78,6 +86,8 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<Long> uemUserId = uemUser.fieldOf("uemUserId", Long.class);
     public static final FieldExpression<String> userType = uemUser.fieldOf("userType", String.class);
     public static final FieldExpression<String> wxId = uemUser.fieldOf("wxId", String.class);
+
+    public static final BaseModelExpression<UemDept, Long> uemDept = new QUemDept(uemUser, "uemDept");
 
     public QUemUser() {
         super("UemUser", UemUser.class);

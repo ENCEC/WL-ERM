@@ -296,3 +296,14 @@ application:
     file: share-file
     portal: share-portal
     center: share-auth-center
+
+# 后端资源权限配置
+authentication:
+  credentialExpireSeconds: 3000
+  cookieExpireSeconds: 3000
+  #刷新凭证的时间
+  millisMinuteTen: 1000
+  ignorePathPatterns:
+    - /register
+    - /authentication/*
+    - /oauth/*

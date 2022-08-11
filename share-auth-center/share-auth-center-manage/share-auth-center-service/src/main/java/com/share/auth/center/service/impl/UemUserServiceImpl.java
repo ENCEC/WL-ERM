@@ -721,11 +721,7 @@ public class UemUserServiceImpl implements UemUserService {
     @Override
     public int saveToEs(UemLog uemLog, UemUser uemUser) {
         long snowId = snowFlakeGenerator.next();
-        Date current = new Date();
         uemLog.setUemLogId(snowId);
-        uemLog.setCreateTime(current);
-        uemLog.setModifyTime(current);
-        uemLog.setRecordVersion(0);
         uemLog.setCity("");
         Map<String, Object> newMap = new HashMap<>();
         Map<String, Object> map = BeanUtil.beanToMap(uemLog);

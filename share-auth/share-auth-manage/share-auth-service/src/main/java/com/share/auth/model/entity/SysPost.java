@@ -10,22 +10,13 @@ import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
 import com.gillion.ds.entity.base.BaseModel;
 import java.io.Serializable;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gillion.ds.entity.base.BaseModel;
-import com.gillion.ec.core.annotations.Generator;
-import com.gillion.ec.core.utils.Long2String;
-import com.gillion.ec.core.utils.String2Long;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
 import javax.persistence.Version;
 import java.lang.Integer;
+import java.lang.Long;
 import java.lang.String;
 import java.util.Date;
 
@@ -49,9 +40,15 @@ private static final long serialVersionUID=1;
     @Generator("snowFlakeGenerator")
     private Long postId;
 
+    /**创建者id*/
+    @Column(name = "creator_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long creatorId;
+
     /**创建者*/
-    @Column(name = "create_by")
-    private String createBy;
+    @Column(name = "creator_name")
+    private String creatorName;
 
     /**创建时间*/
     @Column(name = "create_time")
@@ -77,12 +74,18 @@ private static final long serialVersionUID=1;
     @Column(name = "status")
     private String status;
 
+    /**更新者id*/
+    @Column(name = "modifier_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long modifierId;
+
     /**更新者*/
-    @Column(name = "update_by")
-    private String updateBy;
+    @Column(name = "modifier_name")
+    private String modifierName;
 
     /**更新时间*/
-    @Column(name = "update_time")
-    private Date updateTime;
+    @Column(name = "modify_time")
+    private Date modifyTime;
 
 }

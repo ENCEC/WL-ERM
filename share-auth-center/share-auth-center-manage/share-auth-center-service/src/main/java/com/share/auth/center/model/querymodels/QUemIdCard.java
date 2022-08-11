@@ -3,11 +3,10 @@ package com.share.auth.center.model.querymodels;
 import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
-import com.share.auth.center.model.entity.SysPlatformUser;
 import com.share.auth.center.model.entity.UemIdCard;
-import com.share.auth.center.model.entity.UemUser;
 
 import java.util.Date;
+
 
 /**
 * @author daoServiceGenerator
@@ -36,8 +35,6 @@ public class QUemIdCard extends BaseModelExpression<UemIdCard, Long> {
     public static final FieldExpression<Long> uemIdCardId = uemIdCard.fieldOf("uemIdCardId", Long.class);
     public static final FieldExpression<Long> uemUserId = uemIdCard.fieldOf("uemUserId", Long.class);
 
-    public static final BaseModelExpression<SysPlatformUser, Long> sysPlatformUser = new QSysPlatformUser(uemIdCard, "sysPlatformUser");
-    public static final BaseModelExpression<UemUser, Long> uemUser = new QUemUser(uemIdCard, "uemUser");
 
     public QUemIdCard() {
         super("UemIdCard", UemIdCard.class);

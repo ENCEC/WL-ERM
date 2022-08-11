@@ -16,6 +16,7 @@ import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResultHelper<?> saveOffer(TaskDetailInfoDTO taskDetailInfoDTO) {
         if (Objects.isNull(taskDetailInfoDTO.getApplyDate())
                 || StrUtil.isEmpty(taskDetailInfoDTO.getOfferType())
@@ -49,7 +51,6 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskInfo.setTaskType("员工转正");
         taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"转正申请");
-        taskInfo.setCreateTime(new DateTime());
         taskInfo.setStatus(0);
         QTaskInfo.taskInfo.save(taskInfo);
         TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
@@ -69,6 +70,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResultHelper<?> saveLeave(TaskDetailInfoDTO taskDetailInfoDTO) {
         if (Objects.isNull(taskDetailInfoDTO.getApplyDate())
                 || Objects.isNull(taskDetailInfoDTO.getApprover())
@@ -79,7 +81,6 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskInfo.setTaskType("员工离职");
         taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"离职申请");
-        taskInfo.setCreateTime(new DateTime());
         taskInfo.setStatus(0);
         QTaskInfo.taskInfo.save(taskInfo);
         standardEntryInterface.updateLeaveReason(taskDetailInfoDTO.getUemUserId(),taskDetailInfoDTO.getLeaveReason());
@@ -99,6 +100,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List queryOffer(Long dispatchers,String name) {
         String taskTitle = name+"转正申请";
         TaskInfoDto taskInfoDto = QTaskInfo.taskInfo.selectOne(
@@ -106,7 +108,9 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
                 .where(QTaskInfo.dispatchers.eq$(dispatchers).and(QTaskInfo.taskTitle.eq$(taskTitle)))
                 .mapperTo(TaskInfoDto.class)
                 .execute();
-        TaskDetailInfo execute = QTaskDetailInfo.taskDetailInfo.selectOne().where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId())).execute();
+        TaskDetailInfo execute = QTaskDetailInfo.taskDetailInfo.selectOne(QTaskDetailInfo.interviewerId,QTaskDetailInfo.faceRemark,QTaskDetailInfo.approver,QTaskDetailInfo.offerRemark)
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId()))
+                .execute();
         UemUserDto uemUserDto = standardEntryInterface.queryOfferInfo(dispatchers);
         List list = new LinkedList();
         list.add(execute);

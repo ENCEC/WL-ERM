@@ -95,6 +95,12 @@ private static final long serialVersionUID=1;
     @Column(name = "creator_name")
     private String creatorName;
 
+    /**转正员工答辩成绩*/
+    @Column(name = "defense_score")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long defenseScore;
+
     /**用户所属部门编码*/
     @Column(name = "dept_code")
     private String deptCode;
@@ -102,6 +108,13 @@ private static final long serialVersionUID=1;
     /**用户所属部门名称*/
     @Column(name = "dept_name")
     private String deptName;
+
+    /**辞退时间*/
+    @Column(name = "dismiss_date")
+    private Date dismissDate;
+
+    @Column(name = "dismiss_reason")
+    private String dismissReason;
 
     /**学历（0：专科 1：本科 2：研究生 3：博士生）*/
     @Column(name = "education")
@@ -128,6 +141,10 @@ private static final long serialVersionUID=1;
     /**身份证号码*/
     @Column(name = "id_card")
     private String idCard;
+
+    /**面谈评语*/
+    @Column(name = "interview_comments")
+    private String interviewComments;
 
     /**启/禁用时间*/
     @Column(name = "invalid_time")
@@ -212,6 +229,20 @@ private static final long serialVersionUID=1;
     /**密码*/
     @Column(name = "password")
     private String password;
+
+    /**政治面貌（来源数据字典)*/
+    @Column(name = "political_status")
+    private String politicalStatus;
+
+    /**转正评语*/
+    @Column(name = "positive_comments")
+    private String positiveComments;
+
+    /**转正类型(0 正常转正 1 提前转正)*/
+    @Column(name = "positive_type")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long positiveType;
 
     /**所属项目ID*/
     @Column(name = "project_id")

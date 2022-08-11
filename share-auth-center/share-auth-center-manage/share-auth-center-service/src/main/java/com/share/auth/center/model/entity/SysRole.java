@@ -9,7 +9,10 @@ import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -47,6 +50,14 @@ private static final long serialVersionUID=1;
     @Column(name = "creator_name")
     private String creatorName;
 
+    /**角色所属部门编码*/
+    @Column(name = "dept_code")
+    private String deptCode;
+
+    /**角色所属部门名称*/
+    @Column(name = "dept_name")
+    private String deptName;
+
     /**启/禁用时间*/
     @Column(name = "invalid_time")
     private Date invalidTime;
@@ -54,6 +65,10 @@ private static final long serialVersionUID=1;
     /**是否默认角色(0否,1是)*/
     @Column(name = "is_default")
     private Boolean isDefault;
+
+    /**逻辑删除flag*/
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     /**是否禁用(0禁用,1启用)*/
     @Column(name = "is_valid")
@@ -79,7 +94,6 @@ private static final long serialVersionUID=1;
 
     /**版本号*/
     @Column(name = "record_version")
-    @Version
     private Integer recordVersion;
 
     /**角色描述*/
@@ -111,5 +125,11 @@ private static final long serialVersionUID=1;
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long topRoleId;
+
+    /**角色所属部门ID*/
+    @Column(name = "uem_dept_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long uemDeptId;
 
 }
