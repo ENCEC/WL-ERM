@@ -4,15 +4,14 @@ import com.gillion.ds.client.api.queryobject.expressions.BaseModelExpression;
 import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.gillion.model.entity.TaskDetailInfo;
-import com.gillion.model.entity.TaskInfo;
 
 import java.util.Date;
 
 
 /**
- * @author daoServiceGenerator
- * @version 1.0.0.0
- */
+* @author daoServiceGenerator
+* @version 1.0.0.0
+*/
 @SuppressWarnings({"AlibabaConstantFieldShouldBeUpperCase", "unused", "AlibabaClassNamingShouldBeCamel"})
 public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
 
@@ -22,16 +21,18 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<Integer> actionTime = taskDetailInfo.fieldOf("actionTime", Integer.class);
     public static final FieldExpression<Date> applyDate = taskDetailInfo.fieldOf("applyDate", Date.class);
     public static final FieldExpression<Date> approvalDate = taskDetailInfo.fieldOf("approvalDate", Date.class);
+    public static final FieldExpression<String> approvalRemark = taskDetailInfo.fieldOf("approvalRemark", String.class);
     public static final FieldExpression<Long> approver = taskDetailInfo.fieldOf("approver", Long.class);
     public static final FieldExpression<String> approverName = taskDetailInfo.fieldOf("approverName", String.class);
-    public static final FieldExpression<String> approvalRemark = taskDetailInfo.fieldOf("approvalRemark", String.class);
     public static final FieldExpression<Date> createTime = taskDetailInfo.fieldOf("createTime", Date.class);
     public static final FieldExpression<Long> creatorId = taskDetailInfo.fieldOf("creatorId", Long.class);
     public static final FieldExpression<String> creatorName = taskDetailInfo.fieldOf("creatorName", String.class);
     public static final FieldExpression<Date> endDate = taskDetailInfo.fieldOf("endDate", Date.class);
     public static final FieldExpression<String> faceRemark = taskDetailInfo.fieldOf("faceRemark", String.class);
-    public static final FieldExpression<Date> faceTime = taskDetailInfo.fieldOf("faceTime", Date.class);
     public static final FieldExpression<String> faceScore = taskDetailInfo.fieldOf("faceScore", String.class);
+    public static final FieldExpression<Date> faceTime = taskDetailInfo.fieldOf("faceTime", Date.class);
+    public static final FieldExpression<Long> interviewerId = taskDetailInfo.fieldOf("interviewerId", Long.class);
+    public static final FieldExpression<String> interviewerName = taskDetailInfo.fieldOf("interviewerName", String.class);
     public static final FieldExpression<Long> leader = taskDetailInfo.fieldOf("leader", Long.class);
     public static final FieldExpression<String> leaderName = taskDetailInfo.fieldOf("leaderName", String.class);
     public static final FieldExpression<Long> modifierId = taskDetailInfo.fieldOf("modifierId", Long.class);
@@ -55,8 +56,7 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<Long> taskDetailId = taskDetailInfo.fieldOf("taskDetailId", Long.class);
     public static final FieldExpression<Long> taskInfoId = taskDetailInfo.fieldOf("taskInfoId", Long.class);
     public static final FieldExpression<String> taskName = taskDetailInfo.fieldOf("taskName", String.class);
-    public static final FieldExpression<Long> interviewerId = taskDetailInfo.fieldOf("interviewerId", Long.class);
-    public static final FieldExpression<String> interviewerName = taskDetailInfo.fieldOf("interviewerName", String.class);
+
 
     public QTaskDetailInfo() {
         super("TaskDetailInfo", TaskDetailInfo.class);

@@ -9,9 +9,9 @@ import java.util.Date;
 
 
 /**
- * @author daoServiceGenerator
- * @version 1.0.0.0
- */
+* @author daoServiceGenerator
+* @version 1.0.0.0
+*/
 @SuppressWarnings({"AlibabaConstantFieldShouldBeUpperCase", "unused", "AlibabaClassNamingShouldBeCamel"})
 public class QStandardEntry extends BaseModelExpression<StandardEntry, Long> {
 
@@ -28,6 +28,7 @@ public class QStandardEntry extends BaseModelExpression<StandardEntry, Long> {
     public static final FieldExpression<String> creatorName = standardEntry.fieldOf("creatorName", String.class);
     public static final FieldExpression<String> entryName = standardEntry.fieldOf("entryName", String.class);
     public static final FieldExpression<Boolean> isNeed = standardEntry.fieldOf("isNeed", Boolean.class);
+    public static final FieldExpression<String> itemType = standardEntry.fieldOf("itemType", String.class);
     public static final FieldExpression<Long> modifierId = standardEntry.fieldOf("modifierId", Long.class);
     public static final FieldExpression<String> modifierName = standardEntry.fieldOf("modifierName", String.class);
     public static final FieldExpression<Date> modifyTime = standardEntry.fieldOf("modifyTime", Date.class);
@@ -35,7 +36,6 @@ public class QStandardEntry extends BaseModelExpression<StandardEntry, Long> {
     public static final FieldExpression<Integer> recordVersion = standardEntry.fieldOf("recordVersion", Integer.class);
     public static final FieldExpression<Long> standardEntryId = standardEntry.fieldOf("standardEntryId", Long.class);
     public static final FieldExpression<Boolean> status = standardEntry.fieldOf("status", Boolean.class);
-    public static final FieldExpression<String> itemType = standardEntry.fieldOf("itemType", String.class);
 
 
     public QStandardEntry() {
