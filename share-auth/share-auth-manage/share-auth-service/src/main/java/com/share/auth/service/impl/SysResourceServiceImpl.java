@@ -577,7 +577,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         Integer pageSize = sysResourceDTO.getPageSize();
         //模糊查询拼字段名称
         if (!StringUtils.isEmpty(sysResourceDTO.getResourceTitle())) {
-            sysResourceDTO.setResourceTitle("%" + sysResourceDTO.getParentResourceTitle() + "%");
+            sysResourceDTO.setResourceTitle("%" + sysResourceDTO.getResourceTitle() + "%");
         }
         return DSContext.customization("WL-ERM_queryResourceByPage").select()
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)

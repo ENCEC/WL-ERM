@@ -158,8 +158,8 @@ public class TaskInfoController {
 
     @GetMapping("/queryPositiveApply")
     @ApiOperation("根据任务id查询该申请人的转正申请")
-    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(@RequestParam Long taskInfoId) {
-        return taskInfoService.queryPositiveApply(taskInfoId);
+    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(@RequestParam Long taskInfoId, @RequestParam Long taskDetailId) {
+        return taskInfoService.queryPositiveApply(taskInfoId, taskDetailId);
     }
 
     @PostMapping("/queryAllStandardDetail")
@@ -177,7 +177,7 @@ public class TaskInfoController {
     @PostMapping("/saveLeaveInfo")
     @ApiOperation("我的任务（项目经历初次审核） 添加离职基本信息")
     public ResultHelper<Object> saveLeaveInfo(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
-        return taskInfoService.savePositiveInfo(taskDetailInfoDto);
+        return taskInfoService.saveLeaveInfo(taskDetailInfoDto);
     }
 
     @GetMapping("/queryLeaveInfo")
@@ -195,9 +195,9 @@ public class TaskInfoController {
 
     @GetMapping("/queryLeaveInfoByLeader")
     @ApiOperation("我的任务（部门领导最终审核）查看离职信息以及基本信息")
-    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long uemUserId) {
+    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long uemUserId, @RequestParam Long taskDetailId) {
         List list = new ArrayList();
-        ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId);
+        ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId, taskDetailId);
         ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(uemUserId);
         list.add(taskDetailInfoDtoResultHelper);
         list.add(uemUserDtoResultHelper);
@@ -208,6 +208,12 @@ public class TaskInfoController {
     @ApiOperation("我的任务（部门领导最终审核）添加离职基本信息")
     public ResultHelper<Object> saveLeaveInfoByLeader(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
         return taskInfoService.saveLeaveInfoByLeader(taskDetailInfoDto);
+    }
+
+    @PostMapping("/savePositiveInfoByStaff")
+    @ApiOperation("员工管理（服务调用） 添加员工转正信息")
+    public ResultHelper<Object> savePositiveInfoByStaff(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
+        return taskInfoService.savePositiveInfoByStaff(taskDetailInfoDto);
     }
 
 }

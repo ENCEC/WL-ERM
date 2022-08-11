@@ -89,6 +89,38 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
     private String approvalRemark;
 
     /**
+     * 审核人id
+     */
+    @Column(name = "audit_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long auditId;
+
+    /**
+     * 审核人姓名
+     */
+    @Column(name = "audit_name")
+    private String auditName;
+
+    /**
+     * 审核日期
+     */
+    @Column(name = "audit_date")
+    private Date auditDate;
+
+    /**
+     * 审核结果
+     */
+    @Column(name = "audit_result")
+    private String auditResult;
+
+    /**
+     * 审核意见
+     */
+    @Column(name = "audit_remark")
+    private String auditRemark;
+
+    /**
      * 创建时间
      */
     @Column(name = "create_time")
@@ -269,11 +301,15 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
     @Column(name = "task_name")
     private String taskName;
 
-    /**面谈人ID*/
+    /**
+     * 面谈人ID
+     */
     @Column(name = "interviewer_id")
     private Long interviewerId;
 
-    /**面谈人姓名*/
+    /**
+     * 面谈人姓名
+     */
     @Column(name = "interviewer_name")
     private String interviewerName;
 

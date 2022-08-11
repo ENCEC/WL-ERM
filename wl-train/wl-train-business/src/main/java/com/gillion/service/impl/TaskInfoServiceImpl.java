@@ -599,9 +599,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      * @date 2022-08-09
      */
     @Override
-    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId) {
-        Map<String, Long> parms = new HashMap<>(1);
+    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId,Long taskDetailId) {
+        Map<String, Long> parms = new HashMap<>(2);
         parms.put("taskInfoId", taskInfoId);
+        parms.put("taskDetailId", taskDetailId);
         TaskDetailInfoDto result = DSContext.customization("WL-ERM_queryPositiveApply")
                 .selectOne().mapperTo(TaskDetailInfoDto.class)
                 .execute(parms);
@@ -661,15 +662,15 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
-        Date approvalDate = taskDetailInfoDto.getApprovalDate();
-        String resultAccess = taskDetailInfoDto.getResultAccess();
-        String approvalRemark = taskDetailInfoDto.getApprovalRemark();
+        Date auditDate = taskDetailInfoDto.getAuditDate();
+        String auditResult = taskDetailInfoDto.getAuditResult();
+        String auditRemark = taskDetailInfoDto.getAuditRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
-        taskDetailInfo.setApprover(uemUserId);
-        taskDetailInfo.setApprovalDate(approvalDate);
-        taskDetailInfo.setApprovalRemark(approvalRemark);
-        taskDetailInfo.setResultAccess(resultAccess);
+        taskDetailInfo.setAuditId(uemUserId);
+        taskDetailInfo.setAuditDate(auditDate);
+        taskDetailInfo.setAuditRemark(auditRemark);
+        taskDetailInfo.setAuditResult(auditResult);
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int reslut = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         if (reslut > 0) {
@@ -725,6 +726,67 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             return CommonResult.getSuccessResultData("添加成功");
         } else {
             return CommonResult.getFaildResultData("添加失败");
+        }
+    }
+
+    /**
+     * 员工管理（服务调用） 添加员工转正信息
+     *
+     * @author wzr
+     * @date 2022-08-11
+     */
+
+    @Override
+    public ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDto taskDetailInfoDto) {
+        Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
+        Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
+        String offerType = taskDetailInfoDto.getOfferType();
+        String faceScore = taskDetailInfoDto.getFaceScore();
+        List<String> uemUserIds = taskDetailInfoDto.getUemUserIds();
+        int i = 0;
+        //获取用户表的主键作数组，分别插入任务子表审批人id以及面谈人id
+        for (String uemUserId : uemUserIds) {
+            String ids = uemUserIds.get(i);
+            if (i == 0) {
+                String faceRemark = taskDetailInfoDto.getFaceRemark();
+                TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
+                        .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+                taskDetailInfo.setInterviewerId(Long.valueOf(ids));
+                taskDetailInfo.setFaceRemark(faceRemark);
+                taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+                int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+                if (result == 1) {
+                    i = ++i;
+                    continue;
+                } else {
+                    return CommonResult.getFaildResultData("出错啦!");
+                }
+            } else if (i == 1) {
+                String offerRemark = taskDetailInfoDto.getOfferRemark();
+                TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
+                        .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+                taskDetailInfoDto.setApprover(Long.valueOf(ids));
+                taskDetailInfoDto.setOfferRemark(offerRemark);
+                taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+                int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+                if (result == 1) {
+                    i = ++i;
+                    continue;
+                } else {
+                    return CommonResult.getFaildResultData("出错啦!");
+                }
+            }
+        }
+        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+        taskDetailInfo.setOfferType(offerType);
+        taskDetailInfo.setFaceScore(faceScore);
+        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+        if (result == 1) {
+            return CommonResult.getSuccessResultData("添加成功");
+        } else {
+            return CommonResult.getFaildResultData("出错啦!");
         }
     }
 
