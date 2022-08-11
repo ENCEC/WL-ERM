@@ -27,10 +27,16 @@ public class SysPostDTO extends BaseModel implements Serializable {
     @JsonDeserialize(using = String2Long.class)
     private Long postId;
 
+    /**创建者id*/
+    @Column(name = "creator_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long creatorId;
+
     /**创建者*/
     @ApiModelProperty("创建者")
-    @Column(name = "create_by")
-    private String createBy;
+    @Column(name = "creator_name")
+    private String creatorName;
 
     /**创建时间*/
     @ApiModelProperty("创建时间")
@@ -58,15 +64,21 @@ public class SysPostDTO extends BaseModel implements Serializable {
     @ApiModelProperty("状态（0正常 1停用）")
     private String status;
 
+    /**更新者id*/
+    @Column(name = "modifier_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long modifierId;
+
     /**更新者*/
-    @ApiModelProperty("更新者")
-    private String updateBy;
+    @Column(name = "modifier_name")
+    private String modifierName;
 
     /**更新时间*/
-    @ApiModelProperty("更新时间")
+    @Column(name = "modify_time")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private Date updateTime;
+    private Date modifyTime;
 
     /** 分页页数 */
     @ApiModelProperty("分页页数")

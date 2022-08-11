@@ -24,14 +24,17 @@ import java.util.List;
 @Data
 public class SysTechnicalTitleAndPostVO implements Serializable {
     /**岗位职称ID*/
-
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
     private Long technicalTitleId;
 
-    /**创建者*/
+    /**创建者id*/
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long creatorId;
 
-    private String createBy;
+    /**创建者*/
+    private String creatorName;
 
     /**创建时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -56,19 +59,24 @@ public class SysTechnicalTitleAndPostVO implements Serializable {
     private String technicalName;
 
     /**更新者*/
-    private String updateBy;
+    private String modifierName;
 
     /**更新时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private Date updateTime;
+    private Date modifyTime;
+
+    /**更新者id*/
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long modifierId;
 
     /**岗位名称*/
     private String postName;
 
-   /**分页页数*/
+    /**分页页数*/
     private Integer currentPage;
 
-   /**分页条数*/
+    /**分页条数*/
     private Integer pageSize;
 }
