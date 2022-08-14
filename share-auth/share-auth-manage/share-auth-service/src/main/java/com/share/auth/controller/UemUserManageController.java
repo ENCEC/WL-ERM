@@ -1,11 +1,10 @@
 package com.share.auth.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.gillion.train.api.AuthInfoInterface;
+import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.center.api.AuthCenterInterface;
-import com.share.auth.domain.SysRoleDTO;
-import com.share.auth.domain.UemUserDto;
-import com.share.auth.domain.UemUserEditDTO;
-import com.share.auth.domain.UemUserRoleDto;
+import com.share.auth.domain.*;
 import com.share.auth.service.UemUserManageService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -18,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
@@ -41,6 +39,10 @@ public class UemUserManageController {
 
     @Autowired
     private AuthCenterInterface authCenterInterface;
+
+   /* @Autowired
+    private AuthInfoInterface authInfoInterface;*/
+
 
     /**
      * 根据用户名、姓名或启禁用状态查询用户信息
@@ -238,7 +240,7 @@ public class UemUserManageController {
      */
     @PostMapping("/queryStaffDutyBySelect")
     @ApiOperation(value = "下拉框查询对应所有岗位的信息")
-    public List<UemUserDto> queryStaffDutyBySelect() {
+    public List<SysPostDTO> queryStaffDutyBySelect() {
         return uemUserManageService.queryStaffDutyBySelect();
     }
 
@@ -250,7 +252,7 @@ public class UemUserManageController {
      */
     @PostMapping("/queryTechnicalNameBySelect")
     @ApiOperation(value = "下拉框查询对应所有职称的信息")
-    public List<UemUserDto> queryTechnicalNameBySelect() {
+    public List queryTechnicalNameBySelect() {
         return uemUserManageService.queryTechnicalNameBySelect();
     }
 
@@ -262,7 +264,7 @@ public class UemUserManageController {
      */
     @PostMapping("/queryProjectNameBySelect")
     @ApiOperation(value = "下拉框查询对应所有项目的信息")
-    public List<UemUserDto> queryProjectNameBySelect() {
+    public List<UemProjectDTO> queryProjectNameBySelect() {
         return uemUserManageService.queryProjectNameBySelect();
     }
 
@@ -449,6 +451,7 @@ public class UemUserManageController {
 
     /**
      * 查看转正评语部分信息
+     *
      * @param uemUserId
      * @return
      */
@@ -459,16 +462,18 @@ public class UemUserManageController {
 
     /**
      * 查看离职原因
+     *
      * @param uemUserId
      * @return
      */
     @GetMapping("/queryLeaveInfo")
     public ResultHelper<UemUserDto> queryLeaveInfo(Long uemUserId) {
-        return  uemUserManageService.queryLeaveInfo(uemUserId);
+        return uemUserManageService.queryLeaveInfo(uemUserId);
     }
 
     /**
      * 查看辞退原因
+     *
      * @param uemUserId
      * @return
      */
@@ -479,6 +484,7 @@ public class UemUserManageController {
 
     /**
      * 保存员工信息
+     *
      * @param uemUserDto
      * @return
      */
@@ -489,12 +495,30 @@ public class UemUserManageController {
 
     /**
      * 离职申请添加离职理由
+     *
      * @param
      * @return
      */
     @GetMapping("/updateLeaveReason")
     public ResultHelper<?> updateLeaveReason(
-            @RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
-        return uemUserManageService.updateLeaveReason(uemUserId,leaveReason);
+            @RequestParam(value = "uemUserId") Long uemUserId, @RequestParam(value = "leaveReason") String leaveReason) {
+        return uemUserManageService.updateLeaveReason(uemUserId, leaveReason);
     }
+
+    /**
+     * 服务调用（任务模块通过查询用户id 取到name）
+     *
+     * @param
+     * @return
+     */
+    @GetMapping("/queryUemUserId")
+    public ResultHelper<UemUserDto> queryUemUserById(@RequestParam Long uemUserId) {
+        return uemUserManageService.queryUemUserById(uemUserId);
+    }
+
+
+   /* @PostMapping("/savePositiveInfoByStaff")
+    public ResultHelper<?> savePositiveInfoByStaff(@RequestBody TaskDetailInfoDTO taskDetailInfoDto) {
+        return authInfoInterface.savePositiveInfoByStaff(taskDetailInfoDto);
+    }*/
 }

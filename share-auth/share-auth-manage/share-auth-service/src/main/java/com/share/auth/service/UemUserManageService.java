@@ -1,10 +1,8 @@
 package com.share.auth.service;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.share.auth.domain.SysRoleDTO;
-import com.share.auth.domain.UemUserDto;
-import com.share.auth.domain.UemUserEditDTO;
-import com.share.auth.domain.UemUserRoleDto;
+import com.share.auth.domain.*;
+import com.share.auth.model.entity.UemUser;
 import com.share.support.result.ResultHelper;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -150,7 +148,7 @@ public interface UemUserManageService {
      * @author wzr
      * @date 2022-08-02
      */
-    List<UemUserDto> queryStaffDutyBySelect();
+    List<SysPostDTO> queryStaffDutyBySelect();
 
     /**
      * 下拉框查询对用所有职称的数据
@@ -158,7 +156,7 @@ public interface UemUserManageService {
      * @author wzr
      * @date 2022-08-02
      */
-    List<UemUserDto> queryTechnicalNameBySelect();
+    List queryTechnicalNameBySelect();
 
     /**
      * 下拉框查询对用所有项目的数据
@@ -166,7 +164,7 @@ public interface UemUserManageService {
      * @author wzr
      * @date 2022-08-02
      */
-    List<UemUserDto> queryProjectNameBySelect();
+    List<UemProjectDTO> queryProjectNameBySelect();
 
     /**
      * 根据id查询对应员工信息
@@ -245,6 +243,7 @@ public interface UemUserManageService {
 
     /**
      * 查看转正评语部分信息
+     *
      * @param uemUserId
      * @return
      */
@@ -252,6 +251,7 @@ public interface UemUserManageService {
 
     /**
      * 查看离职原因
+     *
      * @param uemUserId
      * @return
      */
@@ -259,6 +259,7 @@ public interface UemUserManageService {
 
     /**
      * 查看辞退原因
+     *
      * @param uemUserId
      * @return
      */
@@ -266,6 +267,7 @@ public interface UemUserManageService {
 
     /**
      * 保存员工信息
+     *
      * @param uemUserDto
      * @return
      */
@@ -273,10 +275,19 @@ public interface UemUserManageService {
 
     /**
      * 离职申请添加离职理由
+     *
      * @param
      * @return
      */
-    ResultHelper<?> updateLeaveReason(Long uemUserId,String leaveReason);
+    ResultHelper<?> updateLeaveReason(Long uemUserId, String leaveReason);
 
+    /**
+     * 服务调用（任务模块通过查询用户id 取到name）
+     *
+     * @param
+     * @return
+     */
+
+    ResultHelper<UemUserDto> queryUemUserById(Long uemUserId);
 
 }
