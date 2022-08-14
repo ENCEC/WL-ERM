@@ -37,6 +37,7 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<String> faceRemark = taskDetailInfo.fieldOf("faceRemark", String.class);
     public static final FieldExpression<Date> faceTime = taskDetailInfo.fieldOf("faceTime", Date.class);
     public static final FieldExpression<String> faceScore = taskDetailInfo.fieldOf("faceScore", String.class);
+    public static final FieldExpression<String> faceResult = taskDetailInfo.fieldOf("faceResult", String.class);
     public static final FieldExpression<Long> leader = taskDetailInfo.fieldOf("leader", Long.class);
     public static final FieldExpression<String> leaderName = taskDetailInfo.fieldOf("leaderName", String.class);
     public static final FieldExpression<Long> modifierId = taskDetailInfo.fieldOf("modifierId", Long.class);

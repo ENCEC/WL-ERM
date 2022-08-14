@@ -164,6 +164,11 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
     @Column(name = "face_score")
     private String faceScore;
 
+    /**
+     * 面谈结果
+     */
+    @Column(name = "face_result")
+    private String faceResult;
 
     /**
      * 责任人ID

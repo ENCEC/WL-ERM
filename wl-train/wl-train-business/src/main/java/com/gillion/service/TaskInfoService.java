@@ -164,7 +164,7 @@ public interface TaskInfoService {
      * @author wzr
      * @date 2022-08-09
      */
-    ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId,Long taskDetailId);
+    ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId/*, Long taskDetailId*/);
 
     /**
      * 我的任务（项目经理初次审核） 查出规范条目所对应的规范细则 用作转正程序
@@ -214,4 +214,13 @@ public interface TaskInfoService {
      */
 
     ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDto taskDetailInfoDto);
+
+    /**
+     * 我的任务  撤回员工申请（逻辑删除）
+     *
+     * @author wzr
+     * @date 2022-08-12
+     */
+    ResultHelper<?> deletedApplyByStaff(Long taskInfoId);
+
 }

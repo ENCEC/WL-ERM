@@ -600,10 +600,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      * @date 2022-08-09
      */
     @Override
-    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId,Long taskDetailId) {
+    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId/*, Long taskDetailId*/) {
         Map<String, Long> parms = new HashMap<>(2);
         parms.put("taskInfoId", taskInfoId);
-        parms.put("taskDetailId", taskDetailId);
+       // parms.put("taskDetailId", taskDetailId);
         TaskDetailInfoDto result = DSContext.customization("WL-ERM_queryPositiveApply")
                 .selectOne().mapperTo(TaskDetailInfoDto.class)
                 .execute(parms);
@@ -634,13 +634,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Date faceTime = taskDetailInfoDto.getFaceTime();
-        String resultAccess = taskDetailInfoDto.getResultAccess();
+        String faceResult = taskDetailInfoDto.getFaceResult();
         String faceScore = taskDetailInfoDto.getFaceScore();
         String faceRemark = taskDetailInfoDto.getFaceRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne(QTaskDetailInfo.taskDetailInfo.fieldContainer()).byId(taskDetailId);
         taskDetailInfo.setApprover(uemUserId);
         taskDetailInfo.setFaceTime(faceTime);
-        taskDetailInfo.setResultAccess(resultAccess);
+        taskDetailInfo.setFaceResult(faceResult);
         taskDetailInfo.setFaceScore(faceScore);
         taskDetailInfo.setFaceRemark(faceRemark);
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
@@ -720,7 +720,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
         taskDetailInfo.setApprovalDate(approvalDate);
         taskDetailInfo.setResultAccess(resultAccess);
-        taskDetailInfoDto.setApprovalRemark(approvalRemark);
+        taskDetailInfo.setApprovalRemark(approvalRemark);
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         if (result > 0) {
@@ -788,6 +788,23 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             return CommonResult.getSuccessResultData("添加成功");
         } else {
             return CommonResult.getFaildResultData("出错啦!");
+        }
+    }
+
+    /**
+     * 我的任务  员工撤回申请
+     *
+     * @author wzr
+     * @date 2022-08-12
+     */
+
+    @Override
+    public ResultHelper<?> deletedApplyByStaff(Long taskInfoId) {
+        int result = QTaskInfo.taskInfo.deleteById(taskInfoId);
+        if (result == 1) {
+            return CommonResult.getSuccessResultData("撤回成功");
+        } else {
+            return CommonResult.getFaildResultData("撤回失败！");
         }
     }
 
