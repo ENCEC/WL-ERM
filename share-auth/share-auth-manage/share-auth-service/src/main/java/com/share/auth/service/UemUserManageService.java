@@ -1,8 +1,10 @@
 package com.share.auth.service;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
-import com.share.auth.domain.*;
-import com.share.auth.model.entity.UemUser;
+import com.share.auth.domain.SysRoleDTO;
+import com.share.auth.domain.UemUserDto;
+import com.share.auth.domain.UemUserEditDTO;
+import com.share.auth.domain.UemUserRoleDto;
 import com.share.support.result.ResultHelper;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -148,7 +150,7 @@ public interface UemUserManageService {
      * @author wzr
      * @date 2022-08-02
      */
-    List<SysPostDTO> queryStaffDutyBySelect();
+    List<UemUserDto> queryStaffDutyBySelect();
 
     /**
      * 下拉框查询对用所有职称的数据
@@ -156,7 +158,7 @@ public interface UemUserManageService {
      * @author wzr
      * @date 2022-08-02
      */
-    List queryTechnicalNameBySelect();
+    List<UemUserDto> queryTechnicalNameBySelect();
 
     /**
      * 下拉框查询对用所有项目的数据
@@ -164,7 +166,7 @@ public interface UemUserManageService {
      * @author wzr
      * @date 2022-08-02
      */
-    List<UemProjectDTO> queryProjectNameBySelect();
+    List<UemUserDto> queryProjectNameBySelect();
 
     /**
      * 根据id查询对应员工信息
@@ -243,7 +245,6 @@ public interface UemUserManageService {
 
     /**
      * 查看转正评语部分信息
-     *
      * @param uemUserId
      * @return
      */
@@ -251,7 +252,6 @@ public interface UemUserManageService {
 
     /**
      * 查看离职原因
-     *
      * @param uemUserId
      * @return
      */
@@ -259,7 +259,6 @@ public interface UemUserManageService {
 
     /**
      * 查看辞退原因
-     *
      * @param uemUserId
      * @return
      */
@@ -267,7 +266,6 @@ public interface UemUserManageService {
 
     /**
      * 保存员工信息
-     *
      * @param uemUserDto
      * @return
      */
@@ -275,11 +273,45 @@ public interface UemUserManageService {
 
     /**
      * 离职申请添加离职理由
-     *
      * @param
      * @return
      */
-    ResultHelper<?> updateLeaveReason(Long uemUserId, String leaveReason);
+    ResultHelper<?> updateLeaveReason(Long uemUserId,String leaveReason);
+
+    /**
+     * 上传文件
+     * @param uemUserId
+     * @param systemId
+     * @param fileType
+     * @param fileName
+     * @param file
+     * @return
+     */
+    ResultHelper<?> uploadExternalFile(Long uemUserId, String systemId, String fileType, String fileName, MultipartFile file);
+
+    /**
+     * 下拉框查询所有岗位的信息
+     * @return
+     */
+    List<SysPost> querySysPost ();
+
+    /**
+     * 下拉框查询所有职称的信息
+     * @return
+     */
+    List<SysTechnicalTitle> querySysTechnicalTitle ();
+
+    /**
+     * 下拉框查询所有项目的信息
+     * @return
+     */
+    List<UemProject> queryUemProject ();
+
+    /**
+     * 下拉框查询所有部门的信息
+     * @return
+     */
+    List<UemDept> queryUemDept ();
 
     /**
      * 服务调用（任务模块通过查询用户id 取到name）

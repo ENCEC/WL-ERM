@@ -17,6 +17,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>share-file-api</artifactId>
+            <version>1.2020.001-RELEASE</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <exclusions>
