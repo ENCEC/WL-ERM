@@ -282,22 +282,22 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
                 .execute();
         //获取更新前的执行序号
         Integer actionSerialNum = standardEntryDto.getActionSerialNum();
+        //获取最大执行序号
+        List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
+                .where(QStandardEntry.standardEntryId.goe$(1L))
+                .execute();
+        Integer[] strArray = new Integer[lists.size()];
+        for (int i = 0; i < strArray.length; i++) {
+            strArray[i] = lists.get(i).getActionSerialNum();
+        }
+        int maxActionSerialNum = 0;
+        for (Integer integer : strArray) {
+            if (integer > maxActionSerialNum) {
+                maxActionSerialNum = integer;
+            }
+        }
         //更新时执行序号传空值
         if (standardEntryDTO.getActionSerialNum() == null) {
-            List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
-                    .where(QStandardEntry.standardEntryId.goe$(1L))
-                    .execute();
-            Integer[] strArray = new Integer[lists.size()];
-            for (int i = 0; i < strArray.length; i++) {
-                strArray[i] = lists.get(i).getActionSerialNum();
-            }
-            int maxActionSerialNum = 0;
-            for (Integer integer : strArray) {
-                if (integer > maxActionSerialNum) {
-                    maxActionSerialNum = integer;
-                }
-            }
-
             List<StandardEntryDTO> standardEntryDTOS = new ArrayList<>();
             for (int i = 0; i < strArray.length; i++) {
                 if (actionSerialNum < strArray[i]) {
@@ -318,20 +318,26 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
         }
         //如果更新的执行序号，比以前的小
         else if (standardEntryDTO.getActionSerialNum() < actionSerialNum && standardEntryDTO.getActionSerialNum() > 0) {
-            List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
+            List<StandardEntry> list = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
                     .where(QStandardEntry.actionSerialNum.between(":actionSerialNum1", ":actionSerialNum2"))
                     .execute(ImmutableMap.of("actionSerialNum1", standardEntryDTO.getActionSerialNum(), "actionSerialNum2", actionSerialNum));
-            Integer[] strArray = new Integer[lists.size()];
-            for (int i = 0; i < strArray.length; i++) {
-                strArray[i] = lists.get(i).getActionSerialNum();
+            Integer[] str = new Integer[list.size()];
+            for (int i = 0; i < str.length; i++) {
+                str[i] = list.get(i).getActionSerialNum();
             }
             List<StandardEntryDTO> standardEntryDTOS = new ArrayList<>();
-            for (int i = 0; i < strArray.length; i++) {
+            for (int i = 0; i < str.length; i++) {
                 StandardEntryDTO standardEntry = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
-                        .where(QStandardEntry.actionSerialNum.eq$(strArray[i]))
+                        .where(QStandardEntry.actionSerialNum.eq$(str[i]))
                         .mapperTo(StandardEntryDTO.class)
                         .execute();
                 standardEntryDTOS.add(standardEntry);
+            }
+            //在集合中移除更新的数据
+            for (int i = 0; i <standardEntryDTOS.size() ; i++) {
+                if (standardEntryDTOS.get(i).getActionSerialNum() == actionSerialNum) {
+                    standardEntryDTOS.remove(i);
+                }
             }
             standardEntryDTOS.forEach(x -> {
                 x.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
@@ -342,27 +348,26 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
         }
         //如果更新执行序号比以前的大
         else if (standardEntryDTO.getActionSerialNum() > actionSerialNum) {
-            List<StandardEntry> lists = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
+            List<StandardEntry> standardEntryList = QStandardEntry.standardEntry.select(QStandardEntry.actionSerialNum)
                     .where(QStandardEntry.actionSerialNum.between(":actionSerialNum1", ":actionSerialNum2"))
                     .execute(ImmutableMap.of("actionSerialNum1", actionSerialNum, "actionSerialNum2", standardEntryDTO.getActionSerialNum()));
-            Integer[] strArray = new Integer[lists.size()];
-            for (int i = 0; i < strArray.length; i++) {
-                strArray[i] = lists.get(i).getActionSerialNum();
+            Integer[] arr = new Integer[standardEntryList.size()];
+            for (int i = 0; i < arr.length; i++) {
+                arr[i] = standardEntryList.get(i).getActionSerialNum();
             }
-            int maxActionSerialNum = 0;
-            for (Integer integer : strArray) {
-                if (integer > maxActionSerialNum) {
-                    maxActionSerialNum = integer;
-                }
-            }
-
             List<StandardEntryDTO> standardEntryDTOS = new ArrayList<>();
-            for (int i = 0; i < strArray.length; i++) {
+            for (int i = 0; i < arr.length; i++) {
                 StandardEntryDTO standardEntry = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
-                        .where(QStandardEntry.actionSerialNum.eq$(strArray[i]))
+                        .where(QStandardEntry.actionSerialNum.eq$(arr[i]))
                         .mapperTo(StandardEntryDTO.class)
                         .execute();
                 standardEntryDTOS.add(standardEntry);
+            }
+            //在集合中移除更新的数据
+            for (int i = 0; i <standardEntryDTOS.size() ; i++) {
+                if (standardEntryDTOS.get(i).getActionSerialNum() == actionSerialNum) {
+                    standardEntryDTOS.remove(i);
+                }
             }
             //将比传的值大于或者等于的执行序号减一
             standardEntryDTOS.forEach(x -> {
