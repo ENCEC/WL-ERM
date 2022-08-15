@@ -5,6 +5,10 @@ import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
+import com.share.auth.model.entity.SysPost;
+import com.share.auth.model.entity.SysTechnicalTitle;
+import com.share.auth.model.entity.UemDept;
+import com.share.auth.model.entity.UemProject;
 import com.share.support.result.ResultHelper;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -278,5 +282,48 @@ public interface UemUserManageService {
      */
     ResultHelper<?> updateLeaveReason(Long uemUserId,String leaveReason);
 
+    /**
+     * 上传文件
+     * @param uemUserId
+     * @param systemId
+     * @param fileType
+     * @param fileName
+     * @param file
+     * @return
+     */
+    ResultHelper<?> uploadExternalFile(Long uemUserId, String systemId, String fileType, String fileName, MultipartFile file);
+
+    /**
+     * 下拉框查询所有岗位的信息
+     * @return
+     */
+    List<SysPost> querySysPost ();
+
+    /**
+     * 下拉框查询所有职称的信息
+     * @return
+     */
+    List<SysTechnicalTitle> querySysTechnicalTitle ();
+
+    /**
+     * 下拉框查询所有项目的信息
+     * @return
+     */
+    List<UemProject> queryUemProject ();
+
+    /**
+     * 下拉框查询所有部门的信息
+     * @return
+     */
+    List<UemDept> queryUemDept ();
+
+    /**
+     * 服务调用（任务模块通过查询用户id 取到name）
+     *
+     * @param
+     * @return
+     */
+
+    ResultHelper<UemUserDto> queryUemUserById(Long uemUserId);
 
 }

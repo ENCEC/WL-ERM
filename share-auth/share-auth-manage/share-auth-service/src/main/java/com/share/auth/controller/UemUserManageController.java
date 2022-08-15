@@ -6,6 +6,10 @@ import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
+import com.share.auth.model.entity.SysPost;
+import com.share.auth.model.entity.SysTechnicalTitle;
+import com.share.auth.model.entity.UemDept;
+import com.share.auth.model.entity.UemProject;
 import com.share.auth.service.UemUserManageService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -497,4 +501,59 @@ public class UemUserManageController {
             @RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
         return uemUserManageService.updateLeaveReason(uemUserId,leaveReason);
     }
+
+    /**
+     * 上传文件
+     * @param systemId
+     * @param fileType
+     * @param fileName
+     * @param uemUserId
+     * @param file
+     * @return
+     */
+    @RequestMapping(value = "/uploadExternalFile")
+    public  ResultHelper<?> uploadExternalFile(@RequestParam("systemId") String systemId,
+                                               @RequestParam("fileType") String fileType,
+                                               @RequestParam("fileName") String fileName,
+                                               @RequestParam("uemUserId") Long uemUserId,
+                                               @RequestPart("file") MultipartFile file) {
+        return uemUserManageService.uploadExternalFile(uemUserId,systemId, fileType, fileName, file);
+    }
+
+    /**
+     * 下拉框查询所有岗位的信息
+     * @return
+     */
+    @GetMapping("querySysPost")
+    public List<SysPost> querySysPost() {
+        return uemUserManageService.querySysPost();
+    }
+
+    /**
+     * 下拉框查询所有职称的信息
+     * @return
+     */
+    @GetMapping("querySysTechnicalTitle")
+    public List<SysTechnicalTitle> querySysTechnicalTitle() {
+        return uemUserManageService.querySysTechnicalTitle();
+    }
+
+    /**
+     * 下拉框查询所有项目的信息
+     * @return
+     */
+    @GetMapping("queryUemProject")
+    public List<UemProject> queryUemProject() {
+        return uemUserManageService.queryUemProject();
+    }
+
+    /**
+     * 下拉框查询所有部门的信息
+     * @return
+     */
+    @GetMapping("queryUemDept")
+    public List<UemDept> queryUemDept() {
+        return uemUserManageService.queryUemDept();
+    }
+
 }

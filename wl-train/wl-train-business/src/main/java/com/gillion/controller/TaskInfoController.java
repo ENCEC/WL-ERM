@@ -158,8 +158,8 @@ public class TaskInfoController {
 
     @GetMapping("/queryPositiveApply")
     @ApiOperation("根据任务id查询该申请人的转正申请")
-    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(@RequestParam Long taskInfoId, @RequestParam Long taskDetailId) {
-        return taskInfoService.queryPositiveApply(taskInfoId, taskDetailId);
+    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(@RequestParam Long taskInfoId/*, @RequestParam Long taskDetailId*/) {
+        return taskInfoService.queryPositiveApply(taskInfoId/*, taskDetailId*/);
     }
 
     @PostMapping("/queryAllStandardDetail")
@@ -195,9 +195,9 @@ public class TaskInfoController {
 
     @GetMapping("/queryLeaveInfoByLeader")
     @ApiOperation("我的任务（部门领导最终审核）查看离职信息以及基本信息")
-    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long uemUserId, @RequestParam Long taskDetailId) {
+    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long uemUserId/*, @RequestParam Long taskDetailId*/) {
         List list = new ArrayList();
-        ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId, taskDetailId);
+        ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId/*, taskDetailId*/);
         ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(uemUserId);
         list.add(taskDetailInfoDtoResultHelper);
         list.add(uemUserDtoResultHelper);
@@ -216,4 +216,9 @@ public class TaskInfoController {
         return taskInfoService.savePositiveInfoByStaff(taskDetailInfoDto);
     }
 
+    @GetMapping("/deletedApplyByStaff")
+    @ApiOperation("我的任务 员工撤回申请")
+    public ResultHelper<?> deletedApplyByStaff(@RequestParam Long taskInfoId) {
+        return taskInfoService.deletedApplyByStaff(taskInfoId);
+    }
 }

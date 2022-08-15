@@ -163,6 +163,12 @@ public class TaskDetailInfoDto implements Serializable {
     private String faceScore;
 
     /**
+     * 面谈结果
+     */
+    @ApiModelProperty("面谈结果")
+    private String faceResult;
+
+    /**
      * 审批意见
      */
     @ApiModelProperty("审批意见")

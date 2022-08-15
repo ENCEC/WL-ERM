@@ -11,13 +11,13 @@ import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
-import com.share.auth.model.entity.UemUser;
-import com.share.auth.model.entity.UemUserRole;
-import com.share.auth.model.querymodels.QUemUser;
-import com.share.auth.model.querymodels.QUemUserRole;
+import com.share.auth.model.entity.*;
+import com.share.auth.model.querymodels.*;
 import com.share.auth.service.UemUserManageService;
 import com.share.auth.service.UemUserService;
 import com.share.auth.user.DefaultUserService;
+import com.share.file.api.ShareFileInterface;
+import com.share.file.domain.FastDfsUploadResult;
 import com.share.message.api.EmailTemplateService;
 import com.share.message.domain.SendEmailVO;
 import com.share.support.result.CommonResult;
@@ -57,6 +57,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     @Autowired
     private EmailTemplateService emailTemplateService;
+
+    @Autowired
+    private ShareFileInterface shareFileInterface;
 
     /**
      * 查询用户信息
@@ -991,6 +994,93 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             return CommonResult.getSuccessResultData("更新成功");
         } else {
             return CommonResult.getFaildResultData("更新失败");
+        }
+    }
+
+    /**
+     * 上传文件
+     * @param uemUserId
+     * @param systemId
+     * @param fileType
+     * @param fileName
+     * @param file
+     * @return
+     */
+    @Override
+    public ResultHelper<?> uploadExternalFile(Long uemUserId,String systemId, String fileType, String fileName, MultipartFile file) {
+        FastDfsUploadResult fastDfsUploadResult = shareFileInterface.uploadExternalFile(systemId, fileType, fileName, file);
+        String fileKey = fastDfsUploadResult.getFileKey();
+        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        uemUser.setResume(fileKey);
+        int count = QUemUser.uemUser.save(uemUser);
+        if (count == 1) {
+            return CommonResult.getSuccessResultData(fileKey);
+        } else {
+            return CommonResult.getFaildResultData("上传失败");
+        }
+    }
+
+    /**
+     * 下拉框查询所有岗位的信息
+     * @return
+     */
+    @Override
+    public List<SysPost> querySysPost() {
+        List<SysPost> sysPosts = QSysPost.sysPost.select().where(QSysPost.postId.goe$(1L)).execute();
+        return sysPosts;
+    }
+
+    /**
+     * 下拉框查询所有职称的信息
+     * @return
+     */
+    @Override
+    public List<SysTechnicalTitle> querySysTechnicalTitle() {
+        List<SysTechnicalTitle> sysTechnicalTitles = QSysTechnicalTitle.sysTechnicalTitle.select().where(QSysTechnicalTitle.technicalTitleId.goe$(1L)).execute();
+        return sysTechnicalTitles;
+    }
+
+    /**
+     * 下拉框查询所有项目的信息
+     * @return
+     */
+    @Override
+    public List<UemProject> queryUemProject() {
+        List<UemProject> uemProjects = QUemProject.uemProject.select().where(QUemProject.uemProjectId.goe$(1L)).execute();
+        return uemProjects;
+    }
+
+    /**
+     * 下拉框查询所有部门的信息
+     * @return
+     */
+    @Override
+    public List<UemDept> queryUemDept() {
+        List<UemDept> uemDepts = QUemDept.uemDept.select().where(QUemDept.uemDeptId.goe$(1L)).execute();
+        return uemDepts;
+    }
+
+
+    /**
+     * 服务调用（任务模块通过查询用户id 取到name）
+     *
+     * @param
+     * @return
+     */
+    @Override
+    public ResultHelper<UemUserDto> queryUemUserById(Long uemUserId) {
+        UemUserDto result = QUemUser.uemUser.selectOne(
+                        QUemUser.uemUserId,
+                        QUemUser.name
+                )
+                .where(QUemUser.uemUserId.eq$(uemUserId))
+                .mapperTo(UemUserDto.class)
+                .execute();
+        if (result == null) {
+            return CommonResult.getFaildResultData("查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(result);
         }
     }
 
