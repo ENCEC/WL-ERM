@@ -104,7 +104,7 @@ public class UemProjectServiceImpl implements UemProjectService {
         if (Objects.isNull(uemProjectDTO.getStatus())) {
             return CommonResult.getFaildResultData("项目进行状态不能为空");
         }
-        if (StrUtil.isEmpty(uemProjectDTO.getDutyName())) {
+        if (Objects.isNull(uemProjectDTO.getDutyId())) {
             return CommonResult.getFaildResultData("项目经理不能为空");
         }
         if (StrUtil.isEmpty(uemProjectDTO.getGenDemandUsers())) {
@@ -195,8 +195,6 @@ public class UemProjectServiceImpl implements UemProjectService {
         //更新信息
         BeanUtils.copyProperties(uemProjectDTO, uemProject);
         uemProject.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        //更新时间
-        uemProject.setModifyTime(new DateTime());
         int row = QUemProject.uemProject.save(uemProject);
 
         if (row > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
