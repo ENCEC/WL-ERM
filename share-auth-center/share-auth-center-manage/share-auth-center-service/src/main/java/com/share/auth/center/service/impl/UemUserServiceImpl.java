@@ -115,7 +115,7 @@ public class UemUserServiceImpl implements UemUserService {
     private UemUser getUemUser(String username) {
         return QUemUser.uemUser
                 .selectOne()
-                .where(QUemUser.account.eq$(username))
+                .where(QUemUser.account.eq$(username).and(QUemUser.isDeleted.eq$(false)))
                 .execute();
     }
 
@@ -260,7 +260,7 @@ public class UemUserServiceImpl implements UemUserService {
         // 查询用户信息
         UemUser user = QUemUser.uemUser
                 .selectOne()
-                .where(QUemUser.account.eq$(account))
+                .where(QUemUser.account.eq$(account).and(QUemUser.isDeleted.eq$(false)))
                 .execute();
         // 校验账号是否锁定
         if (user.getIsLocked()) {
