@@ -139,38 +139,6 @@ public interface UemUserManageService {
      */
     Page<UemUserDto> queryStaffByPage(UemUserDto uemUserDto);
 
-    /**
-     * 下拉框查询对应部门的所有数据
-     *
-     * @return List<UemUserDto>
-     * @author wzr
-     * @date 2022-08-02
-     */
-    List<UemUserDto> queryDepartmentBySelect();
-
-    /**
-     * 下拉框查询对应岗位的所有数据
-     *
-     * @author wzr
-     * @date 2022-08-02
-     */
-    List<UemUserDto> queryStaffDutyBySelect();
-
-    /**
-     * 下拉框查询对用所有职称的数据
-     *
-     * @author wzr
-     * @date 2022-08-02
-     */
-    List<UemUserDto> queryTechnicalNameBySelect();
-
-    /**
-     * 下拉框查询对用所有项目的数据
-     *
-     * @author wzr
-     * @date 2022-08-02
-     */
-    List<UemUserDto> queryProjectNameBySelect();
 
     /**
      * 根据id查询对应员工信息
@@ -199,15 +167,6 @@ public interface UemUserManageService {
      * @date 2022-08-02
      */
     ResultHelper<Object> deleteStaff(Long uemUserId);
-
-    /**
-     * 重新上传员工简历---编辑功能
-     *
-     * @param mFile
-     * @author wzr
-     * @date 2022-08-03
-     */
-    ResultHelper<?> uploadStaffFile(MultipartFile mFile);
 
 
     /**

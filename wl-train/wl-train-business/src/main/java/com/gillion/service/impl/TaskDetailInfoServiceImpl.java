@@ -108,7 +108,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
                 .where(QTaskInfo.dispatchers.eq$(dispatchers).and(QTaskInfo.taskTitle.eq$(taskTitle)))
                 .mapperTo(TaskInfoDto.class)
                 .execute();
-        TaskDetailInfo execute = QTaskDetailInfo.taskDetailInfo.selectOne(QTaskDetailInfo.interviewerId,QTaskDetailInfo.faceRemark,QTaskDetailInfo.approver,QTaskDetailInfo.offerRemark)
+        TaskDetailInfo execute = QTaskDetailInfo.taskDetailInfo.selectOne(QTaskDetailInfo.interviewerId,QTaskDetailInfo.faceRemark,QTaskDetailInfo.approver,QTaskDetailInfo.offerRemark,QTaskDetailInfo.createTime,QTaskDetailInfo.creatorName)
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId()))
                 .execute();
         UemUserDto uemUserDto = standardEntryInterface.queryOfferInfo(dispatchers);
