@@ -103,11 +103,31 @@ public class SysResourceServiceImpl implements SysResourceService {
             return CommonResult.getFaildResultData("用户不存在！");
         }
         // 根据应用id，用户id查出该应用该用户启用的角色列表
+        sysResourceQueryVO.setSysApplicationId(oauthClientDetails.getSysApplicationId());
         List<QueryResourceDTO> queryResourceDTOList = DSContext
                 .customization("WL-ERM_selectResourceListByUser")
                 .select()
                 .mapperTo(QueryResourceDTO.class)
                 .execute(sysResourceQueryVO);
+        List<Long> resourcePidList = queryResourceDTOList.stream()
+                .map(QueryResourceDTO::getResourcePid)
+                .collect(Collectors.toList());
+        List<QueryResourceDTO> parentResourceDtoList = QSysResource.sysResource
+                .select(QSysResource.sysResourceId,
+                        QSysResource.sysApplicationId,
+                        QSysResource.resourceLogo,
+                        QSysResource.resourceTitle,
+                        QSysResource.resourceUrl,
+                        QSysResource.resourceRemark,
+                        QSysResource.resourceSort,
+                        QSysResource.resourcePid,
+                        QSysResource.resourceType,
+                        QSysResource.component,
+                        QSysResource.componentName)
+                .where(QSysResource.sysResourceId.in$(resourcePidList))
+                .mapperTo(QueryResourceDTO.class)
+                .execute();
+        queryResourceDTOList.addAll(parentResourceDtoList);
         queryResourceDTOList = dealWithResource(queryResourceDTOList, true);
         return CommonResult.getSuccessResultData(queryResourceDTOList);
     }

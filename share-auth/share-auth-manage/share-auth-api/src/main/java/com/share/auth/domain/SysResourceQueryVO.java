@@ -21,4 +21,6 @@ public class SysResourceQueryVO {
     /** 按钮所属页面的资源URL */
     private String resourceUrl;
 
+    private Long sysApplicationId;
+
 }
