@@ -9,9 +9,9 @@ import com.gillion.model.entity.TaskInfo;
 import java.util.Date;
 
 /**
-* @author daoServiceGenerator
-* @version 1.0.0.0
-*/
+ * @author daoServiceGenerator
+ * @version 1.0.0.0
+ */
 @SuppressWarnings({"AlibabaConstantFieldShouldBeUpperCase", "unused", "AlibabaClassNamingShouldBeCamel"})
 public class QTaskInfo extends BaseModelExpression<TaskInfo, Long> {
 
@@ -37,6 +37,7 @@ public class QTaskInfo extends BaseModelExpression<TaskInfo, Long> {
     public static final FieldExpression<Long> taskInfoId = taskInfo.fieldOf("taskInfoId", Long.class);
     public static final FieldExpression<String> taskTitle = taskInfo.fieldOf("taskTitle", String.class);
     public static final FieldExpression<String> taskType = taskInfo.fieldOf("taskType", String.class);
+    public static final FieldExpression<Integer> isDeleted = taskInfo.fieldOf("isDeleted", Integer.class);
 
     public static final BaseModelExpression<TaskDetailInfo, Long> taskDetailInfo = new QTaskDetailInfo(taskInfo, "taskDetailInfo");
 

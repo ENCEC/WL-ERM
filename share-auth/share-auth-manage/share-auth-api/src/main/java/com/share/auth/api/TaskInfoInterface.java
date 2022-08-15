@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @ClassName TaskInfoInterface
  * @Author wzr
  * @Date 2022/8/10
+ * <p>
+ * <p>
+ * wl-train模块进行服务调用
  **/
 
 @FeignClient(value = "${application.name.auth}")
@@ -22,4 +25,13 @@ public interface TaskInfoInterface {
      */
     @GetMapping("/uemUserManage/queryLeaveInfo")
     ResultHelper<UemUserDto> queryLeaveInfo(@RequestParam(value = "uemUserId") Long uemUserId);
+
+    /**
+     * 联想控件---user表id查name
+     *
+     * @param uemUserId
+     * @return
+     */
+    @GetMapping("/uemUserManage/queryUemUserId")
+    ResultHelper<?> queryUemUserId(@RequestParam(value = "uemUserId") Long uemUserId);
 }

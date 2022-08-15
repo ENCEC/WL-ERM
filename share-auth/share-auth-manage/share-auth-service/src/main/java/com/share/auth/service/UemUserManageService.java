@@ -9,10 +9,7 @@ import com.share.auth.model.entity.SysPost;
 import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.entity.UemDept;
 import com.share.auth.model.entity.UemProject;
-import com.share.file.domain.FastDfsUploadResult;
 import com.share.support.result.ResultHelper;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -320,5 +317,13 @@ public interface UemUserManageService {
      */
     List<UemDept> queryUemDept ();
 
+    /**
+     * 服务调用（任务模块通过查询用户id 取到name）
+     *
+     * @param
+     * @return
+     */
+
+    ResultHelper<UemUserDto> queryUemUserById(Long uemUserId);
 
 }

@@ -32,8 +32,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -1061,6 +1059,29 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     public List<UemDept> queryUemDept() {
         List<UemDept> uemDepts = QUemDept.uemDept.select().where(QUemDept.uemDeptId.goe$(1L)).execute();
         return uemDepts;
+    }
+
+
+    /**
+     * 服务调用（任务模块通过查询用户id 取到name）
+     *
+     * @param
+     * @return
+     */
+    @Override
+    public ResultHelper<UemUserDto> queryUemUserById(Long uemUserId) {
+        UemUserDto result = QUemUser.uemUser.selectOne(
+                        QUemUser.uemUserId,
+                        QUemUser.name
+                )
+                .where(QUemUser.uemUserId.eq$(uemUserId))
+                .mapperTo(UemUserDto.class)
+                .execute();
+        if (result == null) {
+            return CommonResult.getFaildResultData("查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(result);
+        }
     }
 
 

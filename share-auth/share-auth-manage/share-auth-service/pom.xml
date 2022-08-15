@@ -604,6 +604,17 @@
             <version>10.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.gillion.train</groupId>
+            <artifactId>wl-train-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.share</groupId>
+            <artifactId>share-file-api</artifactId>
+            <version>1.2020.001-RELEASE</version>
+        </dependency>
 
     </dependencies>
 
