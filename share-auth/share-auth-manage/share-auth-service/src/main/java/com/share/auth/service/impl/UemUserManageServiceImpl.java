@@ -58,6 +58,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Autowired
     private EmailTemplateService emailTemplateService;
 
+    @Autowired
+    private ShareFileInterface shareFileInterface;
+
     /**
      * 查询用户信息
      *

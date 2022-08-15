@@ -5,6 +5,10 @@ import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
+import com.share.auth.model.entity.SysPost;
+import com.share.auth.model.entity.SysTechnicalTitle;
+import com.share.auth.model.entity.UemDept;
+import com.share.auth.model.entity.UemProject;
 import com.share.support.result.ResultHelper;
 import org.springframework.web.multipart.MultipartFile;
 
