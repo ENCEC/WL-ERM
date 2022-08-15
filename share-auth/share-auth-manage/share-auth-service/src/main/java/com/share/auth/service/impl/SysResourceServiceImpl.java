@@ -545,6 +545,10 @@ public class SysResourceServiceImpl implements SysResourceService {
      */
     @Override
     public ResultHelper<Object> saveResource(SysResourceDTO sysResourceDTO) {
+        //获取用户权限管理系统id
+        SysApplication sysApplication = QSysApplication.sysApplication.selectOne()
+                .where(QSysApplication.sysApplicationId.eq$(6726670753768472579L)).execute();
+        Long sysApplicationId = sysApplication.getSysApplicationId();
         SysResource sysResource = new SysResource();
         String resourceTitle = sysResourceDTO.getResourceTitle();
         String resourceUrl = sysResourceDTO.getResourceUrl();
@@ -553,7 +557,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         Long sysResourceId = sysResourceDTO.getSysResourceId();
         Long resourcePid = sysResourceDTO.getResourcePid();
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        sysResource.setSysApplicationId(1L);
+        sysResource.setSysApplicationId(sysApplicationId);
         sysResource.setIsValid(true);
         sysResource.setSysResourceId(sysResourceId);
         sysResource.setResourcePid(resourcePid);
@@ -584,21 +588,6 @@ public class SysResourceServiceImpl implements SysResourceService {
                         ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class)
                 .sorting()
                 .execute(sysResourceDTO);
-      /*  return QSysResource.sysResource.select(
-                        QSysResource.sysResourceId,
-                        QSysResource.sysResource.chain(QSysResource.resourceTitle).as("parentName"),
-                        QSysResource.resourceTitle,
-                        QSysResource.resourcePid,
-                        QSysResource.creatorName,
-                        QSysResource.resourceUrl,
-                        QSysResource.resourceSort,
-                        QSysResource.createTime,
-                        QSysResource.isValid).
-                where(QSysResource.resourceTitle._like$_(sysResourceDTO.getResourceTitle())
-                        .and(QSysResource.isValid.eq(":isValid")))
-                .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
-                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysResourceDTO.class)
-                .sorting(QSysResource.resourceSort.asc()).execute(sysResourceDTO);*/
     }
 
     /**
@@ -631,7 +620,6 @@ public class SysResourceServiceImpl implements SysResourceService {
     @Override
     public ResultHelper<Object> updateResource(SysResourceDTO sysResourceDTO) {
         Long resourceId = sysResourceDTO.getSysResourceId();
-        // Boolean isValid = sysResourceDTO.getIsValid();
         String resourceTitle = sysResourceDTO.getResourceTitle();
         String resourceUrl = sysResourceDTO.getResourceUrl();
         Integer resourceSort = sysResourceDTO.getResourceSort();
@@ -639,7 +627,6 @@ public class SysResourceServiceImpl implements SysResourceService {
         SysResource sysResource = QSysResource.sysResource.selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         sysResource.setSysResourceId(resourceId);
-        // sysResource.setIsValid(isValid);
         sysResource.setResourceTitle(resourceTitle);
         sysResource.setResourceUrl(resourceUrl);
         sysResource.setResourceSort(resourceSort);
