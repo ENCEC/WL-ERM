@@ -221,55 +221,6 @@ public class UemUserManageController {
         Page<UemUserDto> uemUserDtoPage = uemUserManageService.queryStaffByPage(uemUserDto);
         return uemUserDtoPage;
     }
-
-    /**
-     * 下拉框查询对应所有部门的信息
-     *
-     * @author wzr
-     * @date 2022-08-02
-     */
-    @PostMapping("/queryDepartmentBySelect")
-    @ApiOperation(value = "下拉框查询对应所有部门的信息")
-    public List<UemUserDto> queryDepartmentBySelect() {
-        return uemUserManageService.queryDepartmentBySelect();
-    }
-
-    /**
-     * 下拉框查询对应所有岗位的信息
-     *
-     * @author wzr
-     * @date 2022-08-02
-     */
-    @PostMapping("/queryStaffDutyBySelect")
-    @ApiOperation(value = "下拉框查询对应所有岗位的信息")
-    public List<UemUserDto> queryStaffDutyBySelect() {
-        return uemUserManageService.queryStaffDutyBySelect();
-    }
-
-    /**
-     * 下拉框查询对应所有职称的信息
-     *
-     * @author wzr
-     * @date 2022-08-02
-     */
-    @PostMapping("/queryTechnicalNameBySelect")
-    @ApiOperation(value = "下拉框查询对应所有职称的信息")
-    public List<UemUserDto> queryTechnicalNameBySelect() {
-        return uemUserManageService.queryTechnicalNameBySelect();
-    }
-
-    /**
-     * 下拉框查询对应所有项目的信息
-     *
-     * @author wzr
-     * @date 2022-08-02
-     */
-    @PostMapping("/queryProjectNameBySelect")
-    @ApiOperation(value = "下拉框查询对应所有项目的信息")
-    public List<UemUserDto> queryProjectNameBySelect() {
-        return uemUserManageService.queryProjectNameBySelect();
-    }
-
     /**
      * 根据id查询对应员工信息
      *
@@ -306,16 +257,6 @@ public class UemUserManageController {
         return uemUserManageService.deleteStaff(uemUserId);
     }
 
-    /**
-     * 编辑重新上传员工简历
-     *
-     * @author wzr
-     * @date 2022-08-03
-     */
-    @PostMapping("/upload")
-    public ResultHelper<?> uploadStaffFile(@RequestBody MultipartFile mFile) {
-        return uemUserManageService.uploadStaffFile(mFile);
-    }
 
     /**
      * 下载员工简历

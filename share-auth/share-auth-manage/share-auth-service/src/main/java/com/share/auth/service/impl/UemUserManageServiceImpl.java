@@ -34,8 +34,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -486,69 +484,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .execute();
     }
 
-    /**
-     * 下拉框获取所有部门信息
-     *
-     * @author wzr
-     * @date 2022-08-03
-     */
-    @Override
-    public List<UemUserDto> queryDepartmentBySelect() {
-        return QUemUser.uemUser.select(
-                        QUemUser.uemDeptId,
-                        QUemUser.deptName
-                ).where(QUemUser.isDeleted.eq$(false)
-                        .and(QUemUser.uemDeptId.notNull()))
-                .mapperTo(UemUserDto.class).execute();
-    }
-
-    /**
-     * 下拉框获取所有岗位信息
-     *
-     * @author wzr
-     * @date 2022-08-03
-     */
-    @Override
-    public List<UemUserDto> queryStaffDutyBySelect() {
-        return QUemUser.uemUser.select(
-                        QUemUser.staffDutyCode,
-                        QUemUser.staffDuty
-                ).where(QUemUser.isDeleted.eq$(false)
-                        .and(QUemUser.staffDutyCode.notNull()))
-                .mapperTo(UemUserDto.class).execute();
-    }
-
-    /**
-     * 下拉框获取所有职称信息
-     *
-     * @author wzr
-     * @date 2022-08-03
-     */
-    @Override
-    public List<UemUserDto> queryTechnicalNameBySelect() {
-        return QUemUser.uemUser.select(
-                        QUemUser.technicalTitleId,
-                        QUemUser.technicalName
-                ).where(QUemUser.isDeleted.eq$(false)
-                        .and(QUemUser.technicalTitleId.notNull()))
-                .mapperTo(UemUserDto.class).execute();
-    }
-
-    /**
-     * 下拉框获取所有项目信息
-     *
-     * @author wzr
-     * @date 2022-08-03
-     */
-    @Override
-    public List<UemUserDto> queryProjectNameBySelect() {
-        return QUemUser.uemUser.select(
-                        QUemUser.projectId,
-                        QUemUser.projectName
-                ).where(QUemUser.isDeleted.eq$(false)
-                        .and(QUemUser.projectId.notNull()))
-                .mapperTo(UemUserDto.class).execute();
-    }
 
     /**
      * 根据id查询员工信息
@@ -638,40 +573,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     }
 
     /**
-     * 员工简历编辑
-     *
-     * @author wzr
-     * @date 2022-08-03
-     */
-    @Override
-    public ResultHelper<?> uploadStaffFile(MultipartFile mFile) {
-        if (mFile.getSize() < 1) {
-            return CommonResult.getFaildResultData("文件为空");
-        }
-        //获取文件名
-        String orgFileName = mFile.getOriginalFilename();
-//        String dateTimeStr = DateUtil.formatDate(new Date(), "yyyyMMddHHmmss");
-        StringBuilder path = new StringBuilder("D:\\\\uploadFile\\");
-        path.append(orgFileName);
-        String filePath = path.toString();
-
-        File file = new File(filePath);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        try {
-            mFile.transferTo(file);
-            //把上传文件路径存进数据库
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return CommonResult.getFaildResultData("上传失败");
-        }
-        return CommonResult.getSuccessResultData("上传成功");
-    }
-
-
-    /**
      * 转正，离职，辞退---查看信息
      *
      * @author wzr
@@ -690,7 +591,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.deptName,
                         QUemUser.staffDuty,
                         QUemUser.offerDate,
-                        QUemUser.positiveType
+                        QUemUser.positiveType,
+                        QUemUser.resume
                 )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
@@ -769,21 +671,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
         return CommonResult.getSuccessResultData("新增成功!");
     }
-     /*   Long uemUserId = uemUserDto.getUemUserId();
-        Date offerDate = uemUserDto.getOfferDate();
-        Long positiveType = uemUserDto.getPositiveType();
-        Long defenseScore = uemUserDto.getDefenseScore();
-        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
-        uemUser.setOfferDate(offerDate);
-        uemUser.setPositiveType(positiveType);
-        uemUser.setDefenseScore(defenseScore);
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        int result = QUemUser.uemUser.save(uemUser);
-        if (result == 1) {
-            return CommonResult.getSuccessResultData("新增成功!");
-        } else {
-            return CommonResult.getFaildResultData("新增失败！");
-        }*/
 
     /**
      * 添加离职信息
@@ -834,48 +721,50 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 查看转正评语部分信息
+     *
      * @param uemUserId
      * @return
      */
     @Override
     public UemUserDto queryOfferInfo(Long uemUserId) {
         UemUserDto execute = QUemUser.uemUser.selectOne(
-                QUemUser.uemUserId,
-                QUemUser.name,
-                QUemUser.sex,
-                QUemUser.entryDate,
-                QUemUser.jobStatus,
-                QUemUser.deptCode,
-                QUemUser.staffDutyCode,
-                QUemUser.offerDate,
-                QUemUser.positiveType,
-                QUemUser.defenseScore
-        )
+                        QUemUser.uemUserId,
+                        QUemUser.name,
+                        QUemUser.sex,
+                        QUemUser.entryDate,
+                        QUemUser.jobStatus,
+                        QUemUser.deptCode,
+                        QUemUser.staffDutyCode,
+                        QUemUser.offerDate,
+                        QUemUser.positiveType,
+                        QUemUser.defenseScore
+                )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
-        
+
         return execute;
     }
 
     /**
      * 查看离职原因
+     *
      * @param uemUserId
      * @return
      */
     @Override
     public ResultHelper<UemUserDto> queryLeaveInfo(Long uemUserId) {
         UemUserDto execute = QUemUser.uemUser.selectOne(
-                QUemUser.uemUserId,
-                QUemUser.name,
-                QUemUser.sex,
-                QUemUser.entryDate,
-                QUemUser.jobStatus,
-                QUemUser.deptCode,
-                QUemUser.staffDutyCode,
-                QUemUser.leaveDate,
-                QUemUser.leaveReason
-        )
+                        QUemUser.uemUserId,
+                        QUemUser.name,
+                        QUemUser.sex,
+                        QUemUser.entryDate,
+                        QUemUser.jobStatus,
+                        QUemUser.deptCode,
+                        QUemUser.staffDutyCode,
+                        QUemUser.leaveDate,
+                        QUemUser.leaveReason
+                )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
@@ -888,22 +777,23 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 查看辞退原因
+     *
      * @param uemUserId
      * @return
      */
     @Override
     public ResultHelper<UemUserDto> queryDismissInfo(Long uemUserId) {
         UemUserDto execute = QUemUser.uemUser.selectOne(
-                QUemUser.uemUserId,
-                QUemUser.name,
-                QUemUser.sex,
-                QUemUser.entryDate,
-                QUemUser.jobStatus,
-                QUemUser.deptCode,
-                QUemUser.staffDutyCode,
-                QUemUser.dismissDate,
-                QUemUser.dismissReason
-        )
+                        QUemUser.uemUserId,
+                        QUemUser.name,
+                        QUemUser.sex,
+                        QUemUser.entryDate,
+                        QUemUser.jobStatus,
+                        QUemUser.deptCode,
+                        QUemUser.staffDutyCode,
+                        QUemUser.dismissDate,
+                        QUemUser.dismissReason
+                )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
@@ -916,16 +806,17 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 保存员工信息
+     *
      * @param uemUserDto
      * @return
      */
     @Override
     public ResultHelper<?> preservationUemUser(UemUserDto uemUserDto) {
         if (StrUtil.isEmpty(uemUserDto.getIdCard())
-                ||StrUtil.isEmpty(uemUserDto.getEmail())
-                ||Objects.isNull(uemUserDto.getEducation())
-                ||StrUtil.isEmpty(uemUserDto.getGraduateSchool())
-                ||StrUtil.isEmpty(uemUserDto.getSpeciality())) {
+                || StrUtil.isEmpty(uemUserDto.getEmail())
+                || Objects.isNull(uemUserDto.getEducation())
+                || StrUtil.isEmpty(uemUserDto.getGraduateSchool())
+                || StrUtil.isEmpty(uemUserDto.getSpeciality())) {
             return CommonResult.getFaildResultData("必填项不能为空");
         }
         Long uemUserId = uemUserDto.getUemUserId();
@@ -981,11 +872,12 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 离职申请添加离职理由
+     *
      * @param
      * @return
      */
     @Override
-    public ResultHelper<?> updateLeaveReason(Long uemUserId,String leaveReason) {
+    public ResultHelper<?> updateLeaveReason(Long uemUserId, String leaveReason) {
         UemUser uemUser = QUemUser.uemUser.selectOne().where(QUemUser.uemUserId.eq$(uemUserId)).execute();
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         uemUser.setLeaveReason(leaveReason);
@@ -999,6 +891,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 上传文件
+     *
      * @param uemUserId
      * @param systemId
      * @param fileType
@@ -1007,15 +900,21 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @return
      */
     @Override
-    public ResultHelper<?> uploadExternalFile(Long uemUserId,String systemId, String fileType, String fileName, MultipartFile file) {
+    public ResultHelper<?> uploadExternalFile(Long uemUserId, String systemId, String fileType, String fileName, MultipartFile file) {
         FastDfsUploadResult fastDfsUploadResult = shareFileInterface.uploadExternalFile(systemId, fileType, fileName, file);
         String fileKey = fastDfsUploadResult.getFileKey();
+        //返回带后缀的文件名称
+        String originFile = fileName + "." + fileType;
+        //获取fileKey 映射fileName
+        HashMap<String, String> map = new HashMap<>(2);
+        map.put(fileKey, originFile);
         UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         uemUser.setResume(fileKey);
         int count = QUemUser.uemUser.save(uemUser);
         if (count == 1) {
-            return CommonResult.getSuccessResultData(fileKey);
+            return CommonResult.getSuccessResultData(map);
+            //return CommonResult.getSuccessResultData(fileKey);
         } else {
             return CommonResult.getFaildResultData("上传失败");
         }
@@ -1023,6 +922,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 下拉框查询所有岗位的信息
+     *
      * @return
      */
     @Override
@@ -1033,6 +933,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 下拉框查询所有职称的信息
+     *
      * @return
      */
     @Override
@@ -1043,6 +944,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 下拉框查询所有项目的信息
+     *
      * @return
      */
     @Override
@@ -1053,6 +955,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 下拉框查询所有部门的信息
+     *
      * @return
      */
     @Override
