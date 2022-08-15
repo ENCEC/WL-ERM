@@ -74,98 +74,40 @@ public class SysResourceServiceImpl implements SysResourceService {
      */
     @Override
     public ResultHelper<List<QueryResourceDTO>> queryResource(SysResourceQueryVO sysResourceQueryVO) {
-        if (Objects.isNull(sysResourceQueryVO.getClientId())) {
+        String clientId = sysResourceQueryVO.getClientId();
+        Long uemUserId = sysResourceQueryVO.getUemUserId();
+        if (Objects.isNull(clientId)) {
             log.info("入参客户端id为空");
             return CommonResult.getFaildResultData("入参客户端id为空");
         }
-        if (Objects.isNull(sysResourceQueryVO.getUid())) {
+        if (Objects.isNull(uemUserId)) {
             log.info("入参用户id为空");
             return CommonResult.getFaildResultData("入参用户id为空，请确认！");
         }
         // 根据clientId查出应用id
-        OauthClientDetails oauthClientDetails = QOauthClientDetails.oauthClientDetails.selectOne(QOauthClientDetails.oauthClientDetails.fieldContainer()).byId(sysResourceQueryVO.getClientId());
+        OauthClientDetails oauthClientDetails = QOauthClientDetails.oauthClientDetails
+                .selectOne(QOauthClientDetails.oauthClientDetails.fieldContainer())
+                .byId(sysResourceQueryVO.getClientId());
 //        // 允许所有用户登录的客户端id
 //        List<Long> allowAllClientIdList = OauthClientUtils.ALLOW_ALL_CLIENT_ID;
 //        // 只允许管理员登录的客户端id
 //        List<Long> allowAdminClientIdList = OauthClientUtils.ALLOW_ADMIN_CLIENT_ID;
 //        // 允许没有角色的账号登录
 //        List<Long> allowNoRoleClientIdList = OauthClientUtils.ALLOW_NO_ROLE_CLIENT_ID;
-        // 是否登录公共服务
-        if (allowAdminClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
-            SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(sysResourceQueryVO.getUid());
-            if (Objects.isNull(sysPlatformUser)) {
-                return CommonResult.getFaildResultData("非平台客服无法登录公共服务，请确认！");
-            }
-            return CommonResult.getSuccessResultData();
-        }
-        SysPlatformUser sysPlatformUser = QSysPlatformUser.sysPlatformUser.selectOne().byId(sysResourceQueryVO.getUid());
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(sysResourceQueryVO.getUid());
-        if (Objects.isNull(sysPlatformUser) && Objects.isNull(uemUser)) {
-            log.info("获取用户{}信息失败", sysResourceQueryVO.getUid());
+        UemUser uemUser = QUemUser.uemUser.selectOne()
+                .where(QUemUser.uemUserId.eq$(uemUserId)
+                        .and(QUemUser.isDeleted.eq$(false)))
+                .execute();
+        if (Objects.isNull(uemUser)) {
+            log.info("获取用户{}信息失败", uemUserId);
             return CommonResult.getFaildResultData("用户不存在！");
         }
-        // 校验用户信息
-        if (Objects.nonNull(uemUser)) {
-            if (!CodeFinal.AUDIT_STATUS_ONE.equals(uemUser.getAuditStatus())) {
-                log.info("用户{}未实名认证通过，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户未实名认证，请前往实名认证！");
-            }
-            if (Objects.isNull(uemUser.getBlindCompanny())) {
-                log.info("用户{}未绑定企业，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户未绑定企业，请前往绑定企业！");
-            }
-            UemCompany uemCompany = QUemCompany.uemCompany.selectOne().byId(uemUser.getBlindCompanny());
-            if (Objects.isNull(uemCompany) || !CodeFinal.AUDIT_STATUS_ONE.equals(uemCompany.getAuditStatus())) {
-                log.info("用户{}绑定的企业未审批通过，获取资源菜单失败", uemUser.getAccount());
-                return CommonResult.getFaildResultDataWithErrorCode(400000302, "用户绑定的企业未审批通过！");
-            }
-        }
-
-        Expression expression = null;
-        // 判断根据是否有当前用户角色id来选择查询条件（调度系统传来的当前用户角色id） -- modified by huanghwh
-        if (Objects.isNull(sysResourceQueryVO.getSysRoleId())) {
-            expression = QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.sysApplicationId.eq$(oauthClientDetails.getSysApplicationId())).and(QUemUserRole.isValid.eq$(true));
-        } else {
-            expression = QUemUserRole.uemUserId.eq$(sysResourceQueryVO.getUid()).and(QUemUserRole.sysApplicationId.eq$(oauthClientDetails.getSysApplicationId())).and(QUemUserRole.isValid.eq$(true)).and(QUemUserRole.sysRoleId.eq$(sysResourceQueryVO.getSysRoleId()));
-        }
-
-        // 根据应用id，用户id查出该应用该用户启用的角色
-        List<UemUserRole> uemUserRoleList = QUemUserRole.uemUserRole.select(QUemUserRole.sysRoleId)
-                .where(expression)
-                .execute();
-        if (CollectionUtils.isEmpty(uemUserRoleList)) {
-            // 平台客服登录
-            if (Objects.nonNull(sysPlatformUser)) {
-                UemUserRole uemUserRole = new UemUserRole();
-                uemUserRole.setSysRoleId(0L);
-                uemUserRoleList.add(uemUserRole);
-            } else if (allowNoRoleClientIdList.contains(oauthClientDetails.getSysApplicationId())) {
-                // 若登录允许没角色的应用，赋值默认角色，角色id = 0（客服），1（其他用户）
-                UemUserRole uemUserRole = new UemUserRole();
-                uemUserRole.setSysRoleId(1L);
-                uemUserRoleList.add(uemUserRole);
-            } else {
-                log.info("该用户在该应用没有角色，clientId:" + sysResourceQueryVO.getClientId() + "，用户id" + sysResourceQueryVO.getUid());
-                return CommonResult.getFaildResultData("该用户在该应用没有角色，请联系客服人员确认！");
-            }
-        }
-        // 根据应用id，启用状态，父级资源id，关联查询上面所查的该用户该应用启用的角色的角色资源表数据，查出所有资源
-        List<QueryResourceDTO> queryResourceDTOList = QSysResource.sysResource.select(
-                        QSysResource.sysResourceId,
-                        QSysResource.resourceLogo,
-                        QSysResource.resourceTitle,
-                        QSysResource.resourceUrl,
-                        QSysResource.resourceSort,
-                        QSysResource.component,
-                        QSysResource.resourcePid
-                ).where(
-                        QSysResource.sysApplicationId.eq(SYS_APPLICATION_ID_PLACEHOLDER)
-                                .and(QSysResource.isValid.eq(IS_VALID_PLACEHOLDER))
-                                .and(QSysResource.sysResource.chain(QSysRoleResource.sysRoleId).eq(":sysRoleId"))
-                                .and(QSysResource.resourceType.eq$(1)))
+        // 根据应用id，用户id查出该应用该用户启用的角色列表
+        List<QueryResourceDTO> queryResourceDTOList = DSContext
+                .customization("WL-ERM_selectResourceListByUser")
+                .select()
                 .mapperTo(QueryResourceDTO.class)
-                .sorting(QSysResource.resourceSort.asc())
-                .execute(ImmutableMap.of(SYS_APPLICATION_ID, oauthClientDetails.getSysApplicationId(), IS_VALID, true, "sysRoleId", uemUserRoleList.get(0).getSysRoleId()));
+                .execute(sysResourceQueryVO);
         queryResourceDTOList = dealWithResource(queryResourceDTOList, true);
         return CommonResult.getSuccessResultData(queryResourceDTOList);
     }

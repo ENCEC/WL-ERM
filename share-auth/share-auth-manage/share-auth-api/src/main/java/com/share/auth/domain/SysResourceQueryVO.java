@@ -13,6 +13,8 @@ public class SysResourceQueryVO {
 
     private Long uid;
 
+    private Long uemUserId;
+
     /** 调度系统用户当前角色id */
     private Long sysRoleId;
 
