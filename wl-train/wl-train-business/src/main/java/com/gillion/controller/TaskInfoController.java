@@ -195,10 +195,10 @@ public class TaskInfoController {
 
     @GetMapping("/queryLeaveInfoByLeader")
     @ApiOperation("我的任务（部门领导最终审核）查看离职信息以及基本信息")
-    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long uemUserId/*, @RequestParam Long taskDetailId*/) {
+    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long dispatchers/*, @RequestParam Long taskDetailId*/) {
         List list = new ArrayList();
         ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId/*, taskDetailId*/);
-        ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(uemUserId);
+        ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(dispatchers);
         list.add(taskDetailInfoDtoResultHelper);
         list.add(uemUserDtoResultHelper);
         return CommonResult.getSuccessResultData(list);

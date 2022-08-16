@@ -33,5 +33,5 @@ public interface TaskInfoInterface {
      * @return
      */
     @GetMapping("/uemUserManage/queryUemUserId")
-    ResultHelper<?> queryUemUserId(@RequestParam(value = "uemUserId") Long uemUserId);
+    ResultHelper<UemUserDto> queryUemUserId(@RequestParam(value = "uemUserId") Long uemUserId);
 }
