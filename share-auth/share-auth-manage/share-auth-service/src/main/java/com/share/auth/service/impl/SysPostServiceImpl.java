@@ -44,7 +44,7 @@ public class SysPostServiceImpl implements SysPostService {
                 .where(QSysPost.postName.eq$(sysPostDTO.getPostName()))
                 .execute();
         if (CollectionUtils.isNotEmpty(sysPostList)) {
-            return CommonResult.getSuccessResultData("该岗位名已注册过！");
+            return CommonResult.getFaildResultData("该岗位名已注册过！");
         }
 
         SysPost sysPost = new SysPost();
