@@ -48,16 +48,11 @@ public class UemProjectServiceImpl implements UemProjectService {
 
         //项目名称
         String projectName = uemProjectDTO.getProjectName();
-        //项目经理
-        String dutyName = uemProjectDTO.getDutyName();
         //项目客户
         String customer = uemProjectDTO.getCustomer();
 
         if (!StringUtils.isEmpty(projectName)) {
             uemProjectDTO.setProjectName("%" + projectName + "%");
-        }
-        if (!StringUtils.isEmpty(dutyName)) {
-            uemProjectDTO.setDutyName("%" + dutyName + "%");
         }
         if (!StringUtils.isEmpty(customer)) {
             uemProjectDTO.setCustomer("%" + customer + "%");
@@ -71,7 +66,7 @@ public class UemProjectServiceImpl implements UemProjectService {
                 QUemProject.uemProject.fieldContainer()
         ).where(
                 QUemProject.projectName.like(":projectName")
-                        .and(QUemProject.dutyName.like(":dutyName"))
+                        .and(QUemProject.dutyId.eq(":dutyId"))
                         .and(QUemProject.customer.like(":customer"))
                         .and(QUemProject.status.like(":status"))
                         .and(QUemProject.uemProjectId.goe$(1L))

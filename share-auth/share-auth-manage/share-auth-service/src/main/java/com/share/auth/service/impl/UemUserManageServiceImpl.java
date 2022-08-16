@@ -737,7 +737,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.staffDutyCode,
                         QUemUser.offerDate,
                         QUemUser.positiveType,
-                        QUemUser.defenseScore
+                        QUemUser.defenseScore,
+                        QUemUser.resume
                 )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
@@ -964,7 +965,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         return uemDepts;
     }
 
-
     /**
      * 服务调用（任务模块通过查询用户id 取到name）
      *
@@ -972,7 +972,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @return
      */
     @Override
-    public ResultHelper<UemUserDto> queryUemUserById(Long uemUserId) {
+    public UemUserDto queryUemUserById(Long uemUserId) {
         UemUserDto result = QUemUser.uemUser.selectOne(
                         QUemUser.uemUserId,
                         QUemUser.name
@@ -980,11 +980,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
-        if (result == null) {
-            return CommonResult.getFaildResultData("查询失败");
-        } else {
-            return CommonResult.getSuccessResultData(result);
-        }
+          return result;
+
     }
 
 

@@ -3,8 +3,7 @@ package com.share.auth.api;
 import com.share.auth.domain.UemUserDto;
 import com.share.support.result.ResultHelper;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @ClassName TaskInfoInterface
@@ -32,6 +31,6 @@ public interface TaskInfoInterface {
      * @param uemUserId
      * @return
      */
-    @GetMapping("/uemUserManage/queryUemUserId")
-    ResultHelper<?> queryUemUserId(@RequestParam(value = "uemUserId") Long uemUserId);
+    @RequestMapping ("/uemUserManage/queryUemUserById")
+    UemUserDto queryUemUserById(@RequestParam(value = "uemUserId") Long uemUserId);
 }
