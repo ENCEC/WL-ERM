@@ -11,6 +11,7 @@ import com.gillion.model.querymodels.QTaskInfo;
 import com.gillion.service.TaskDetailInfoService;
 import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.api.StandardEntryInterface;
+import com.share.auth.api.TaskInfoInterface;
 import com.share.auth.domain.UemUserDto;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -33,6 +34,9 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
 
     @Autowired
     private StandardEntryInterface standardEntryInterface;
+
+    @Autowired
+    private TaskInfoInterface taskInfoInterface;
 
     /**
      * 转正申请
@@ -108,12 +112,16 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
                 .where(QTaskInfo.dispatchers.eq$(dispatchers).and(QTaskInfo.taskTitle.eq$(taskTitle)))
                 .mapperTo(TaskInfoDto.class)
                 .execute();
-        TaskDetailInfo execute = QTaskDetailInfo.taskDetailInfo.selectOne(QTaskDetailInfo.interviewerId,QTaskDetailInfo.faceRemark,QTaskDetailInfo.approver,QTaskDetailInfo.offerRemark,QTaskDetailInfo.createTime,QTaskDetailInfo.creatorName)
+        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId()))
                 .execute();
+        UemUserDto uemUserDto1 = taskInfoInterface.queryUemUserById(taskDetailInfo.getInterviewerId());
+        taskDetailInfo.setInterviewerName(uemUserDto1.getName());
+        UemUserDto uemUserDto2 = taskInfoInterface.queryUemUserById(taskDetailInfo.getApprover());
+        taskDetailInfo.setApproverName(uemUserDto2.getName());
         UemUserDto uemUserDto = standardEntryInterface.queryOfferInfo(dispatchers);
         List list = new LinkedList();
-        list.add(execute);
+        list.add(taskDetailInfo);
         list.add(uemUserDto);
 
         return list;

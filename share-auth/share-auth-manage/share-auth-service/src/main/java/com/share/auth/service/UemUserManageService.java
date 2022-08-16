@@ -283,6 +283,6 @@ public interface UemUserManageService {
      * @return
      */
 
-    ResultHelper<UemUserDto> queryUemUserById(Long uemUserId);
+    UemUserDto queryUemUserById(Long uemUserId);
 
 }

@@ -497,4 +497,15 @@ public class UemUserManageController {
         return uemUserManageService.queryUemDept();
     }
 
+    /**
+     * 联想控件---user表id查name
+     *
+     * @param uemUserId
+     * @return
+     */
+    @RequestMapping ("/queryUemUserById")
+    public UemUserDto queryUemUserById(@RequestParam(value = "uemUserId") Long uemUserId) {
+        return uemUserManageService.queryUemUserById(uemUserId);
+    }
+
 }
