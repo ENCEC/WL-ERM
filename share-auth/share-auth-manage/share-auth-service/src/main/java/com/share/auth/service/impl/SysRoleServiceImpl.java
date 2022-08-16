@@ -8,9 +8,11 @@ import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysRoleDTO;
+import com.share.auth.model.entity.SysApplication;
 import com.share.auth.model.entity.SysResource;
 import com.share.auth.model.entity.SysRole;
 import com.share.auth.model.entity.SysRoleResource;
+import com.share.auth.model.querymodels.QSysApplication;
 import com.share.auth.model.querymodels.QSysResource;
 import com.share.auth.model.querymodels.QSysRole;
 import com.share.auth.model.querymodels.QSysRoleResource;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author chenxf
@@ -453,6 +456,9 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public ResultHelper<Object> updateSysRole(SysRoleDTO sysRoleDTO) {
+        SysApplication sysApplication = QSysApplication.sysApplication.selectOne()
+                .where(QSysApplication.sysApplicationId.eq$(6726670753768472580L)).execute();
+        Long sysApplicationId = sysApplication.getSysApplicationId();
         Long sysRoleId = sysRoleDTO.getSysRoleId();
         SysRole sysRole = QSysRole.sysRole.selectOne().byId(sysRoleId);
         String roleName = sysRoleDTO.getRoleName();
@@ -461,7 +467,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         sysRole.setRoleName(roleName);
         sysRole.setRemark(remark);
         sysRole.setSysRoleId(sysRoleId);
-        sysRole.setSysApplicationId(1L);
+        sysRole.setSysApplicationId(sysApplicationId);
         QSysRole.sysRole.save(sysRole);
         // 判断是角色id否存在
            /* if (sysRoleId != null) {
@@ -491,7 +497,7 @@ public class SysRoleServiceImpl implements SysRoleService {
                     .where(QSysRoleResource.sysRoleId.eq$(sysRoleId)).execute();
             int resourceList = list.size();
             //给对应的角色 减少相应的权限
-            if (sysResourceIdList.size() == resourceList) {
+            if (sysResourceIdList.size() <= resourceList) {
                 for (int i = 0; i < sysResourceIdList.size(); i++) {
                     //中间表对象
                     SysRoleResource sysRoleResource = new SysRoleResource();
@@ -508,10 +514,21 @@ public class SysRoleServiceImpl implements SysRoleService {
             }
             //编辑角色添加权限
             else if (sysResourceIdList.size() > resourceList) {
-                //临时变量i
-                int i = 0;
+                //需要循环的次数
+                int size = sysResourceIdList.size() - resourceList;
                 //逐个存入中间表中
-                for (String s : sysResourceIdList) {
+                for ( int i = 0; i < size; ++i) {
+                    SysRoleResource sysRoleResource = new SysRoleResource();
+                    sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+                    //截取需要增加的权限数组
+                    List<String> newResourceIds = sysResourceIdList.stream().skip(size).collect(Collectors.toList());
+                    String s = newResourceIds.get(i);
+                    sysRoleResource.setSysRoleId(sysRoleId);
+                    sysRoleResource.setSysResourceId(Long.valueOf(s));
+                    //插入中间表
+                    QSysRoleResource.sysRoleResource.save(sysRoleResource);
+                }
+             /*   for (String s : sysResourceIdList) {
                     //中间表对象
                     SysRoleResource sysRoleResource = new SysRoleResource();
                     sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
@@ -521,7 +538,7 @@ public class SysRoleServiceImpl implements SysRoleService {
                     sysRoleResource.setSysResourceId(Long.valueOf(s));
                     //插入中间表
                     QSysRoleResource.sysRoleResource.save(sysRoleResource);
-                }
+                }*/
             }
         } else {
             return CommonResult.getFaildResultData("更新失败！");
