@@ -4,6 +4,9 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.gillion.ds.client.DSContext;
+import com.gillion.ds.client.api.queryobject.expressions.CombinableExpression;
+import com.gillion.ds.client.api.queryobject.expressions.ConditionExpression;
+import com.gillion.ds.client.api.queryobject.expressions.Expression;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.share.auth.constants.CodeFinal;
@@ -15,6 +18,7 @@ import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.service.UemUserManageService;
 import com.share.auth.service.UemUserService;
+import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.file.api.ShareFileInterface;
 import com.share.file.domain.FastDfsUploadResult;
@@ -36,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户信息管理
@@ -473,6 +478,67 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     public Page<UemUserDto> queryStaffByPage(UemUserDto uemUserDto) {
         Integer currentPage = uemUserDto.getPageNo();
         Integer pageSize = uemUserDto.getPageSize();
+        ResultHelper<UemUserDto> loginUser = uemUserService.getLoginUserInfo();
+        if (!loginUser.getSuccess() ||
+                loginUser.getData() == null ||
+                loginUser.getData().getRoleList() == null ||
+                loginUser.getData().getRoleList().isEmpty()) {
+            return null;
+        }
+        CombinableExpression expression = QUemProject.uemProjectId.isNull();
+        for (SysRoleDTO sysRoleDTO : loginUser.getData().getRoleList()) {
+            String roleName = sysRoleDTO.getRoleName();
+            switch (roleName) {
+                case "MD":
+                case "PD":
+                    expression = expression.or(QUemProject.chiefId.eq$(loginUser.getData().getUemUserId()));
+                    break;
+                case "PM":
+                    expression = expression.or(QUemProject.dutyId.eq$(loginUser.getData().getUemUserId()));
+                    break;
+                case "DM":
+                    expression = expression.or(QUemProject.devDirectorId.eq$(loginUser.getData().getUemUserId()));
+                    break;
+                case "ADMIN":
+                case "GM":
+                case "VGM":
+                    expression = expression.or(QUemProject.uemProjectId.notNull());
+                    break;
+            }
+        }
+        List<UemProject> uemProjectList = QUemProject.uemProject
+                .select(QUemProject.uemProject.fieldContainer())
+                .where(expression)
+                .execute();
+        Set<Long> uemUserIdSet = new HashSet<>();
+        for (UemProject uemProject : uemProjectList) {
+            uemUserIdSet.add(uemProject.getDutyId());
+            uemUserIdSet.add(uemProject.getChiefId());
+            uemUserIdSet.add(uemProject.getDevDirectorId());
+            uemUserIdSet.add(uemProject.getDemandId());
+            if (!StrUtil.isEmpty(uemProject.getGenDevUsers())) {
+                String [] ids = uemProject.getGenDevUsers().split(",");
+                for (String id : ids) {
+                    uemUserIdSet.add(Long.parseLong(id));
+                }
+            }
+            if (!StrUtil.isEmpty(uemProject.getGenDemandUsers())) {
+                String [] ids = uemProject.getGenDemandUsers().split(",");
+                for (String id : ids) {
+                    uemUserIdSet.add(Long.parseLong(id));
+                }
+            }
+        }
+        CombinableExpression expression1 = QUemUser.name._like$_(uemUserDto.getName())
+                .and(QUemUser.uemDeptId.eq$(uemUserDto.getUemDeptId()))
+                .and(QUemUser.technicalTitleId.eq$(uemUserDto.getTechnicalTitleId()))
+                .and(QUemUser.staffDutyCode.eq$(uemUserDto.getStaffDutyCode()))
+                .and(QUemUser.jobStatus.eq$(uemUserDto.getJobStatus()));
+        if (!uemUserIdSet.isEmpty()) {
+            expression1 = QUemUser.uemUserId.in$(uemUserIdSet).and(expression1);
+        } else {
+            expression1 = QUemUser.uemUserId.isNull();
+        }
         return QUemUser.uemUser.select(
                         QUemUser.uemUserId,
                         QUemUser.name,
@@ -485,11 +551,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.technicalTitleId,
                         QUemUser.technicalName,
                         QUemUser.jobStatus).
-                where(QUemUser.name._like$_(uemUserDto.getName())
-                        .and(QUemUser.uemDeptId.eq$(uemUserDto.getUemDeptId()))
-                        .and(QUemUser.technicalTitleId.eq$(uemUserDto.getTechnicalTitleId()))
-                        .and(QUemUser.staffDutyCode.eq$(uemUserDto.getStaffDutyCode()))
-                        .and(QUemUser.jobStatus.eq$(uemUserDto.getJobStatus())))
+                where(expression1)
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
                         ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(UemUserDto.class)
                 .execute();
