@@ -7,6 +7,7 @@ import com.gillion.ec.core.utils.String2Long;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * @date 2020-10-26 16:49
  */
 @Data
+@EqualsAndHashCode(of = {"sysResourceId"})
 @ApiModel("QueryResourceDTO 树状系统资源列表")
 public class QueryResourceDTO implements Serializable{
     private static final long serialVersionUID = 1;

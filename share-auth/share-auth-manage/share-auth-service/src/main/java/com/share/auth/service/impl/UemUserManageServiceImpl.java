@@ -401,6 +401,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             return CommonResult.getFaildResultData("列表不能为空");
         }
         long uniqueUemUserId = Long.parseLong(uemUserRoleDtoList.get(0).getUemUserId());
+        List<Long> roleIdList = new ArrayList<>();
         for (UemUserRoleDto uemUserRoleDto : uemUserRoleDtoList) {
             if (Objects.isNull(uemUserRoleDto.getUemUserId())) {
                 return CommonResult.getFaildResultData("用户ID不能为空");
@@ -413,11 +414,21 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             if (uemUserId != uniqueUemUserId) {
                 return CommonResult.getFaildResultData("只能同时修改一个用户的绑定关系");
             }
+            roleIdList.add(sysRoleId);
+
+        }
+        List<SysRole> sysRoleList = QSysRole.sysRole
+                .select(QSysRole.sysRole.fieldContainer())
+                .where(QSysRole.sysRoleId.in$(roleIdList)
+                        .and(QSysRole.isDeleted.eq$(false))
+                        .and(QSysRole.isValid.eq$(true)))
+                .execute();
+        for (SysRole sysRole : sysRoleList) {
             UemUserRole uemUserRole = new UemUserRole();
             uemUserRole.setUemUserId(uniqueUemUserId);
-            uemUserRole.setSysRoleId(sysRoleId);
+            uemUserRole.setSysRoleId(sysRole.getSysRoleId());
             uemUserRole.setIsValid(true);
-            uemUserRole.setSysApplicationId(1L);
+            uemUserRole.setSysApplicationId(sysRole.getSysApplicationId());
             uemUserRole.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
             uemUserRoles.add(uemUserRole);
         }

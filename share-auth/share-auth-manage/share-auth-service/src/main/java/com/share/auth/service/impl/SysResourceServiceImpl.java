@@ -14,6 +14,7 @@ import com.share.auth.domain.SysResourceQueryVO;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.service.SysResourceService;
+import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -84,6 +85,10 @@ public class SysResourceServiceImpl implements SysResourceService {
             log.info("入参用户id为空");
             return CommonResult.getFaildResultData("入参用户id为空，请确认！");
         }
+        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) defaultUserService.getCurrentLoginUser();
+        if (!uemUserId.equals(userInfoModel.getUemUserId())) {
+            return CommonResult.getFaildResultData("用户未登录！");
+        }
         // 根据clientId查出应用id
         OauthClientDetails oauthClientDetails = QOauthClientDetails.oauthClientDetails
                 .selectOne(QOauthClientDetails.oauthClientDetails.fieldContainer())
@@ -112,22 +117,28 @@ public class SysResourceServiceImpl implements SysResourceService {
         List<Long> resourcePidList = queryResourceDTOList.stream()
                 .map(QueryResourceDTO::getResourcePid)
                 .collect(Collectors.toList());
-        List<QueryResourceDTO> parentResourceDtoList = QSysResource.sysResource
-                .select(QSysResource.sysResourceId,
-                        QSysResource.sysApplicationId,
-                        QSysResource.resourceLogo,
-                        QSysResource.resourceTitle,
-                        QSysResource.resourceUrl,
-                        QSysResource.resourceRemark,
-                        QSysResource.resourceSort,
-                        QSysResource.resourcePid,
-                        QSysResource.resourceType,
-                        QSysResource.component,
-                        QSysResource.componentName)
-                .where(QSysResource.sysResourceId.in$(resourcePidList))
-                .mapperTo(QueryResourceDTO.class)
-                .execute();
-        queryResourceDTOList.addAll(parentResourceDtoList);
+        if (!resourcePidList.isEmpty()) {
+            List<QueryResourceDTO> parentResourceDtoList = QSysResource.sysResource
+                    .select(QSysResource.sysResourceId,
+                            QSysResource.sysApplicationId,
+                            QSysResource.resourceLogo,
+                            QSysResource.resourceTitle,
+                            QSysResource.resourceUrl,
+                            QSysResource.resourceRemark,
+                            QSysResource.resourceSort,
+                            QSysResource.resourcePid,
+                            QSysResource.resourceType,
+                            QSysResource.component,
+                            QSysResource.componentName)
+                    .where(QSysResource.sysResourceId.in$(resourcePidList))
+                    .mapperTo(QueryResourceDTO.class)
+                    .execute();
+            Set<QueryResourceDTO> queryResourceDTOSet = new HashSet<>();
+            queryResourceDTOSet.addAll(queryResourceDTOList);
+            queryResourceDTOSet.addAll(parentResourceDtoList);
+            queryResourceDTOList = new ArrayList<>(queryResourceDTOSet);
+        }
+
         queryResourceDTOList = dealWithResource(queryResourceDTOList, true);
         return CommonResult.getSuccessResultData(queryResourceDTOList);
     }
