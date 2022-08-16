@@ -457,7 +457,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     @Override
     public ResultHelper<Object> updateSysRole(SysRoleDTO sysRoleDTO) {
         SysApplication sysApplication = QSysApplication.sysApplication.selectOne()
-                .where(QSysApplication.sysApplicationId.eq$(6726670753768472579L)).execute();
+                .where(QSysApplication.sysApplicationId.eq$(6726670753768472580L)).execute();
         Long sysApplicationId = sysApplication.getSysApplicationId();
         Long sysRoleId = sysRoleDTO.getSysRoleId();
         SysRole sysRole = QSysRole.sysRole.selectOne().byId(sysRoleId);
