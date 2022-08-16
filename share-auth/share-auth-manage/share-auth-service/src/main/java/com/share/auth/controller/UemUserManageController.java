@@ -1,6 +1,8 @@
 package com.share.auth.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.gillion.train.api.AuthInfoInterface;
+import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.center.api.AuthCenterInterface;
 import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
@@ -45,6 +47,9 @@ public class UemUserManageController {
 
     @Autowired
     private AuthCenterInterface authCenterInterface;
+
+    @Autowired
+    private AuthInfoInterface authInfoInterface;
 
     /**
      * 根据用户名、姓名或启禁用状态查询用户信息
@@ -221,6 +226,7 @@ public class UemUserManageController {
         Page<UemUserDto> uemUserDtoPage = uemUserManageService.queryStaffByPage(uemUserDto);
         return uemUserDtoPage;
     }
+
     /**
      * 根据id查询对应员工信息
      *
@@ -394,6 +400,7 @@ public class UemUserManageController {
 
     /**
      * 查看转正评语部分信息
+     *
      * @param uemUserId
      * @return
      */
@@ -404,16 +411,18 @@ public class UemUserManageController {
 
     /**
      * 查看离职原因
+     *
      * @param uemUserId
      * @return
      */
     @GetMapping("/queryLeaveInfo")
     public ResultHelper<UemUserDto> queryLeaveInfo(Long uemUserId) {
-        return  uemUserManageService.queryLeaveInfo(uemUserId);
+        return uemUserManageService.queryLeaveInfo(uemUserId);
     }
 
     /**
      * 查看辞退原因
+     *
      * @param uemUserId
      * @return
      */
@@ -424,6 +433,7 @@ public class UemUserManageController {
 
     /**
      * 保存员工信息
+     *
      * @param uemUserDto
      * @return
      */
@@ -434,17 +444,19 @@ public class UemUserManageController {
 
     /**
      * 离职申请添加离职理由
+     *
      * @param
      * @return
      */
     @GetMapping("/updateLeaveReason")
     public ResultHelper<?> updateLeaveReason(
-            @RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason) {
-        return uemUserManageService.updateLeaveReason(uemUserId,leaveReason);
+            @RequestParam(value = "uemUserId") Long uemUserId, @RequestParam(value = "leaveReason") String leaveReason) {
+        return uemUserManageService.updateLeaveReason(uemUserId, leaveReason);
     }
 
     /**
      * 上传文件
+     *
      * @param systemId
      * @param fileType
      * @param fileName
@@ -453,16 +465,17 @@ public class UemUserManageController {
      * @return
      */
     @RequestMapping(value = "/uploadExternalFile")
-    public  ResultHelper<?> uploadExternalFile(@RequestParam("systemId") String systemId,
-                                               @RequestParam("fileType") String fileType,
-                                               @RequestParam("fileName") String fileName,
-                                               @RequestParam("uemUserId") Long uemUserId,
-                                               @RequestPart("file") MultipartFile file) {
-        return uemUserManageService.uploadExternalFile(uemUserId,systemId, fileType, fileName, file);
+    public ResultHelper<?> uploadExternalFile(@RequestParam("systemId") String systemId,
+                                              @RequestParam("fileType") String fileType,
+                                              @RequestParam("fileName") String fileName,
+                                              @RequestParam("uemUserId") Long uemUserId,
+                                              @RequestPart("file") MultipartFile file) {
+        return uemUserManageService.uploadExternalFile(uemUserId, systemId, fileType, fileName, file);
     }
 
     /**
      * 下拉框查询所有岗位的信息
+     *
      * @return
      */
     @GetMapping("querySysPost")
@@ -472,6 +485,7 @@ public class UemUserManageController {
 
     /**
      * 下拉框查询所有职称的信息
+     *
      * @return
      */
     @GetMapping("querySysTechnicalTitle")
@@ -481,6 +495,7 @@ public class UemUserManageController {
 
     /**
      * 下拉框查询所有项目的信息
+     *
      * @return
      */
     @GetMapping("queryUemProject")
@@ -490,6 +505,7 @@ public class UemUserManageController {
 
     /**
      * 下拉框查询所有部门的信息
+     *
      * @return
      */
     @GetMapping("queryUemDept")
@@ -503,9 +519,22 @@ public class UemUserManageController {
      * @param uemUserId
      * @return
      */
-    @RequestMapping ("/queryUemUserById")
+    @RequestMapping("/queryUemUserById")
     public UemUserDto queryUemUserById(@RequestParam(value = "uemUserId") Long uemUserId) {
         return uemUserManageService.queryUemUserById(uemUserId);
     }
+
+    /**
+     * 服务调用---添加转正信息
+     *
+     * @param taskDetailInfoDTO
+     * @return
+     */
+    @PostMapping("/savePositiveInfoByStaff")
+    public ResultHelper<TaskDetailInfoDTO> savePositiveInfoByStaff(@RequestBody TaskDetailInfoDTO taskDetailInfoDTO) {
+        ResultHelper<Object> objectResultHelper = authInfoInterface.savePositiveInfoByStaff(taskDetailInfoDTO);
+        return CommonResult.getSuccessResultData(objectResultHelper);
+    }
+
 
 }

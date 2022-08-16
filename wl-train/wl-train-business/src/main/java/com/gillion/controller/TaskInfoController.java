@@ -3,8 +3,10 @@ package com.gillion.controller;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.model.domain.TaskDetailInfoDto;
 import com.gillion.model.domain.TaskInfoDto;
+import com.gillion.model.entity.TaskInfo;
 import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
+import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.api.TaskInfoInterface;
 import com.share.auth.domain.UemUserDto;
 import com.share.support.result.CommonResult;
@@ -195,10 +197,10 @@ public class TaskInfoController {
 
     @GetMapping("/queryLeaveInfoByLeader")
     @ApiOperation("我的任务（部门领导最终审核）查看离职信息以及基本信息")
-    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long uemUserId/*, @RequestParam Long taskDetailId*/) {
+    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long dispatchers/*, @RequestParam Long taskDetailId*/) {
         List list = new ArrayList();
         ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId/*, taskDetailId*/);
-        ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(uemUserId);
+        ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(dispatchers);
         list.add(taskDetailInfoDtoResultHelper);
         list.add(uemUserDtoResultHelper);
         return CommonResult.getSuccessResultData(list);
@@ -212,8 +214,20 @@ public class TaskInfoController {
 
     @PostMapping("/savePositiveInfoByStaff")
     @ApiOperation("员工管理（服务调用） 添加员工转正信息")
-    public ResultHelper<Object> savePositiveInfoByStaff(@RequestBody TaskDetailInfoDto taskDetailInfoDto) {
-        return taskInfoService.savePositiveInfoByStaff(taskDetailInfoDto);
+    public ResultHelper<Object> savePositiveInfoByStaff(@RequestBody TaskDetailInfoDTO taskDetailInfoDTO, @RequestParam(value = "uemUserId") Long uemUserId) {
+        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(uemUserId);
+        Long id = uemUserDto.getUemUserId();
+        String name = uemUserDto.getName();
+        TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setDispatchers(id);
+        taskInfo.setDispatchersName(name);
+        taskInfo.setTaskTitle(name + "转正申请");
+     /*   if (uemUserDto != null) {
+            return CommonResult.getSuccessResultData(uemUserDto);
+        } else {
+            return CommonResult.getFaildResultData("对象为空查询失败!");
+        }*/
+        return taskInfoService.savePositiveInfoByStaff(taskDetailInfoDTO);
     }
 
     @GetMapping("/deletedApplyByStaff")

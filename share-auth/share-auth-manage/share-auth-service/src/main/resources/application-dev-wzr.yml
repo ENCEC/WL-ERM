@@ -518,6 +518,7 @@ application:
     file: share-file-wzr
     portal: share-portal-wzr
     center: share-auth-center-wzr
+    train: wl-train-wzr
 
 # 验证码图片路径
 imgPath: /image/picture/*.jpg

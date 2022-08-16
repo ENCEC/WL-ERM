@@ -4,6 +4,7 @@ import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.model.domain.TaskDetailInfoDto;
 import com.gillion.model.domain.TaskInfoDto;
 import com.gillion.model.vo.StandardDetailVo;
+import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.support.result.ResultHelper;
 
 import java.util.List;
@@ -213,7 +214,7 @@ public interface TaskInfoService {
      * @date 2022-08-11
      */
 
-    ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDto taskDetailInfoDto);
+    ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDTO taskDetailInfoDTO);
 
     /**
      * 我的任务  撤回员工申请（逻辑删除）

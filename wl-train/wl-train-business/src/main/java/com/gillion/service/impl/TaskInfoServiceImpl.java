@@ -16,6 +16,7 @@ import com.gillion.model.querymodels.QTaskDetailInfo;
 import com.gillion.model.querymodels.QTaskInfo;
 import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
+import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.api.ShareAuthInterface;
 import com.share.auth.api.UemUserInterface;
 import com.share.auth.center.api.AuthCenterInterface;
@@ -738,18 +739,18 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      */
 
     @Override
-    public ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDto taskDetailInfoDto) {
-        Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
-        Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
-        String offerType = taskDetailInfoDto.getOfferType();
-        String faceScore = taskDetailInfoDto.getFaceScore();
-        List<String> uemUserIds = taskDetailInfoDto.getUemUserIds();
+    public ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDTO taskDetailInfoDTO) {
+        Long taskDetailId = taskDetailInfoDTO.getTaskDetailId();
+        Long taskInfoId = taskDetailInfoDTO.getTaskInfoId();
+        String offerType = taskDetailInfoDTO.getOfferType();
+        String faceScore = taskDetailInfoDTO.getFaceScore();
+        List<String> uemUserIds = taskDetailInfoDTO.getUemUserIds();
         int i = 0;
         //获取用户表的主键作数组，分别插入任务子表审批人id以及面谈人id
         for (String uemUserId : uemUserIds) {
             String ids = uemUserIds.get(i);
             if (i == 0) {
-                String faceRemark = taskDetailInfoDto.getFaceRemark();
+                String faceRemark = taskDetailInfoDTO.getFaceRemark();
                 TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                         .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
                 taskDetailInfo.setInterviewerId(Long.valueOf(ids));
@@ -763,11 +764,11 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                     return CommonResult.getFaildResultData("出错啦!");
                 }
             } else if (i == 1) {
-                String offerRemark = taskDetailInfoDto.getOfferRemark();
+                String offerRemark = taskDetailInfoDTO.getOfferRemark();
                 TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                         .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
-                taskDetailInfoDto.setApprover(Long.valueOf(ids));
-                taskDetailInfoDto.setOfferRemark(offerRemark);
+                taskDetailInfoDTO.setApprover(Long.valueOf(ids));
+                taskDetailInfoDTO.setOfferRemark(offerRemark);
                 taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
                 int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
                 if (result == 1) {
