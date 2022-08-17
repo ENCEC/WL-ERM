@@ -242,7 +242,7 @@ public interface UemUserManageService {
      * @param file
      * @return
      */
-    ResultHelper<?> uploadExternalFile(Long uemUserId, String systemId, String fileType, String fileName, MultipartFile file);
+    ResultHelper<?> uploadExternalFile(Long uemUserId, String systemId, String fileType, String fileName, String type, MultipartFile file);
 
     /**
      * 下拉框查询所有岗位的信息

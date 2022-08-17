@@ -456,9 +456,10 @@ public class UemUserManageController {
     public ResultHelper<?> uploadExternalFile(@RequestParam("systemId") String systemId,
                                               @RequestParam("fileType") String fileType,
                                               @RequestParam("fileName") String fileName,
+                                              @RequestParam("type") String type,
                                               @RequestParam("uemUserId") Long uemUserId,
                                               @RequestPart("file") MultipartFile file) {
-        return uemUserManageService.uploadExternalFile(uemUserId, systemId, fileType, fileName, file);
+        return uemUserManageService.uploadExternalFile(uemUserId, systemId, fileType, fileName, type,file);
     }
 
     /**

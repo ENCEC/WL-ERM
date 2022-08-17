@@ -60,6 +60,8 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      * 申请日期
      */
     @Column(name = "apply_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date applyDate;
 
     /**
@@ -82,6 +84,8 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      * 创建时间
      */
     @Column(name = "create_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date createTime;
 
     /**
@@ -102,6 +106,8 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      * 实际完成日期
      */
     @Column(name = "end_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date endDate;
 
     /**
@@ -114,6 +120,8 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      * 面谈时间
      */
     @Column(name = "face_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date faceTime;
 
     /**
@@ -149,6 +157,8 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      * 修改时间
      */
     @Column(name = "modify_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date modifyTime;
 
     /**
@@ -175,12 +185,16 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      * 计划完成日期
      */
     @Column(name = "plan_end_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planEndDate;
 
     /**
      * 计划开始日期
      */
     @Column(name = "plan_start_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planStartDate;
 
     /**
@@ -227,6 +241,8 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      * 实际开始日期
      */
     @Column(name = "start_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startDate;
 
     /**
