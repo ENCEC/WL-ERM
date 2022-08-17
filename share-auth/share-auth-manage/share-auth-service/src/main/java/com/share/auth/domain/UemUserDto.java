@@ -264,6 +264,10 @@ public class UemUserDto extends BaseModel implements Serializable {
     @ApiModelProperty("简历")
     private String resume;
 
+    /**员工申请表*/
+    @ApiModelProperty("员工申请表")
+    private String staffApplication;
+
     /**用户评分*/
     @ApiModelProperty("用户评分")
     private Integer score;

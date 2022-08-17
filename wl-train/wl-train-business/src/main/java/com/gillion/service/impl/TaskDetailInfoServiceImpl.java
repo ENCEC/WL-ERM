@@ -57,6 +57,8 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         }
         TaskInfo taskInfo = new TaskInfo();
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        taskInfo.setDispatchers(taskDetailInfoDTO.getUemUserId());
+        taskInfo.setDispatchersName(taskDetailInfoDTO.getUemUserName());
         taskInfo.setTaskType("员工转正");
         taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"转正申请");
         taskInfo.setStatus(0);
@@ -78,7 +80,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
      * @return
      */
     @Override
-//    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public ResultHelper<?> saveLeave(TaskDetailInfoDTO taskDetailInfoDTO) {
         if (Objects.isNull(taskDetailInfoDTO.getApplyDate())
                 || Objects.isNull(taskDetailInfoDTO.getApprover())
@@ -87,6 +89,8 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         }
         TaskInfo taskInfo = new TaskInfo();
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        taskInfo.setDispatchers(taskDetailInfoDTO.getUemUserId());
+        taskInfo.setDispatchersName(taskDetailInfoDTO.getUemUserName());
         taskInfo.setTaskType("员工离职");
         taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"离职申请");
         taskInfo.setStatus(0);

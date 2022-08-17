@@ -271,6 +271,11 @@ private static final long serialVersionUID=1;
     @Column(name = "resume")
     private String resume;
 
+    /**员工申请表*/
+    @Column(name = "staff_application")
+    private String staffApplication;
+
+
     /**用户评分*/
     @Column(name = "score")
     private Integer score;
