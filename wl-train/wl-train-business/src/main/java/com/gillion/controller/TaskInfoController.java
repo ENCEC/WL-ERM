@@ -1,9 +1,11 @@
 package com.gillion.controller;
 
 import com.gillion.ds.client.api.queryobject.model.Page;
+import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.model.domain.TaskDetailInfoDto;
 import com.gillion.model.domain.TaskInfoDto;
 import com.gillion.model.entity.TaskInfo;
+import com.gillion.model.querymodels.QTaskInfo;
 import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
 import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
@@ -219,9 +221,12 @@ public class TaskInfoController {
         Long id = uemUserDto.getUemUserId();
         String name = uemUserDto.getName();
         TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskInfo.setDispatchers(id);
         taskInfo.setDispatchersName(name);
         taskInfo.setTaskTitle(name + "转正申请");
+        //关联查出用户id，name 插入任务表，生成新任务
+                QTaskInfo.taskInfo.save(taskInfo);
      /*   if (uemUserDto != null) {
             return CommonResult.getSuccessResultData(uemUserDto);
         } else {
