@@ -71,7 +71,7 @@ import java.util.Set;
 //        "com.share"}, markerInterface = BaseMapper.class)
 @EnableCaching(proxyTargetClass = true, mode = AdviceMode.PROXY)
 @EnableEurekaClient
-@EnableFeignClients(basePackages = {"com.share"})
+@EnableFeignClients(basePackages = {"com.share","com.gillion.train"})
 @EnableTransactionManagement
 @EnableRedisHttpSession
 @ComponentScan(basePackages = {"com.share.support.config","com.share.auth"})

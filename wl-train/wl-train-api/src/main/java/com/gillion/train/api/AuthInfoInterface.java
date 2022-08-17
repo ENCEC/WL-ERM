@@ -1,6 +1,4 @@
 package com.gillion.train.api;
-
-
 import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.support.result.ResultHelper;
 import org.springframework.cloud.openfeign.FeignClient;
