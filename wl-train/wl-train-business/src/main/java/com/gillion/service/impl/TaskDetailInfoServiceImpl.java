@@ -11,6 +11,7 @@ import com.gillion.model.querymodels.QTaskInfo;
 import com.gillion.service.TaskDetailInfoService;
 import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.api.StandardEntryInterface;
+import com.share.auth.api.TaskDetailInfoInterface;
 import com.share.auth.api.TaskInfoInterface;
 import com.share.auth.domain.UemUserDto;
 import com.share.support.result.CommonResult;
@@ -32,11 +33,14 @@ import java.util.Objects;
 @Service
 public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
 
-    @Autowired
-    private StandardEntryInterface standardEntryInterface;
+//    @Autowired
+//    private StandardEntryInterface standardEntryInterface;
 
     @Autowired
     private TaskInfoInterface taskInfoInterface;
+
+    @Autowired
+    private TaskDetailInfoInterface taskDetailInfoInterface;
 
     /**
      * 转正申请
@@ -74,7 +78,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
      * @return
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     public ResultHelper<?> saveLeave(TaskDetailInfoDTO taskDetailInfoDTO) {
         if (Objects.isNull(taskDetailInfoDTO.getApplyDate())
                 || Objects.isNull(taskDetailInfoDTO.getApprover())
@@ -87,7 +91,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"离职申请");
         taskInfo.setStatus(0);
         QTaskInfo.taskInfo.save(taskInfo);
-        standardEntryInterface.updateLeaveReason(taskDetailInfoDTO.getUemUserId(),taskDetailInfoDTO.getLeaveReason());
+        taskDetailInfoInterface.updateLeaveReason(taskDetailInfoDTO.getUemUserId(),taskDetailInfoDTO.getLeaveReason());
         TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
@@ -119,7 +123,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskDetailInfo.setInterviewerName(uemUserDto1.getName());
         UemUserDto uemUserDto2 = taskInfoInterface.queryUemUserById(taskDetailInfo.getApprover());
         taskDetailInfo.setApproverName(uemUserDto2.getName());
-        UemUserDto uemUserDto = standardEntryInterface.queryOfferInfo(dispatchers);
+        UemUserDto uemUserDto = taskDetailInfoInterface.queryOfferInfo(dispatchers);
         List list = new LinkedList();
         list.add(taskDetailInfo);
         list.add(uemUserDto);
