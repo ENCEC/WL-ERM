@@ -115,8 +115,12 @@ public class UemProjectServiceImpl implements UemProjectService {
             return CommonResult.getFaildResultData("计划结束时间不能为空");
         }
         uemProjectDTO.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        QUemProject.uemProject.save(uemProjectDTO);
-        return CommonResult.getSuccessResultData("项目新增成功");
+        int save = QUemProject.uemProject.save(uemProjectDTO);
+        if (save > 0) {
+            return CommonResult.getSuccessResultData("项目新增成功");
+        } else {
+            return CommonResult.getFaildResultData("项目新增失败");
+        }
     }
 
 

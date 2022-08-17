@@ -807,11 +807,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.sex,
                         QUemUser.entryDate,
                         QUemUser.jobStatus,
-                        QUemUser.deptCode,
+                        QUemUser.uemDeptId,
                         QUemUser.staffDutyCode,
                         QUemUser.offerDate,
-                        QUemUser.positiveType,
-                        QUemUser.defenseScore,
                         QUemUser.resume
                 )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
@@ -835,7 +833,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.sex,
                         QUemUser.entryDate,
                         QUemUser.jobStatus,
-                        QUemUser.deptCode,
+                        QUemUser.uemDeptId,
                         QUemUser.staffDutyCode,
                         QUemUser.leaveDate,
                         QUemUser.leaveReason
@@ -864,7 +862,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.sex,
                         QUemUser.entryDate,
                         QUemUser.jobStatus,
-                        QUemUser.deptCode,
+                        QUemUser.uemDeptId,
                         QUemUser.staffDutyCode,
                         QUemUser.dismissDate,
                         QUemUser.dismissReason
@@ -938,11 +936,21 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setGraduateSchool(graduateSchool);
         uemUser.setSpeciality(speciality);
         uemUser.setEntryDate(entryDate);
+        SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne(QSysTechnicalTitle.technicalName).byId(technicalTitleId);
+        uemUser.setTechnicalName(sysTechnicalTitle.getTechnicalName());
         uemUser.setTechnicalTitleId(technicalTitleId);
+        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postName).where(QSysPost.postCode.eq$(staffDutyCode)).execute();
+        uemUser.setStaffDuty(sysPost.getPostName());
         uemUser.setStaffDutyCode(staffDutyCode);
+        UemProject uemProject = QUemProject.uemProject.selectOne(QUemProject.projectName).byId(projectId);
+        uemUser.setProjectName(uemProject.getProjectName());
         uemUser.setProjectId(projectId);
-        QUemUser.uemUser.save(uemUser);
-        return CommonResult.getSuccessResultData("保存成功!");
+        int save = QUemUser.uemUser.save(uemUser);
+        if (save > 0){
+            return CommonResult.getSuccessResultData("保存成功!");
+        } else {
+            return CommonResult.getFaildResultData("保存失败");
+        }
     }
 
     /**
@@ -975,7 +983,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @return
      */
     @Override
-    public ResultHelper<?> uploadExternalFile(Long uemUserId, String systemId, String fileType, String fileName, MultipartFile file) {
+    public ResultHelper<?> uploadExternalFile(Long uemUserId, String systemId, String fileType, String fileName, String type, MultipartFile file) {
         FastDfsUploadResult fastDfsUploadResult = shareFileInterface.uploadExternalFile(systemId, fileType, fileName, file);
         String fileKey = fastDfsUploadResult.getFileKey();
         //返回带后缀的文件名称
@@ -985,7 +993,12 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         map.put(fileKey, originFile);
         UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUser.setResume(fileKey);
+        if ("个人简历".equals(type)) {
+            uemUser.setResume(fileKey);
+        }
+        if ("转正申请表".equals(type)) {
+            uemUser.setStaffApplication(fileKey);
+        }
         int count = QUemUser.uemUser.save(uemUser);
         if (count == 1) {
             return CommonResult.getSuccessResultData(map);
