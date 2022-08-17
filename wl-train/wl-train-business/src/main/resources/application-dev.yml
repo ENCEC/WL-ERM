@@ -294,8 +294,8 @@ application:
     auth: share-auth
     message: share-message
     file: share-file
-    portal: share-portal
     center: share-auth-center
+    train: wl-train
 
 # 后端资源权限配置
 authentication:

@@ -172,6 +172,6 @@ public class TaskInfo extends BaseModel implements Serializable {
      * 逻辑删除
      */
     @Column(name = "is_deleted")
-    private Integer isDeleted;
+    private Boolean isDeleted;
 
 }

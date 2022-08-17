@@ -516,8 +516,8 @@ application:
     auth: share-auth
     message: share-message
     file: share-file
-    portal: share-portal
     center: share-auth-center
+    train: wl-train
 
 # 验证码图片路径
 imgPath: /image/picture/*.jpg

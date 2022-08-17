@@ -99,9 +99,12 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
         }
         standardEntry.setActionSerialNum(saveActionSerialNum);
         standardEntry.setStatus(Boolean.TRUE);
-        QStandardEntry.standardEntry.save(standardEntry);
-
-        return CommonResult.getSuccessResultData("新增成功");
+        int save = QStandardEntry.standardEntry.save(standardEntry);
+        if (save >0) {
+            return CommonResult.getSuccessResultData("新增成功");
+        } else {
+            return CommonResult.getFaildResultData("新增失败");
+        }
     }
 
     /**
@@ -218,8 +221,12 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
             return  CommonResult.getFaildResultData("执行序号要为正整数");
         }
         standardEntryDto.setActionSerialNum(actionSerialNum);
-        QStandardEntry.standardEntry.save(standardEntryDto);
-        return CommonResult.getSuccessResultData("编辑成功");
+        int save = QStandardEntry.standardEntry.save(standardEntryDto);
+        if (save > 0) {
+            return CommonResult.getSuccessResultData("编辑成功");
+        } else {
+            return CommonResult.getFaildResultData("编辑失败");
+        }
     }
 
 
