@@ -533,7 +533,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .and(QUemUser.uemDeptId.eq$(uemUserDto.getUemDeptId()))
                 .and(QUemUser.technicalTitleId.eq$(uemUserDto.getTechnicalTitleId()))
                 .and(QUemUser.staffDutyCode.eq$(uemUserDto.getStaffDutyCode()))
-                .and(QUemUser.jobStatus.eq$(uemUserDto.getJobStatus()));
+                .and(QUemUser.jobStatus.eq$(uemUserDto.getJobStatus()))
+                .and(QUemUser.isDeleted.eq$(false));
         if (!uemUserIdSet.isEmpty()) {
             expression1 = QUemUser.uemUserId.in$(uemUserIdSet).and(expression1);
         } else {
