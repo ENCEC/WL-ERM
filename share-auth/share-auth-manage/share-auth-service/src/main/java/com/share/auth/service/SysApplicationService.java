@@ -18,6 +18,14 @@ import java.util.List;
  *
  */
 public interface SysApplicationService {
+
+    /**
+     * 获取所有的应用
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-17
+     */
+    List<QueryApplicationDTO> queryAllApplication();
+
     /**
      *  查询应用接口
      * @Author:chenxf

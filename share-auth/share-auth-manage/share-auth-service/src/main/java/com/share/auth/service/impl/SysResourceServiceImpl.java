@@ -201,6 +201,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         }
         // 调用递归方法完善子资源数据
         queryResourceDTOList = dealWithChildrenResource(parentList, childrenMap, isSort);
+        queryResourceDTOList.sort(Comparator.comparingInt(QueryResourceDTO::getResourceSort));
         return queryResourceDTOList;
 
     }
@@ -597,6 +598,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         String resourceUrl = sysResourceDTO.getResourceUrl();
         Integer resourceSort = sysResourceDTO.getResourceSort();
         String resourceRemark = sysResourceDTO.getResourceRemark();
+        Long sysApplicationId = sysResourceDTO.getSysApplicationId();
         SysResource sysResource = QSysResource.sysResource.selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         sysResource.setSysResourceId(resourceId);
@@ -604,6 +606,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         sysResource.setResourceUrl(resourceUrl);
         sysResource.setResourceSort(resourceSort);
         sysResource.setResourceRemark(resourceRemark);
+        sysResource.setSysApplicationId(sysApplicationId);
         QSysResource.sysResource.save(sysResource);
         return CommonResult.getSuccessResultData("修改成功");
     }
