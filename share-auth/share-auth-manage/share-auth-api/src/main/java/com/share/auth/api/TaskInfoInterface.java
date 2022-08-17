@@ -33,4 +33,13 @@ public interface TaskInfoInterface {
      */
     @RequestMapping ("/uemUserManage/queryUemUserById")
     UemUserDto queryUemUserById(@RequestParam(value = "uemUserId") Long uemUserId);
+
+    /**
+     * 服务调用---转正，离职，辞退---查看信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @GetMapping("/uemUserManage/queryStaffInfo")
+    UemUserDto queryStaffInfo(@RequestParam(value = "uemUserId") Long uemUserId);
 }
