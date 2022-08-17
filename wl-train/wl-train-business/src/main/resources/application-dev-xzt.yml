@@ -298,5 +298,5 @@ application:
     auth: share-auth-xzt
     message: share-message-xzt
     file: share-file-xzt
-    portal: share-portal-xzt
     center: share-auth-center-xzt
+    train: wl-train-xzt

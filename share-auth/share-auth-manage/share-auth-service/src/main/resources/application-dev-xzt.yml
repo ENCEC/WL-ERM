@@ -127,7 +127,7 @@ eureka:
 ####ec auto autoconfiguration
 ec:
   debugger:
-    enable: false
+    enable: true
   validation:
     enabled: true
     staticDirPath:
@@ -182,6 +182,7 @@ ec:
   mybatis:
     interceptor:
       dataPermission:
+        enabled: true
         allowFullTableQuery: "uem_user,sys_application,sys_dict_type,uem_id_card,md_country"
 # redis配置
 redis:
@@ -516,8 +517,8 @@ application:
     auth: share-auth-xzt
     message: share-message-xzt
     file: share-file-xzt
-    #    portal: share-portal-xzt
     center: share-auth-center-xzt
+    train: wl-train-xzt
 
 # 验证码图片路径
 imgPath: /image/picture/*.jpg
