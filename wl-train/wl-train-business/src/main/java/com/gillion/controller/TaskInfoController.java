@@ -4,7 +4,9 @@ import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.model.domain.TaskDetailInfoDto;
 import com.gillion.model.domain.TaskInfoDto;
+import com.gillion.model.entity.TaskDetailInfo;
 import com.gillion.model.entity.TaskInfo;
+import com.gillion.model.querymodels.QTaskDetailInfo;
 import com.gillion.model.querymodels.QTaskInfo;
 import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
@@ -186,8 +188,8 @@ public class TaskInfoController {
 
     @GetMapping("/queryLeaveInfo")
     @ApiOperation("我的任务（项目经历初次审核） 查询员工离职原因")
-    public ResultHelper<UemUserDto> queryDismissInfo(@RequestParam(value = "uemUserId") Long uemUserId) {
-        ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(uemUserId);
+    public ResultHelper<UemUserDto> queryDismissInfo(@RequestParam(value = "dispatchers") Long dispatchers) {
+        ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(dispatchers);
         return CommonResult.getSuccessResultData(uemUserDtoResultHelper);
     }
 
@@ -217,22 +219,91 @@ public class TaskInfoController {
     @PostMapping("/savePositiveInfoByStaff")
     @ApiOperation("员工管理（服务调用） 添加员工转正信息")
     public ResultHelper<Object> savePositiveInfoByStaff(@RequestBody TaskDetailInfoDTO taskDetailInfoDTO, @RequestParam(value = "uemUserId") Long uemUserId) {
-        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(uemUserId);
-        Long id = uemUserDto.getUemUserId();
-        String name = uemUserDto.getName();
+        UemUserDto positiveUser = taskInfoInterface.queryStaffInfo(uemUserId);
+        Long id = positiveUser.getUemUserId();
+        String name = positiveUser.getName();
         TaskInfo taskInfo = new TaskInfo();
-        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskInfo.setDispatchers(id);
         taskInfo.setDispatchersName(name);
+        taskInfo.setTaskType("员工转正");
         taskInfo.setTaskTitle(name + "转正申请");
+        taskInfo.setStatus(2);
+        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         //关联查出用户id，name 插入任务表，生成新任务
-                QTaskInfo.taskInfo.save(taskInfo);
-     /*   if (uemUserDto != null) {
-            return CommonResult.getSuccessResultData(uemUserDto);
-        } else {
-            return CommonResult.getFaildResultData("对象为空查询失败!");
-        }*/
+        QTaskInfo.taskInfo.save(taskInfo);
+        Long taskInfoId = taskInfo.getTaskInfoId();
+        TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
+        taskDetailInfo.setTaskInfoId(taskInfoId);
+        taskDetailInfo.setStandardEntryId(6960875859204194304L);
+        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+        taskDetailInfoDTO.setTaskInfoId(taskInfo.getTaskInfoId());
+        taskDetailInfoDTO.setTaskDetailId(taskDetailInfo.getTaskDetailId());
         return taskInfoService.savePositiveInfoByStaff(taskDetailInfoDTO);
+    }
+
+    @PostMapping("/saveResignInfo")
+    @ApiOperation("员工管理（服务调用） 添加员工离职信息")
+    public ResultHelper<?> saveResignInfo(@RequestBody UemUserDto uemUserDto, @RequestParam(value = "uemUserId") Long uemUserId) {
+        UemUserDto resignUser = taskInfoInterface.queryStaffInfo(uemUserId);
+        uemUserDto.setUemUserId(uemUserId);
+        taskInfoInterface.saveResignInfo(uemUserDto);
+        Long id = resignUser.getUemUserId();
+        String name = resignUser.getName();
+        TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setDispatchers(id);
+        taskInfo.setDispatchersName(name);
+        taskInfo.setTaskType("员工离职");
+        taskInfo.setTaskTitle(name + "离职申请");
+        taskInfo.setStatus(2);
+        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        //关联查出用户id，name 插入任务表，生成新任务
+        int taskResult = QTaskInfo.taskInfo.save(taskInfo);
+        Long taskInfoId = taskInfo.getTaskInfoId();
+        TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
+        taskDetailInfo.setTaskInfoId(taskInfoId);
+        taskDetailInfo.setStandardEntryId(6960875859204194304L);
+        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        int taskDetailResult = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+        taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
+        taskDetailInfo.setTaskDetailId(taskDetailInfo.getTaskDetailId());
+        if ((taskResult == 1) && (taskDetailResult == 1)) {
+            return CommonResult.getSuccessResultData("添加成功！");
+        } else {
+            return CommonResult.getFaildResultData("添加失败！");
+        }
+    }
+
+    @PostMapping("/saveDismissInfo")
+    @ApiOperation("员工管理（服务调用） 添加员工辞退信息")
+    public ResultHelper<?> saveDismissInfo(@RequestBody UemUserDto uemUserDto, @RequestParam(value = "uemUserId") Long uemUserId) {
+        UemUserDto dismissUser = taskInfoInterface.queryStaffInfo(uemUserId);
+        uemUserDto.setUemUserId(uemUserId);
+        taskInfoInterface.saveDismissInfo(uemUserDto);
+        Long id = dismissUser.getUemUserId();
+        String name = dismissUser.getName();
+        TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setDispatchers(id);
+        taskInfo.setDispatchersName(name);
+        taskInfo.setTaskType("员工辞退");
+        taskInfo.setTaskTitle(name + "辞退申请");
+        taskInfo.setStatus(2);
+        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        //关联查出用户id，name 插入任务表，生成新任务
+        int taskResult = QTaskInfo.taskInfo.save(taskInfo);
+        Long taskInfoId = taskInfo.getTaskInfoId();
+        TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
+        taskDetailInfo.setTaskInfoId(taskInfoId);
+        taskDetailInfo.setStandardEntryId(6960875859204194304L);
+        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        int taskDetailResult = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+        taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
+        taskDetailInfo.setTaskDetailId(taskDetailInfo.getTaskDetailId());
+        if ((taskResult == 1) && (taskDetailResult == 1)) {
+            return CommonResult.getSuccessResultData("添加成功！");
+        } else {
+            return CommonResult.getFaildResultData("添加失败！");
+        }
     }
 
     @GetMapping("/deletedApplyByStaff")

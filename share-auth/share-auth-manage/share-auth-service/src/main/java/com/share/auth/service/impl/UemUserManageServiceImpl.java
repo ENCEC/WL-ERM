@@ -517,13 +517,13 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             uemUserIdSet.add(uemProject.getDevDirectorId());
             uemUserIdSet.add(uemProject.getDemandId());
             if (!StrUtil.isEmpty(uemProject.getGenDevUsers())) {
-                String [] ids = uemProject.getGenDevUsers().split(",");
+                String[] ids = uemProject.getGenDevUsers().split(",");
                 for (String id : ids) {
                     uemUserIdSet.add(Long.parseLong(id));
                 }
             }
             if (!StrUtil.isEmpty(uemProject.getGenDemandUsers())) {
-                String [] ids = uemProject.getGenDemandUsers().split(",");
+                String[] ids = uemProject.getGenDemandUsers().split(",");
                 for (String id : ids) {
                     uemUserIdSet.add(Long.parseLong(id));
                 }
@@ -653,7 +653,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @date 2022-08-04
      */
     @Override
-    public ResultHelper<UemUserDto> queryStaffInfo(Long uemUserId) {
+    public UemUserDto queryStaffInfo(Long uemUserId) {
         UemUserDto execute = QUemUser.uemUser.selectOne(
                         QUemUser.uemUserId,
                         QUemUser.uemDeptId,
@@ -671,80 +671,13 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
-        if (execute == null) {
-            return CommonResult.getFaildResultData("对象信息为空!查询失败");
+        if (execute != null) {
+            return execute;
         } else {
-            return CommonResult.getSuccessResultData(execute);
+            return null;
         }
     }
 
-    /**
-     * 添加转正信息
-     *
-     * @author wzr
-     * @date 2022-08-04
-     */
-    @Override
-    public ResultHelper<Object> savePositiveInfo(UemUserDto uemUserDto) {
-        //主键数组--添加基本信息，添加面试人评语，添加审批人评语，都需要主键
-        List<String> uemUserIds = uemUserDto.getUemUserIds();
-        int i = 0;
-        for (String uemUserId : uemUserIds) {
-            String infoId = uemUserIds.get(i);
-            if (i == 0) {
-                //第一个数组值为主键，执行添加基本信息操作
-                Date offerDate = uemUserDto.getOfferDate();
-                Long positiveType = uemUserDto.getPositiveType();
-                Long defenseScore = uemUserDto.getDefenseScore();
-                UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(Long.valueOf(infoId));
-                uemUser.setOfferDate(offerDate);
-                uemUser.setPositiveType(positiveType);
-                uemUser.setDefenseScore(defenseScore);
-                uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-                int result = QUemUser.uemUser.save(uemUser);
-                if (result == 1) {
-                    i = ++i;
-                    continue;
-                } else {
-                    return CommonResult.getSuccessResultData("出错啦!");
-                }
-            }
-            //第二个数组值为面谈人id,执行添加面谈人评语操作
-            else {
-                String interviewId = uemUserIds.get(i);
-                if (i == 1) {
-                    String interviewComments = uemUserDto.getInterviewComments();
-                    UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(Long.valueOf(interviewId));
-                    uemUser.setInterviewComments(interviewComments);
-                    uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-                    int result = QUemUser.uemUser.save(uemUser);
-                    if (result == 1) {
-                        i = ++i;
-                        continue;
-                    } else {
-                        return CommonResult.getSuccessResultData("出错啦!");
-                    }
-                }
-                //第三个数组值为审批人id，执行添加转正评语操作
-                else {
-                    String positiveId = uemUserIds.get(i);
-                    if (i == 2) {
-                        String positiveComments = uemUserDto.getPositiveComments();
-                        UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(Long.valueOf(positiveId));
-                        uemUser.setPositiveComments(positiveComments);
-                        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-                        int result = QUemUser.uemUser.save(uemUser);
-                        if (result == 1) {
-                            continue;
-                        } else {
-                            return CommonResult.getSuccessResultData("出错啦!");
-                        }
-                    }
-                }
-            }
-        }
-        return CommonResult.getSuccessResultData("新增成功!");
-    }
 
     /**
      * 添加离职信息
@@ -781,8 +714,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         Date dismissDate = uemUserDto.getDismissDate();
         String dismissReason = uemUserDto.getDismissReason();
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
-        uemUser.setLeaveDate(dismissDate);
-        uemUser.setLeaveReason(dismissReason);
+        uemUser.setDismissDate(dismissDate);
+        uemUser.setDismissReason(dismissReason);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int result = QUemUser.uemUser.save(uemUser);
         if (result == 1) {
@@ -1054,7 +987,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
-          return result;
+        return result;
 
     }
 
