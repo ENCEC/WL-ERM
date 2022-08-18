@@ -9,9 +9,12 @@ import com.gillion.model.querymodels.QStandardEntry;
 import com.gillion.service.StandardEntryService;
 import com.gillion.train.api.model.vo.StandardEntryDTO;
 import com.google.common.collect.ImmutableMap;
+import com.share.auth.api.UemUserInterface;
+import com.share.auth.domain.UemUserDto;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +29,10 @@ import java.util.Objects;
  **/
 @Service
 public class StandardEntryServiceImpl implements StandardEntryService  {
+
+    @Autowired
+    private UemUserInterface uemUserInterface;
+
     /**
      * 查询条目
      * @param standardEntryDTO
@@ -74,12 +81,26 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
         if (StrUtil.isEmpty(standardEntryDTO.getActionRemark())) {
             return CommonResult.getFaildResultData("执行说明不能为空");
         }
-        List<StandardEntryDTO> standardEntryDTOS = QStandardEntry.standardEntry.select(QStandardEntry.standardEntry.fieldContainer())
+        List<StandardEntryDTO> standardEntryDTOS = QStandardEntry.standardEntry
+                .select(QStandardEntry.standardEntry.fieldContainer())
                 .where(QStandardEntry.entryName.eq$(standardEntryDTO.getEntryName()))
                 .mapperTo(StandardEntryDTO.class)
                 .execute();
         if (CollectionUtils.isNotEmpty(standardEntryDTOS)) {
             return CommonResult.getFaildResultData("该条目已经存在");
+        }
+        String [] ordinatorIds = standardEntryDTO.getOrdinatorId().split(",");
+        StringBuilder ordinatorNamesBuilder = new StringBuilder();
+        for (String ordinatorIdStr : ordinatorIds) {
+            Long ordinatorId = Long.parseLong(ordinatorIdStr);
+            ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+            if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                String ordinatorName = ordinatorResult.getData().getName();
+                if (ordinatorName != null) {
+                    ordinatorNamesBuilder.append(ordinatorName);
+                    ordinatorNamesBuilder.append(",");
+                }
+            }
         }
         StandardEntry standardEntry = new StandardEntry();
         standardEntry.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
@@ -92,6 +113,7 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
         standardEntry.setActionPeriod(standardEntryDTO.getActionPeriod());
         standardEntry.setIsNeed(standardEntryDTO.getIsNeed());
         standardEntry.setOrdinatorId(standardEntryDTO.getOrdinatorId());
+        standardEntry.setOrdinatorName(ordinatorNamesBuilder.toString());
         standardEntry.setActionRemark(standardEntryDTO.getActionRemark());
         Integer saveActionSerialNum = saveActionSerialNum(standardEntryDTO.getActionSerialNum());
         if (saveActionSerialNum == 0) {
@@ -201,7 +223,21 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
         if (StrUtil.isEmpty(standardEntryDTO.getActionRemark())) {
             return CommonResult.getFaildResultData("执行说明不能为空");
         }
-        StandardEntryDTO standardEntryDto = QStandardEntry.standardEntry.selectOne(QStandardEntry.standardEntry.fieldContainer())
+        String [] ordinatorIds = standardEntryDTO.getOrdinatorId().split(",");
+        StringBuilder ordinatorNamesBuilder = new StringBuilder();
+        for (String ordinatorIdStr : ordinatorIds) {
+            Long ordinatorId = Long.parseLong(ordinatorIdStr);
+            ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
+            if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
+                String ordinatorName = ordinatorResult.getData().getName();
+                if (ordinatorName != null) {
+                    ordinatorNamesBuilder.append(ordinatorName);
+                    ordinatorNamesBuilder.append(",");
+                }
+            }
+        }
+        StandardEntryDTO standardEntryDto = QStandardEntry.standardEntry
+                .selectOne(QStandardEntry.standardEntry.fieldContainer())
                 .where(QStandardEntry.standardEntryId.eq$(standardEntryDTO.getStandardEntryId()))
                 .mapperTo(StandardEntryDTO.class)
                 .execute();
@@ -215,6 +251,7 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
         standardEntryDto.setActionPeriod(standardEntryDTO.getActionPeriod());
         standardEntryDto.setIsNeed(standardEntryDTO.getIsNeed());
         standardEntryDto.setOrdinatorId(standardEntryDTO.getOrdinatorId());
+        standardEntryDto.setOrdinatorName(ordinatorNamesBuilder.toString());
         standardEntryDto.setActionRemark(standardEntryDTO.getActionRemark());
         Integer actionSerialNum = updateActionSerialNum(standardEntryDTO);
         if (actionSerialNum == 0) {

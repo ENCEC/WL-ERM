@@ -302,27 +302,6 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .paging(pageNo, pageSize)
                 .mapperTo(StandardDetailVo.class)
                 .execute(taskInfoDto);
-        List<StandardDetailVo> standardDetailVoList = standardDetailVoPage.getRecords();
-        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
-            // 查询统筹人姓名列表
-            List<Long> ordinatorIds = StrUtil
-                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
-                    .stream()
-                    .map(Long::parseLong)
-                    .collect(Collectors.toList());
-            StringBuilder ordinatorNameBuilder = new StringBuilder();
-            for (Long ordinatorId : ordinatorIds) {
-                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
-                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
-                    String ordinatorName = ordinatorResult.getData().getName();
-                    if (ordinatorName != null) {
-                        ordinatorNameBuilder.append(ordinatorName);
-                        ordinatorNameBuilder.append(",");
-                    }
-                }
-            }
-            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
-        }
         return CommonResult.getSuccessResultData(standardDetailVoPage);
     }
 
@@ -336,26 +315,6 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .select()
                 .mapperTo(StandardDetailVo.class)
                 .execute(taskInfoDto);
-        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
-            // 查询统筹人姓名列表
-            List<Long> ordinatorIds = StrUtil
-                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
-                    .stream()
-                    .map(Long::parseLong)
-                    .collect(Collectors.toList());
-            StringBuilder ordinatorNameBuilder = new StringBuilder();
-            for (Long ordinatorId : ordinatorIds) {
-                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
-                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
-                    String ordinatorName = ordinatorResult.getData().getName();
-                    if (ordinatorName != null) {
-                        ordinatorNameBuilder.append(ordinatorName);
-                        ordinatorNameBuilder.append(",");
-                    }
-                }
-            }
-            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
-        }
         return CommonResult.getSuccessResultData(standardDetailVoList);
     }
 
@@ -372,27 +331,6 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .mapperTo(StandardDetailVo.class)
                 .paging(pageNo, pageSize)
                 .execute(taskInfoDto);
-        List<StandardDetailVo> standardDetailVoList = standardDetailVoPage.getRecords();
-        for (StandardDetailVo standardDetailVo : standardDetailVoList) {
-            // 查询统筹人姓名列表
-            List<Long> ordinatorIds = StrUtil
-                    .splitTrim(standardDetailVo.getOrdinatorId(), ",")
-                    .stream()
-                    .map(Long::parseLong)
-                    .collect(Collectors.toList());
-            StringBuilder ordinatorNameBuilder = new StringBuilder();
-            for (Long ordinatorId : ordinatorIds) {
-                ResultHelper<UemUserDto> ordinatorResult = uemUserInterface.getUemUser(ordinatorId);
-                if (ordinatorResult.getSuccess() && ordinatorResult.getData() != null) {
-                    String ordinatorName = ordinatorResult.getData().getName();
-                    if (ordinatorName != null) {
-                        ordinatorNameBuilder.append(ordinatorName);
-                        ordinatorNameBuilder.append(",");
-                    }
-                }
-            }
-            standardDetailVo.setOrdinatorName(ordinatorNameBuilder.toString());
-        }
         return CommonResult.getSuccessResultData(standardDetailVoPage);
     }
 
