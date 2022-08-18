@@ -202,6 +202,15 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         if (Objects.isNull(uemUser)) {
             return CommonResult.getFaildResultData("用户不存在");
         }
+        if (!uemUser.getAccount().equals(uemUserEditDto.getAccount())) {
+            List<UemUser> uemUserList = QUemUser.uemUser
+                    .select(QUemUser.uemUser.fieldContainer())
+                    .where(QUemUser.account.eq$(uemUserEditDto.getAccount()))
+                    .execute();
+            if (CollectionUtils.isNotEmpty(uemUserList)) {
+                return CommonResult.getFaildResultData("该用户名已经被占用！");
+            }
+        }
         // 检查手机号是否被占用
         if (!uemUser.getMobile().equals(uemUserEditDto.getMobile())) {
             List<UemUser> uemUserList = QUemUser.uemUser

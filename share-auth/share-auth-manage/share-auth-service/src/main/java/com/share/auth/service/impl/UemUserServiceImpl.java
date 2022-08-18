@@ -833,9 +833,23 @@ public class UemUserServiceImpl implements UemUserService {
      */
     private String accountValidate(UemUserDto uemUserDto, UemUser uemUser, AuthUserInfoModel userInfoModel) {
         if (uemUserDto.getAccount() != null) {
-            List<UemUser> userList = QUemUser.uemUser.select().where(QUemUser.account.eq$(uemUserDto.getAccount()).and(QUemUser.uemUserId.ne$(userInfoModel.getUemUserId()))).execute();
-            List<SysPlatformUser> sysPlatformUserList = QSysPlatformUser.sysPlatformUser.select().where(QSysPlatformUser.account.eq$(uemUserDto.getAccount())).execute();
-            if (CollectionUtils.isNotEmpty(userList) || CollectionUtils.isNotEmpty(sysPlatformUserList)) {
+            List<UemUser> userList = QUemUser.uemUser
+                    .select()
+                    .where(QUemUser.account.eq$(uemUserDto.getAccount())
+                            .and(QUemUser.uemUserId.ne$(userInfoModel.getUemUserId())))
+                    .execute();
+            if (CollectionUtils.isNotEmpty(userList)) {
+                return "用户名已存在，修改失败";
+            }
+            uemUser.setAccount(uemUserDto.getAccount());
+        }
+        if (uemUserDto.getMobile() != null) {
+            List<UemUser> userList = QUemUser.uemUser
+                    .select()
+                    .where(QUemUser.account.eq$(uemUserDto.getAccount())
+                            .and(QUemUser.uemUserId.ne$(userInfoModel.getUemUserId())))
+                    .execute();
+            if (CollectionUtils.isNotEmpty(userList)) {
                 return "用户名已存在，修改失败";
             }
             uemUser.setAccount(uemUserDto.getAccount());
