@@ -9,6 +9,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @ClassName StandardEntryInterface
  * @Author weiq
@@ -55,23 +57,8 @@ public interface StandardEntryInterface {
      * @param sysDictTypeDto
      * @return
      */
-    @PostMapping("/sysDictType/querySysDictType")
+    @PostMapping("/sysDictType/querySysDictCodeByDictType")
     @ResponseBody
-    ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto);
+    ResultHelper<List<SysDictCodeDTO>> querySysDictCodeByDictType(@RequestBody SysDictTypeDto sysDictTypeDto);
 
-    /**
-     * 查看转正评语部分信息
-     * @param uemUserId
-     * @return
-     */
-    @RequestMapping("/uemUserManage/queryOfferInfo")
-    UemUserDto queryOfferInfo(@RequestParam(value = "uemUserId") Long uemUserId);
-
-    /**
-     * 离职申请添加离职理由
-     * @param
-     * @return
-     */
-    @GetMapping("/uemUserManage/updateLeaveReason")
-    ResultHelper<?> updateLeaveReason(@RequestParam(value = "uemUserId") Long uemUserId,@RequestParam(value = "leaveReason")String leaveReason);
 }
