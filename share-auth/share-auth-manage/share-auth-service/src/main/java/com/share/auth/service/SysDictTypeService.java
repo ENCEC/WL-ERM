@@ -127,13 +127,6 @@ public interface SysDictTypeService {
     /**
      * 查询数据字典
      * @param sysDictTypeDto
-     * @return
-     */
-    ResultHelper<Page<SysDictTypeDto>> querySysDictType(SysDictTypeDto sysDictTypeDto);
-
-    /**
-     * 查询数据字典
-     * @param sysDictTypeDto
      * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.daoService.SysDictCodeDTO>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-03

@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -264,8 +265,8 @@ public class UemUserDto extends BaseModel implements Serializable {
     @ApiModelProperty("简历")
     private String resume;
 
-    /**员工申请表*/
-    @ApiModelProperty("员工申请表")
+    /**员工转正申请表*/
+    @ApiModelProperty("员工转正申请表")
     private String staffApplication;
 
     /**用户评分*/
@@ -328,6 +329,12 @@ public class UemUserDto extends BaseModel implements Serializable {
     /**人员岗位code*/
     @ApiModelProperty("人员岗位code")
     private String staffDutyCode;
+
+    /**人员岗位ID*/
+    @ApiModelProperty("人员岗位id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long staffDutyId;
 
     /**岗位级别*/
     @ApiModelProperty("岗位级别")

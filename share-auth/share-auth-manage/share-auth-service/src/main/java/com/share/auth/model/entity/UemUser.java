@@ -312,6 +312,12 @@ private static final long serialVersionUID=1;
     @Column(name = "staff_duty_code")
     private String staffDutyCode;
 
+    /**人员岗位ID*/
+    @Column(name = "staff_duty_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long staffDutyId;
+
     /**岗位级别*/
     @Column(name = "staff_level")
     private String staffLevel;

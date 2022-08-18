@@ -277,4 +277,11 @@ public interface UemUserManageService {
 
     UemUserDto queryUemUserById(Long uemUserId);
 
+    /**
+     * 设置数据库resume为空
+     * @param uemUserId
+     * @return
+     */
+    ResultHelper<?> deleteResume(Long uemUserId);
+
 }

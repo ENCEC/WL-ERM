@@ -532,7 +532,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         CombinableExpression expression1 = QUemUser.name._like$_(uemUserDto.getName())
                 .and(QUemUser.uemDeptId.eq$(uemUserDto.getUemDeptId()))
                 .and(QUemUser.technicalTitleId.eq$(uemUserDto.getTechnicalTitleId()))
-                .and(QUemUser.staffDutyCode.eq$(uemUserDto.getStaffDutyCode()))
+                .and(QUemUser.staffDutyId.eq$(uemUserDto.getStaffDutyId()))
                 .and(QUemUser.jobStatus.eq$(uemUserDto.getJobStatus()))
                 .and(QUemUser.isDeleted.eq$(false));
         if (!uemUserIdSet.isEmpty()) {
@@ -547,7 +547,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.mobile,
                         QUemUser.deptName,
                         QUemUser.uemDeptId,
-                        QUemUser.staffDutyCode,
+                        QUemUser.staffDutyId,
                         QUemUser.staffDuty,
                         QUemUser.technicalTitleId,
                         QUemUser.technicalName,
@@ -741,9 +741,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.entryDate,
                         QUemUser.jobStatus,
                         QUemUser.uemDeptId,
-                        QUemUser.staffDutyCode,
+                        QUemUser.staffDutyId,
                         QUemUser.offerDate,
-                        QUemUser.resume
+                        QUemUser.staffApplication
                 )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
@@ -767,7 +767,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.entryDate,
                         QUemUser.jobStatus,
                         QUemUser.uemDeptId,
-                        QUemUser.staffDutyCode,
+                        QUemUser.staffDutyId,
                         QUemUser.leaveDate,
                         QUemUser.leaveReason
                 )
@@ -796,7 +796,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.entryDate,
                         QUemUser.jobStatus,
                         QUemUser.uemDeptId,
-                        QUemUser.staffDutyCode,
+                        QUemUser.staffDutyId,
                         QUemUser.dismissDate,
                         QUemUser.dismissReason
                 )
@@ -829,7 +829,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         String account = uemUserDto.getAccount();
         String name = uemUserDto.getName();
         Boolean sex = uemUserDto.getSex();
-        String date = uemUserDto.getBirthday();
+        String birthday = uemUserDto.getBirthday();
         Long jobStatus = uemUserDto.getJobStatus();
         String idCard = uemUserDto.getIdCard();
         String mobile = uemUserDto.getMobile();
@@ -845,7 +845,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         String speciality = uemUserDto.getSpeciality();
         Date entryDate = uemUserDto.getEntryDate();
         Long technicalTitleId = uemUserDto.getTechnicalTitleId();
-        String staffDutyCode = uemUserDto.getStaffDutyCode();
+        Long staffDutyId = uemUserDto.getStaffDutyId();
         Long projectId = uemUserDto.getProjectId();
         //根据id查询出对应的员工信息，避免空字段
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
@@ -853,7 +853,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setUemUserId(uemUserId);
         uemUser.setAccount(account);
         uemUser.setSex(sex);
-        uemUser.setBirthday(date);
+        uemUser.setBirthday(birthday);
         uemUser.setJobStatus(jobStatus);
         uemUser.setIdCard(idCard);
         uemUser.setName(name);
@@ -872,9 +872,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne(QSysTechnicalTitle.technicalName).byId(technicalTitleId);
         uemUser.setTechnicalName(sysTechnicalTitle.getTechnicalName());
         uemUser.setTechnicalTitleId(technicalTitleId);
-        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postName).where(QSysPost.postCode.eq$(staffDutyCode)).execute();
+        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postName).where(QSysPost.postId.eq$(staffDutyId)).execute();
         uemUser.setStaffDuty(sysPost.getPostName());
-        uemUser.setStaffDutyCode(staffDutyCode);
+        uemUser.setStaffDutyId(staffDutyId);
         UemProject uemProject = QUemProject.uemProject.selectOne(QUemProject.projectName).byId(projectId);
         uemUser.setProjectName(uemProject.getProjectName());
         uemUser.setProjectId(projectId);
@@ -1001,6 +1001,25 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .mapperTo(UemUserDto.class)
                 .execute();
         return result;
+
+    }
+
+    /**
+     * 设置数据库resume为空
+     * @param uemUserId
+     * @return
+     */
+    @Override
+    public ResultHelper<?> deleteResume(Long uemUserId) {
+        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        uemUser.setResume("");
+        int count = QUemUser.uemUser.save(uemUser);
+        if (count > 0) {
+            return CommonResult.getSuccessResultData("编辑成功");
+        } else {
+            return CommonResult.getFaildResultData("编辑失败");
+        }
 
     }
 
