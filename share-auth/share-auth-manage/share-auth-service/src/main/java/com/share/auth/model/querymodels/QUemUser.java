@@ -12,8 +12,6 @@ import java.lang.String;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import com.share.auth.model.entity.UemDept;
-import com.share.auth.model.querymodels.QUemDept;
 
 /**
 * @author daoServiceGenerator
@@ -75,7 +73,6 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> qqId = uemUser.fieldOf("qqId", String.class);
     public static final FieldExpression<Integer> recordVersion = uemUser.fieldOf("recordVersion", Integer.class);
     public static final FieldExpression<String> resume = uemUser.fieldOf("resume", String.class);
-    public static final FieldExpression<String> staffApplication = uemUser.fieldOf("staffApplication", String.class);
     public static final FieldExpression<Integer> score = uemUser.fieldOf("score", Integer.class);
     public static final FieldExpression<BigDecimal> seniority = uemUser.fieldOf("seniority", BigDecimal.class);
     public static final FieldExpression<String> seqNo = uemUser.fieldOf("seqNo", String.class);
@@ -83,8 +80,10 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> source = uemUser.fieldOf("source", String.class);
     public static final FieldExpression<String> sourceAddress = uemUser.fieldOf("sourceAddress", String.class);
     public static final FieldExpression<String> speciality = uemUser.fieldOf("speciality", String.class);
+    public static final FieldExpression<String> staffApplication = uemUser.fieldOf("staffApplication", String.class);
     public static final FieldExpression<String> staffDuty = uemUser.fieldOf("staffDuty", String.class);
     public static final FieldExpression<String> staffDutyCode = uemUser.fieldOf("staffDutyCode", String.class);
+    public static final FieldExpression<Long> staffDutyId = uemUser.fieldOf("staffDutyId", Long.class);
     public static final FieldExpression<String> staffLevel = uemUser.fieldOf("staffLevel", String.class);
     public static final FieldExpression<String> technicalName = uemUser.fieldOf("technicalName", String.class);
     public static final FieldExpression<Long> technicalTitleId = uemUser.fieldOf("technicalTitleId", Long.class);
@@ -94,7 +93,6 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> userType = uemUser.fieldOf("userType", String.class);
     public static final FieldExpression<String> wxId = uemUser.fieldOf("wxId", String.class);
 
-    public static final BaseModelExpression<UemDept, Long> uemDept = new QUemDept(uemUser, "uemDept");
 
     public QUemUser() {
         super("UemUser", UemUser.class);

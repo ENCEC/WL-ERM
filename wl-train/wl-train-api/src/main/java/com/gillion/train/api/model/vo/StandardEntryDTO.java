@@ -103,6 +103,9 @@ public class StandardEntryDTO extends BaseModel implements Serializable {
     @Column(name = "ordinator_id")
     private String ordinatorId;
 
+    @Column(name = "ordinator_name")
+    private String ordinatorName;
+
     /**版本号*/
     @Column(name = "record_version")
     private Integer recordVersion;

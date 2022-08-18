@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @ClassName StandardEntryController
  * @Author weiq
@@ -70,9 +72,9 @@ public class StandardEntryController {
      * @param sysDictTypeDto
      * @return
      */
-    @PostMapping("/sysDictType/querySysDictType")
-    ResultHelper<Page<SysDictTypeDto>> querySysDictType(@RequestBody SysDictTypeDto sysDictTypeDto) {
-        return standardEntryInterface.querySysDictType(sysDictTypeDto);
+    @PostMapping("/sysDictType/querySysDictCodeByDictType")
+    public ResultHelper<List<SysDictCodeDTO>> querySysDictCodeByDictType(@RequestBody SysDictTypeDto sysDictTypeDto) {
+        return standardEntryInterface.querySysDictCodeByDictType(sysDictTypeDto);
     }
 
     /**

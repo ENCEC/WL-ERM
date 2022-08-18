@@ -271,11 +271,6 @@ private static final long serialVersionUID=1;
     @Column(name = "resume")
     private String resume;
 
-    /**员工申请表*/
-    @Column(name = "staff_application")
-    private String staffApplication;
-
-
     /**用户评分*/
     @Column(name = "score")
     private Integer score;
@@ -304,6 +299,10 @@ private static final long serialVersionUID=1;
     @Column(name = "speciality")
     private String speciality;
 
+    /**员工转正申请表*/
+    @Column(name = "staff_application")
+    private String staffApplication;
+
     /**人员岗位*/
     @Column(name = "staff_duty")
     private String staffDuty;
@@ -311,6 +310,12 @@ private static final long serialVersionUID=1;
     /**人员岗位code*/
     @Column(name = "staff_duty_code")
     private String staffDutyCode;
+
+    /**人员岗位id*/
+    @Column(name = "staff_duty_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long staffDutyId;
 
     /**岗位级别*/
     @Column(name = "staff_level")

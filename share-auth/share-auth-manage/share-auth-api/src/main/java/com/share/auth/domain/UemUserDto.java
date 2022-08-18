@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 用户信息
@@ -398,6 +399,12 @@ public class UemUserDto extends BaseModel implements Serializable {
     @ApiModelProperty("人员岗位code")
     private String staffDutyCode;
 
+    /**人员岗位ID*/
+    @ApiModelProperty("人员岗位id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long staffDutyId;
+
     /**
      * 岗位级别
      */
@@ -482,4 +489,10 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     @ApiModelProperty("修改密码")
     private String newPassword;
+
+    @ApiModelProperty("角色列表")
+    private List<SysRoleDTO> roleList;
+
+    @ApiModelProperty("政治面貌")
+    private String politicalStatus;
 }

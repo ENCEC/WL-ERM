@@ -29,6 +29,17 @@ public class SysApplicationController {
     private SysApplicationService sysApplicationService;
 
     /**
+     * 获取所有的应用
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-17
+     */
+    @GetMapping("/application/queryAllApplication")
+    @ApiOperation(value = "获取所有的应用", notes = "获取所有的应用")
+    public ResultHelper<List<QueryApplicationDTO>> queryAllApplication() {
+        return CommonResult.getSuccessResultData(sysApplicationService.queryAllApplication());
+    }
+
+    /**
      * @Author:chenxf
      * @Description: 根据opTyp查询应用接口
      * @Date: 17:54 2020/11/28

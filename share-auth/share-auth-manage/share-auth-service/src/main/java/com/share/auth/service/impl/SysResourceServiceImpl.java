@@ -207,6 +207,7 @@ public class SysResourceServiceImpl implements SysResourceService {
         }
         // 调用递归方法完善子资源数据
         queryResourceDTOList = dealWithChildrenResource(parentList, childrenMap, isSort);
+        queryResourceDTOList.sort(Comparator.comparingInt(QueryResourceDTO::getResourceSort));
         return queryResourceDTOList;
 
     }

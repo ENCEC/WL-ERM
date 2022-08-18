@@ -45,6 +45,24 @@ public class SysApplicationServiceImpl implements SysApplicationService {
     @Autowired
     private SysRoleService sysRoleService;
 
+    /**
+     * 获取所有的应用
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-17
+     */
+    @Override
+    public List<QueryApplicationDTO> queryAllApplication() {
+        List<QueryApplicationDTO> queryApplicationDTOList = QSysApplication.sysApplication
+                .select(QSysApplication.sysApplicationId,
+                        QSysApplication.applicationCode,
+                        QSysApplication.applicationName,
+                        QSysApplication.applicationAbbreviName)
+                .where(QSysApplication.isValid.eq$(true))
+                .mapperTo(QueryApplicationDTO.class)
+                .execute();
+        return queryApplicationDTOList;
+    }
+
 
     /**
      * @Author:chenxf

@@ -1,6 +1,10 @@
 package com.share.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gillion.ec.core.utils.Long2String;
+import com.gillion.ec.core.utils.String2Long;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,6 +31,8 @@ public class UemUserEditDTO {
      * 主键id(新增时为空,修改时不为空)
      */
     @ApiModelProperty("主键id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long uemUserId;
 
     /**
@@ -93,9 +99,11 @@ public class UemUserEditDTO {
     /**
      * 人员岗位code
      */
-    @ApiModelProperty("人员岗位code")
-    @NotBlank(message = "人员岗位不能为空")
-    private String staffDutyCode;
+    @ApiModelProperty("人员岗位ID")
+    @NotNull(message = "人员岗位不能为空")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long staffDutyId;
 
     /**
      * 人员岗位
@@ -107,7 +115,9 @@ public class UemUserEditDTO {
      * 所属项目ID
      */
     @ApiModelProperty("所属项目ID")
-    @NotNull(message = "所属项目ID不能为空")
+//    @NotNull(message = "所属项目ID不能为空")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
     private Long projectId;
 
     /**

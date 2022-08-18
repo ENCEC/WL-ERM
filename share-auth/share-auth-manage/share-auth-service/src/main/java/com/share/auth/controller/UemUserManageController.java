@@ -544,5 +544,15 @@ public class UemUserManageController {
         return CommonResult.getSuccessResultData(objectResultHelper);
     }
 
+    /**
+     * 设置数据库resume为空
+     * @param uemUserId
+     * @return
+     */
+    @GetMapping("/deleteResume")
+    public ResultHelper<?> deleteResume(Long uemUserId) {
+        return uemUserManageService.deleteResume(uemUserId);
+    }
+
 
 }
