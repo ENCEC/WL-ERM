@@ -358,20 +358,8 @@ public class UemUserManageController {
     @GetMapping("/queryStaffInfo")
     @ApiOperation(value = "转正，离职，辞退---查看信息")
 
-    public ResultHelper<UemUserDto> queryStaffInfo(@RequestParam Long uemUserId) {
+    public UemUserDto queryStaffInfo(@RequestParam Long uemUserId) {
         return uemUserManageService.queryStaffInfo(uemUserId);
-    }
-
-    /**
-     * 添加转正信息
-     *
-     * @author wzr
-     * @date 2022-08-04
-     */
-    @PostMapping("/savePositiveInfo")
-    @ApiOperation(value = "添加转正信息")
-    public ResultHelper<Object> savePositiveInfo(@RequestBody UemUserDto uemUserDto) {
-        return uemUserManageService.savePositiveInfo(uemUserDto);
     }
 
     /**

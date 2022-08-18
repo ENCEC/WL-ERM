@@ -18,6 +18,7 @@ import com.gillion.model.vo.StandardDetailVo;
 import com.gillion.service.TaskInfoService;
 import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.api.ShareAuthInterface;
+import com.share.auth.api.TaskInfoInterface;
 import com.share.auth.api.UemUserInterface;
 import com.share.auth.center.api.AuthCenterInterface;
 import com.share.auth.domain.UemUserDto;
@@ -49,6 +50,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     @Autowired
     private ShareAuthInterface shareAuthInterface;
+
+    @Autowired
+    private TaskInfoInterface taskInfoInterface;
 
     private Snowflake snowflake = IdUtil.createSnowflake(RandomUtil.randomLong(1, 31), 1L);
 
@@ -604,7 +608,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     public ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId/*, Long taskDetailId*/) {
         Map<String, Long> parms = new HashMap<>(2);
         parms.put("taskInfoId", taskInfoId);
-       // parms.put("taskDetailId", taskDetailId);
+        // parms.put("taskDetailId", taskDetailId);
         TaskDetailInfoDto result = DSContext.customization("WL-ERM_queryPositiveApply")
                 .selectOne().mapperTo(TaskDetailInfoDto.class)
                 .execute(parms);
@@ -633,6 +637,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Override
     public ResultHelper<Object> savePositiveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
+        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(uemUserId);
+        String name = uemUserDto.getName();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Date faceTime = taskDetailInfoDto.getFaceTime();
         String faceResult = taskDetailInfoDto.getFaceResult();
@@ -640,6 +646,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         String faceRemark = taskDetailInfoDto.getFaceRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne(QTaskDetailInfo.taskDetailInfo.fieldContainer()).byId(taskDetailId);
         taskDetailInfo.setApprover(uemUserId);
+        taskDetailInfo.setApproverName(name);
         taskDetailInfo.setFaceTime(faceTime);
         taskDetailInfo.setFaceResult(faceResult);
         taskDetailInfo.setFaceScore(faceScore);
@@ -662,6 +669,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Override
     public ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
+        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(uemUserId);
+        String name = uemUserDto.getName();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
         Date auditDate = taskDetailInfoDto.getAuditDate();
@@ -670,6 +679,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
         taskDetailInfo.setAuditId(uemUserId);
+        taskDetailInfo.setAuditName(name);
         taskDetailInfo.setAuditDate(auditDate);
         taskDetailInfo.setAuditRemark(auditRemark);
         taskDetailInfo.setAuditResult(auditResult);
@@ -710,6 +720,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         }
     }
 
+    /**
+     * 我的任务（部门领导最终审核） 添加离职基本信息
+     *
+     * @author wzr
+     * @date 2022-08-09
+     */
+
     @Override
     public ResultHelper<Object> saveLeaveInfoByLeader(TaskDetailInfoDto taskDetailInfoDto) {
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
@@ -718,7 +735,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         String resultAccess = taskDetailInfoDto.getResultAccess();
         String approvalRemark = taskDetailInfoDto.getApprovalRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
-                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)
+                        .and(QTaskDetailInfo.taskDetailId.eq$(taskDetailId))).execute();
         taskDetailInfo.setApprovalDate(approvalDate);
         taskDetailInfo.setResultAccess(resultAccess);
         taskDetailInfo.setApprovalRemark(approvalRemark);
@@ -750,11 +768,14 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         for (String uemUserId : uemUserIds) {
             String ids = uemUserIds.get(i);
             if (i == 0) {
+                UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(Long.valueOf(ids));
+                String name = uemUserDto.getName();
                 String faceRemark = taskDetailInfoDTO.getFaceRemark();
                 TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                         .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
                 taskDetailInfo.setInterviewerId(Long.valueOf(ids));
                 taskDetailInfo.setFaceRemark(faceRemark);
+                taskDetailInfo.setInterviewerName(name);
                 taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
                 int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
                 if (result == 1) {
@@ -764,11 +785,14 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                     return CommonResult.getFaildResultData("出错啦!");
                 }
             } else if (i == 1) {
+                UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(Long.valueOf(ids));
+                String name = uemUserDto.getName();
                 String offerRemark = taskDetailInfoDTO.getOfferRemark();
                 TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                         .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
-                taskDetailInfoDTO.setApprover(Long.valueOf(ids));
-                taskDetailInfoDTO.setOfferRemark(offerRemark);
+                taskDetailInfo.setApprover(Long.valueOf(ids));
+                taskDetailInfo.setOfferRemark(offerRemark);
+                taskDetailInfo.setApproverName(name);
                 taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
                 int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
                 if (result == 1) {

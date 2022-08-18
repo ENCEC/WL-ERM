@@ -1,5 +1,6 @@
 package com.gillion.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gillion.ds.entity.base.BaseModel;
@@ -8,6 +9,7 @@ import com.gillion.ec.core.utils.Long2String;
 import com.gillion.ec.core.utils.String2Long;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -60,12 +62,16 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 申请日期
      */
     @Column(name = "apply_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date applyDate;
 
     /**
      * 审批日期
      */
     @Column(name = "approval_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date approvalDate;
 
     /**
@@ -106,6 +112,8 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 审核日期
      */
     @Column(name = "audit_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date auditDate;
 
     /**
@@ -124,6 +132,8 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 创建时间
      */
     @Column(name = "create_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date createTime;
 
     /**
@@ -144,6 +154,8 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 实际完成日期
      */
     @Column(name = "end_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date endDate;
 
     /**
@@ -156,6 +168,8 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 面谈时间
      */
     @Column(name = "face_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date faceTime;
 
     /**
@@ -202,6 +216,8 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 修改时间
      */
     @Column(name = "modify_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date modifyTime;
 
     /**
@@ -232,12 +248,16 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 计划完成日期
      */
     @Column(name = "plan_end_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planEndDate;
 
     /**
      * 计划开始日期
      */
     @Column(name = "plan_start_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planStartDate;
 
     /**
@@ -284,6 +304,8 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 实际开始日期
      */
     @Column(name = "start_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startDate;
 
     /**

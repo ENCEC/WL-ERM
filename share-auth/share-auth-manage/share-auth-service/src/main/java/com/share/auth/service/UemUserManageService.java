@@ -177,16 +177,8 @@ public interface UemUserManageService {
      * @date 2022-08-04
      */
 
-    ResultHelper<UemUserDto> queryStaffInfo(Long uemUserId);
+    UemUserDto queryStaffInfo(Long uemUserId);
 
-    /**
-     * 添加转正信息
-     *
-     * @param uemUserDto
-     * @author wzr
-     * @date 2022-08-04
-     */
-    ResultHelper<Object> savePositiveInfo(UemUserDto uemUserDto);
 
     /**
      * 添加离职信息

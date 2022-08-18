@@ -519,19 +519,20 @@ public class SysResourceServiceImpl implements SysResourceService {
      */
     @Override
     public ResultHelper<Object> saveResource(SysResourceDTO sysResourceDTO) {
-        //获取用户权限管理系统id
-        SysApplication sysApplication = QSysApplication.sysApplication.selectOne()
-                .where(QSysApplication.sysApplicationId.eq$(6726670753768472580L)).execute();
-        Long sysApplicationId = sysApplication.getSysApplicationId();
         SysResource sysResource = new SysResource();
+        Long sysApplicationId = sysResourceDTO.getSysApplicationId();
         String resourceTitle = sysResourceDTO.getResourceTitle();
+        String resourceLogo = sysResourceDTO.getResourceLogo();
         String resourceUrl = sysResourceDTO.getResourceUrl();
         Integer resourceSort = sysResourceDTO.getResourceSort();
         String resourceRemark = sysResourceDTO.getResourceRemark();
         Long sysResourceId = sysResourceDTO.getSysResourceId();
         Long resourcePid = sysResourceDTO.getResourcePid();
+        String component = sysResourceDTO.getComponent();
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        sysResource.setResourceLogo(resourceLogo);
         sysResource.setSysApplicationId(sysApplicationId);
+        sysResource.setComponent(component);
         sysResource.setIsValid(true);
         sysResource.setSysResourceId(sysResourceId);
         sysResource.setResourcePid(resourcePid);
@@ -571,15 +572,7 @@ public class SysResourceServiceImpl implements SysResourceService {
      */
     @Override
     public SysResourceDTO queryResourceById(Long sysResourceId) {
-        return QSysResource.sysResource.selectOne(
-                        //QSysResource.resourcePid,
-                        QSysResource.sysResourceId,
-                        QSysResource.resourceTitle,
-                        QSysResource.resourcePid,
-                        QSysResource.resourceUrl,
-                        QSysResource.resourceSort,
-                        QSysResource.resourceRemark
-                ).where(
+        return QSysResource.sysResource.selectOne().where(
                         QSysResource.sysResourceId.eq$(sysResourceId)
                 )
                 .mapperTo(SysResourceDTO.class)
@@ -595,18 +588,24 @@ public class SysResourceServiceImpl implements SysResourceService {
     public ResultHelper<Object> updateResource(SysResourceDTO sysResourceDTO) {
         Long resourceId = sysResourceDTO.getSysResourceId();
         String resourceTitle = sysResourceDTO.getResourceTitle();
+        Long resourcePid = sysResourceDTO.getResourcePid();
         String resourceUrl = sysResourceDTO.getResourceUrl();
         Integer resourceSort = sysResourceDTO.getResourceSort();
         String resourceRemark = sysResourceDTO.getResourceRemark();
+        String component = sysResourceDTO.getComponent();
+        String resourceLogo = sysResourceDTO.getResourceLogo();
         Long sysApplicationId = sysResourceDTO.getSysApplicationId();
         SysResource sysResource = QSysResource.sysResource.selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        sysResource.setResourcePid(resourcePid);
+        sysResource.setSysApplicationId(sysApplicationId);
+        sysResource.setResourceLogo(resourceLogo);
+        sysResource.setComponent(component);
         sysResource.setSysResourceId(resourceId);
         sysResource.setResourceTitle(resourceTitle);
         sysResource.setResourceUrl(resourceUrl);
         sysResource.setResourceSort(resourceSort);
         sysResource.setResourceRemark(resourceRemark);
-        sysResource.setSysApplicationId(sysApplicationId);
         QSysResource.sysResource.save(sysResource);
         return CommonResult.getSuccessResultData("修改成功");
     }
