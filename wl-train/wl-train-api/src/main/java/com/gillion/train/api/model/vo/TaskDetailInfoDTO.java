@@ -35,6 +35,8 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
     @Column(name = "task_detail_id")
     @JsonSerialize(using = Long2String.class)
     @JsonDeserialize(using = String2Long.class)
+
+
     @Generator("snowFlakeGenerator")
     private Long taskDetailId;
 
@@ -43,6 +45,7 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      */
     @Column(name = "action_period")
     private Integer actionPeriod;
+
 
     /**
      * 执行顺序

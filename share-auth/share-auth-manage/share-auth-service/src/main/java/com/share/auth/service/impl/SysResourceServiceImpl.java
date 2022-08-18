@@ -16,6 +16,8 @@ import com.share.auth.model.querymodels.*;
 import com.share.auth.service.SysResourceService;
 import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
+import com.share.file.api.ShareFileInterface;
+import com.share.file.domain.FastDfsUploadResult;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,6 +51,9 @@ public class SysResourceServiceImpl implements SysResourceService {
 
     @Autowired
     private DefaultUserService defaultUserService;
+
+    @Autowired
+    private ShareFileInterface shareFileInterface;
     /**
      * 应用id(数据服务查询占位符)
      */
@@ -656,5 +662,26 @@ public class SysResourceServiceImpl implements SysResourceService {
         return DSContext.customization("WL-ERM_queryResourceTitle").select()
                 .mapperTo(SysResourceDTO.class)
                 .execute();
+    }
+
+    @Override
+    public ResultHelper<?> uploadExternalFile(Long sysResourceId, String systemId, String fileType, String fileName, MultipartFile file) {
+        FastDfsUploadResult fastDfsUploadResult = shareFileInterface.uploadExternalFile(systemId, fileType, fileName, file);
+        String fileKey = fastDfsUploadResult.getFileKey();
+        //返回带后缀的文件名称
+        String originFile = fileName + "." + fileType;
+        //获取fileKey 映射fileName
+        HashMap<String, String> map = new HashMap<>(2);
+        map.put(fileKey, originFile);
+        SysResource sysResource = QSysResource.sysResource.selectOne().byId(sysResourceId);
+        sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        sysResource.setResourceLogo(fileKey);
+        int count = QSysResource.sysResource.save(sysResource);
+        if (count == 1) {
+            return CommonResult.getSuccessResultData(map);
+            //return CommonResult.getSuccessResultData(fileKey);
+        } else {
+            return CommonResult.getFaildResultData("上传失败");
+        }
     }
 }

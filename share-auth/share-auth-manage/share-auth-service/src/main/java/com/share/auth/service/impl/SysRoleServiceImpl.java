@@ -495,6 +495,8 @@ public class SysRoleServiceImpl implements SysRoleService {
             //查出sysRoleResource对应的所有权限id
             List<SysRoleResource> list = QSysRoleResource.sysRoleResource.select(QSysRoleResource.sysResourceId)
                     .where(QSysRoleResource.sysRoleId.eq$(sysRoleId)).execute();
+            List<SysRoleResource> sysRoleResourceList = QSysRoleResource.sysRoleResource.select(QSysRoleResource.sysRoleResourceId)
+                    .where(QSysRoleResource.sysRoleId.eq$(sysRoleId)).execute();
             int resourceList = list.size();
             //给对应的角色 减少相应的权限
             if (sysResourceIdList.size() <= resourceList) {
@@ -521,24 +523,13 @@ public class SysRoleServiceImpl implements SysRoleService {
                     SysRoleResource sysRoleResource = new SysRoleResource();
                     sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
                     //截取需要增加的权限数组
-                    List<String> newResourceIds = sysResourceIdList.stream().skip(size).collect(Collectors.toList());
+                    List<String> newResourceIds = sysResourceIdList.stream().skip(resourceList).collect(Collectors.toList());
                     String s = newResourceIds.get(i);
                     sysRoleResource.setSysRoleId(sysRoleId);
                     sysRoleResource.setSysResourceId(Long.valueOf(s));
                     //插入中间表
                     QSysRoleResource.sysRoleResource.save(sysRoleResource);
                 }
-             /*   for (String s : sysResourceIdList) {
-                    //中间表对象
-                    SysRoleResource sysRoleResource = new SysRoleResource();
-                    sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-                    s = sysResourceIdList.get(i);
-                    i = ++i;
-                    sysRoleResource.setSysRoleId(sysRoleId);
-                    sysRoleResource.setSysResourceId(Long.valueOf(s));
-                    //插入中间表
-                    QSysRoleResource.sysRoleResource.save(sysRoleResource);
-                }*/
             }
         } else {
             return CommonResult.getFaildResultData("更新失败！");

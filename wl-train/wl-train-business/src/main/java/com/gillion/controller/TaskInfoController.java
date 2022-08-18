@@ -164,8 +164,8 @@ public class TaskInfoController {
 
     @GetMapping("/queryPositiveApply")
     @ApiOperation("根据任务id查询该申请人的转正申请")
-    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(@RequestParam Long taskInfoId/*, @RequestParam Long taskDetailId*/) {
-        return taskInfoService.queryPositiveApply(taskInfoId/*, taskDetailId*/);
+    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(@RequestParam Long taskInfoId) {
+        return taskInfoService.queryPositiveApply(taskInfoId);
     }
 
     @PostMapping("/queryAllStandardDetail")
@@ -201,9 +201,9 @@ public class TaskInfoController {
 
     @GetMapping("/queryLeaveInfoByLeader")
     @ApiOperation("我的任务（部门领导最终审核）查看离职信息以及基本信息")
-    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long dispatchers/*, @RequestParam Long taskDetailId*/) {
+    public ResultHelper<List> queryLeaveInfoByLeader(@RequestParam Long taskInfoId, @RequestParam Long dispatchers) {
         List list = new ArrayList();
-        ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId/*, taskDetailId*/);
+        ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId);
         ResultHelper<UemUserDto> uemUserDtoResultHelper = taskInfoInterface.queryLeaveInfo(dispatchers);
         list.add(taskDetailInfoDtoResultHelper);
         list.add(uemUserDtoResultHelper);
@@ -218,8 +218,9 @@ public class TaskInfoController {
 
     @PostMapping("/savePositiveInfoByStaff")
     @ApiOperation("员工管理（服务调用） 添加员工转正信息")
-    public ResultHelper<Object> savePositiveInfoByStaff(@RequestBody TaskDetailInfoDTO taskDetailInfoDTO, @RequestParam(value = "uemUserId") Long uemUserId) {
-        UemUserDto positiveUser = taskInfoInterface.queryStaffInfo(uemUserId);
+    public ResultHelper<Object> savePositiveInfoByStaff(@RequestBody TaskDetailInfoDTO taskDetailInfoDTO) {
+        Long uemUserId = taskDetailInfoDTO.getUemUserId();
+        UemUserDto positiveUser = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
         Long id = positiveUser.getUemUserId();
         String name = positiveUser.getName();
         TaskInfo taskInfo = new TaskInfo();
@@ -244,8 +245,9 @@ public class TaskInfoController {
 
     @PostMapping("/saveResignInfo")
     @ApiOperation("员工管理（服务调用） 添加员工离职信息")
-    public ResultHelper<?> saveResignInfo(@RequestBody UemUserDto uemUserDto, @RequestParam(value = "uemUserId") Long uemUserId) {
-        UemUserDto resignUser = taskInfoInterface.queryStaffInfo(uemUserId);
+    public ResultHelper<?> saveResignInfo(@RequestBody UemUserDto uemUserDto) {
+        Long uemUserId = uemUserDto.getUemUserId();
+        UemUserDto resignUser = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
         uemUserDto.setUemUserId(uemUserId);
         taskInfoInterface.saveResignInfo(uemUserDto);
         Long id = resignUser.getUemUserId();
@@ -276,9 +278,10 @@ public class TaskInfoController {
 
     @PostMapping("/saveDismissInfo")
     @ApiOperation("员工管理（服务调用） 添加员工辞退信息")
-    public ResultHelper<?> saveDismissInfo(@RequestBody UemUserDto uemUserDto, @RequestParam(value = "uemUserId") Long uemUserId) {
-        UemUserDto dismissUser = taskInfoInterface.queryStaffInfo(uemUserId);
-        uemUserDto.setUemUserId(uemUserId);
+    public ResultHelper<?> saveDismissInfo(@RequestBody UemUserDto uemUserDto) {
+        Long uemUserId = uemUserDto.getUemUserId();
+        UemUserDto dismissUser = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
+        uemUserDto.setUemUserId(Long.valueOf(uemUserId));
         taskInfoInterface.saveDismissInfo(uemUserDto);
         Long id = dismissUser.getUemUserId();
         String name = dismissUser.getName();

@@ -589,7 +589,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         String address = uemUserDto.getAddress();
         String sourceAddress = uemUserDto.getSourceAddress();
         Long maritalStatus = uemUserDto.getMaritalStatus();
-        //政治面貌暂时不写---来源数据字典
+        //政治面貌---来源数据字典
+        String politicalStatus = uemUserDto.getPoliticalStatus();
         Long education = uemUserDto.getEducation();
         Date graduateDate = uemUserDto.getGraduateDate();
         String graduateSchool = uemUserDto.getGraduateSchool();
@@ -605,6 +606,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         uemUser.setUemUserId(uemUserId);
+        uemUser.setPoliticalStatus(politicalStatus);
         //  uemUser.setAccount(account);
         uemUser.setSex(sex);
         uemUser.setBirthday(date);
@@ -620,11 +622,16 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setGraduateSchool(graduateSchool);
         uemUser.setSpeciality(speciality);
         uemUser.setEntryDate(entryDate);
-        uemUser.setUemDeptId(uemDeptId);
-        uemUser.setStaffDutyCode(staffDutyCode);
-        uemUser.setTechnicalTitleId(technicalTitleId);
         uemUser.setEmail(email);
         uemUser.setSeniority(seniority);
+        SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne(QSysTechnicalTitle.technicalName).byId(technicalTitleId);
+        uemUser.setTechnicalName(sysTechnicalTitle.getTechnicalName());
+        uemUser.setTechnicalTitleId(technicalTitleId);
+        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postName).where(QSysPost.postCode.eq$(staffDutyCode)).execute();
+        uemUser.setStaffDuty(sysPost.getPostName());
+        uemUser.setStaffDutyCode(staffDutyCode);
+        UemProject uemProject = QUemProject.uemProject.selectOne(QUemProject.projectName).byId(projectId);
+        uemUser.setProjectName(uemProject.getProjectName());
         uemUser.setProjectId(projectId);
         QUemUser.uemUser.save(uemUser);
         return CommonResult.getSuccessResultData("修改成功!");
@@ -654,20 +661,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     public UemUserDto queryStaffInfo(Long uemUserId) {
-        UemUserDto execute = QUemUser.uemUser.selectOne(
-                        QUemUser.uemUserId,
-                        QUemUser.uemDeptId,
-                        QUemUser.staffDutyCode,
-                        QUemUser.name,
-                        QUemUser.sex,
-                        QUemUser.entryDate,
-                        QUemUser.jobStatus,
-                        QUemUser.deptName,
-                        QUemUser.staffDuty,
-                        QUemUser.offerDate,
-                        QUemUser.positiveType,
-                        QUemUser.resume
-                )
+        UemUserDto execute = QUemUser.uemUser.selectOne()
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
@@ -879,7 +873,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setProjectName(uemProject.getProjectName());
         uemUser.setProjectId(projectId);
         int save = QUemUser.uemUser.save(uemUser);
-        if (save > 0){
+        if (save > 0) {
             return CommonResult.getSuccessResultData("保存成功!");
         } else {
             return CommonResult.getFaildResultData("保存失败");
@@ -922,8 +916,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         //返回带后缀的文件名称
         String originFile = fileName + "." + fileType;
         //获取fileKey 映射fileName
-        HashMap<String, String> map = new HashMap<>(2);
-        map.put(fileKey, originFile);
+     /*   HashMap<String, String> map = new HashMap<>(2);
+        map.put(fileKey, originFile);*/
         UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         if ("个人简历".equals(type)) {
@@ -934,8 +928,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
         int count = QUemUser.uemUser.save(uemUser);
         if (count == 1) {
-            return CommonResult.getSuccessResultData(map);
-            //return CommonResult.getSuccessResultData(fileKey);
+            //return CommonResult.getSuccessResultData(map);
+            return CommonResult.getSuccessResultData(fileKey);
         } else {
             return CommonResult.getFaildResultData("上传失败");
         }

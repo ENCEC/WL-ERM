@@ -221,7 +221,8 @@ public class UemUserDto extends BaseModel implements Serializable {
      * 辞退时间
      */
     @ApiModelProperty("辞退时间")
-    @JsonFormat(pattern = "yyyy-MM-dd ", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date dismissDate;
 
     /**

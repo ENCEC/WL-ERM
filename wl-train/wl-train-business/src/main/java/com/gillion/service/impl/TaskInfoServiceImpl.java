@@ -637,7 +637,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Override
     public ResultHelper<Object> savePositiveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
-        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(uemUserId);
+        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
         String name = uemUserDto.getName();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Date faceTime = taskDetailInfoDto.getFaceTime();
@@ -669,7 +669,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Override
     public ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
-        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(uemUserId);
+        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
         String name = uemUserDto.getName();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
@@ -768,7 +768,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         for (String uemUserId : uemUserIds) {
             String ids = uemUserIds.get(i);
             if (i == 0) {
-                UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(Long.valueOf(ids));
+                UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(ids);
                 String name = uemUserDto.getName();
                 String faceRemark = taskDetailInfoDTO.getFaceRemark();
                 TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
@@ -785,7 +785,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                     return CommonResult.getFaildResultData("出错啦!");
                 }
             } else if (i == 1) {
-                UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(Long.valueOf(ids));
+                UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(ids);
                 String name = uemUserDto.getName();
                 String offerRemark = taskDetailInfoDTO.getOfferRemark();
                 TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()

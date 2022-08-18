@@ -363,6 +363,25 @@ public class UemUserManageController {
     }
 
     /**
+     * 服务调用---查看转正信息
+     *
+     * @author wzr
+     * @date 2022-08-04
+     */
+    @GetMapping("/queryPositiveStaffInfo")  
+    @ApiOperation(value = "服务调用查看转正信息")
+    public List queryPositiveStaffInfo(@RequestParam Long dispatchers) {
+        UemUserDto uemUserDto = uemUserManageService.queryStaffInfo(dispatchers);
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("dispatchers", dispatchers);
+        ResultHelper<Object> objectResultHelper = authInfoInterface.queryPositiveApply(dispatchers);
+        List list = new ArrayList();
+        list.add(uemUserDto);
+        list.add(objectResultHelper);
+        return list;
+    }
+
+    /**
      * 添加离职信息
      *
      * @author wzr
@@ -459,7 +478,7 @@ public class UemUserManageController {
                                               @RequestParam("type") String type,
                                               @RequestParam("uemUserId") Long uemUserId,
                                               @RequestPart("file") MultipartFile file) {
-        return uemUserManageService.uploadExternalFile(uemUserId, systemId, fileType, fileName, type,file);
+        return uemUserManageService.uploadExternalFile(uemUserId, systemId, fileType, fileName, type, file);
     }
 
     /**

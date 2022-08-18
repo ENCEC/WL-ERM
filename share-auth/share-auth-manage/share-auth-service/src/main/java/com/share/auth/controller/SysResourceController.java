@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -176,5 +177,25 @@ public class SysResourceController {
     @PostMapping("/queryParentResource")
     public List<SysResourceDTO> queryParentResource() {
         return sysResourceService.queryParentResource();
+    }
+
+    /**
+     * 上传文件
+     *
+     * @param systemId
+     * @param fileType
+     * @param fileName
+     * @param sysResourceId
+     * @param file
+     * @return
+     */
+    @RequestMapping(value = "/uploadExternalFile")
+    public ResultHelper<?> uploadExternalFile(@RequestParam("systemId") String systemId,
+                                              @RequestParam("fileType") String fileType,
+                                              @RequestParam("fileName") String fileName,
+                                              @RequestParam("type") String type,
+                                              @RequestParam("sysResourceId") Long sysResourceId,
+                                              @RequestPart("file") MultipartFile file) {
+        return sysResourceService.uploadExternalFile(sysResourceId, systemId, fileType, fileName,file);
     }
 }

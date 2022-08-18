@@ -1,5 +1,6 @@
 package com.share.auth.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -234,7 +235,7 @@ public class UemUserDto extends BaseModel implements Serializable {
      */
     @ApiModelProperty("辞退时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date dismissDate;
 
     /**

@@ -42,7 +42,7 @@ public interface TaskInfoInterface {
      * @date 2022-08-16
      */
     @GetMapping("/uemUserManage/queryStaffInfo")
-    UemUserDto queryStaffInfo(@RequestParam(value = "uemUserId") Long uemUserId);
+    UemUserDto queryStaffInfo(@RequestParam(value = "uemUserId") String uemUserId);
 
 
     /**

@@ -8,6 +8,7 @@ import com.share.auth.domain.SysResourceQueryVO;
 import com.share.auth.model.entity.SysResource;
 import com.share.auth.model.vo.SysResourceVO;
 import com.share.support.result.ResultHelper;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,8 @@ public interface SysResourceService {
 
     /**
      * 获取所有未禁用角色
-     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysResourceDTO>>
+     *
+     * @return com.share.support.result.ResultHelper<java.util.List < com.share.auth.domain.SysResourceDTO>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
@@ -109,16 +111,29 @@ public interface SysResourceService {
      * @param sysResourceDTO
      */
     ResultHelper<Object> updateResourceStatus(SysResourceDTO sysResourceDTO);
-/**
- * 逻辑删除菜单信息
- *
- * @param sysResourceId
- */
+
+    /**
+     * 逻辑删除菜单信息
+     *
+     * @param sysResourceId
+     */
     ResultHelper<Object> deleteResource(Long sysResourceId);
 
     /**
      * 查询父级菜单
      */
     List<SysResourceDTO> queryParentResource();
+
+    /**
+     * 上传菜单logo
+     *
+     * @param sysResourceId * @param systemId
+     *                      * @param fileType
+     *                      * @param fileName
+     *                      * @param file
+     *                      * @return
+     */
+    ResultHelper<?> uploadExternalFile(Long sysResourceId, String systemId, String fileType, String fileName, MultipartFile file);
+
 }
 
