@@ -325,6 +325,12 @@ public class UemUserDto extends BaseModel implements Serializable {
     @ApiModelProperty("人员岗位")
     private String staffDuty;
 
+    /**人员岗位ID*/
+    @ApiModelProperty("人员岗位ID")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long staffDutyId;
+
     /**人员岗位code*/
     @ApiModelProperty("人员岗位code")
     private String staffDutyCode;

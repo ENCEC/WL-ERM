@@ -5,6 +5,10 @@ import com.gillion.ds.client.api.queryobject.expressions.FieldExpression;
 import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.gillion.model.entity.StandardEntry;
 
+import java.lang.Boolean;
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.String;
 import java.util.Date;
 
 
@@ -33,6 +37,7 @@ public class QStandardEntry extends BaseModelExpression<StandardEntry, Long> {
     public static final FieldExpression<String> modifierName = standardEntry.fieldOf("modifierName", String.class);
     public static final FieldExpression<Date> modifyTime = standardEntry.fieldOf("modifyTime", Date.class);
     public static final FieldExpression<String> ordinatorId = standardEntry.fieldOf("ordinatorId", String.class);
+    public static final FieldExpression<String> ordinatorName = standardEntry.fieldOf("ordinatorName", String.class);
     public static final FieldExpression<Integer> recordVersion = standardEntry.fieldOf("recordVersion", Integer.class);
     public static final FieldExpression<Long> standardEntryId = standardEntry.fieldOf("standardEntryId", Long.class);
     public static final FieldExpression<Boolean> status = standardEntry.fieldOf("status", Boolean.class);
