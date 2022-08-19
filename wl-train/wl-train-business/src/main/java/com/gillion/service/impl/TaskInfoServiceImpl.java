@@ -107,6 +107,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     private String setTaskDetailInfoByStandardDetail(
             TaskInfoDto taskInfoDto, TaskInfo retTaskInfo, List<TaskDetailInfo> retTaskDetailInfoList, boolean isUpdate
     ) {
+        String taskType = taskInfoDto.getTaskType();
+        if (!"试用任务".equals(taskType)
+                && !"培训任务".equals(taskType)
+                && !"学习任务".equals(taskType)
+                && !"其他任务".equals(taskType)) {
+            return "任务类型不存在";
+        }
         // 获取执行人信息
         UemUserDto executorUemUserDto = uemUserInterface.getUemUser(taskInfoDto.getExecutor()).getData();
         if (Objects.isNull(executorUemUserDto)) {
