@@ -176,6 +176,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             taskDetailInfo.setActionSerialNum(seriesNum++);
             taskDetailInfo.setPlanStartDate(startDate);
             taskDetailInfo.setPlanEndDate(endDate);
+            taskDetailInfo.setStartDate(startDate);
             taskDetailInfo.setStatus(0);
             taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
             // 设置总体起始时间
@@ -196,6 +197,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         retTaskInfo.setPlanStartDate(planStartDate);
         retTaskInfo.setPlanEndDate(planEndDate);
         retTaskInfo.setPublishDate(new Date());
+        retTaskInfo.setStartDate(planStartDate);
         retTaskInfo.setStatus(0);
         return null;
     }
@@ -477,11 +479,16 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             taskDetailInfo.setTaskDetailId(taskDetailId);
             taskDetailInfo.setStatus(status);
             taskDetailInfo.setResultAccess(resultAccess);
+            if (status == 2) {
+                taskDetailInfo.setEndDate(new Date());
+            } else {
+                taskDetailInfo.setEndDate(null);
+            }
             taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
             taskDetailInfoList.add(taskDetailInfo);
         }
         int rowCount = QTaskDetailInfo.taskDetailInfo
-                .selective(QTaskDetailInfo.status, QTaskDetailInfo.resultAccess)
+                .selective(QTaskDetailInfo.status, QTaskDetailInfo.resultAccess, QTaskDetailInfo.endDate)
                 .update(taskDetailInfoList);
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo
                 .selectOne(QTaskDetailInfo.taskInfoId)
@@ -496,14 +503,18 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .selectCount(QTaskDetailInfo.taskInfoId.count())
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskDetailInfo.getTaskInfoId()))
                 .execute();
+        TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setTaskInfoId(taskInfoId);
         if (finishCount == totalCount) {
-            TaskInfo taskInfo = new TaskInfo();
-            taskInfo.setTaskInfoId(taskInfoId);
             taskInfo.setStatus(2);
-            taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-            QTaskInfo.taskInfo.selective(QTaskInfo.status)
-                    .update(taskInfo);
+            taskInfo.setEndDate(new Date());
+        } else {
+            taskInfo.setStatus(1);
+            taskInfo.setEndDate(null);
         }
+        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        QTaskInfo.taskInfo.selective(QTaskInfo.status, QTaskInfo.endDate)
+                .update(taskInfo);
         if (rowCount > 0) {
             return CommonResult.getSuccessResultData("更新成功");
         } else {
