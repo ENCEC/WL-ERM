@@ -71,10 +71,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     public ResultHelper<Page<TaskInfoDto>> queryTaskInfoPage(TaskInfoDto taskInfoDto) {
         ResultHelper<UemUserDto> uemUserDtoResultHelper = shareAuthInterface.getLoginUserInfo();
         UemUserDto uemUserDto = uemUserDtoResultHelper.getData();
-        Long uemUserId = uemUserDto.getUemUserId();
-        if (!uemUserDtoResultHelper.getSuccess() || uemUserDto == null || uemUserId == null) {
+        if (!uemUserDtoResultHelper.getSuccess() || uemUserDto == null || uemUserDto.getUemUserId() == null) {
             return CommonResult.getFaildResultData("用户未登录或没有权限！");
         }
+        Long uemUserId = uemUserDto.getUemUserId();
         String taskTitle = taskInfoDto.getTaskTitle();
         if (!Objects.isNull(taskTitle)) {
             taskInfoDto.setTaskTitle("%" + taskTitle + "%");
@@ -120,7 +120,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 新增和更新（培训任务、学习任务、试用任务、其他任务）逻辑
-     * @param [taskInfoDto, retTaskInfo, retTaskDetailInfoList, isUpdate]
+     * @param taskInfoDto 上传数据
+     * @param retTaskInfo 生成任务主表数据
+     * @param retTaskDetailInfoList 生成任务子表数据
+     * @param isUpdate 是否为更新
      * @return java.lang.String
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-19
