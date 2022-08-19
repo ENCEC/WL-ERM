@@ -6,6 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.client.DSContext;
+import com.gillion.ds.client.api.queryobject.expressions.AndExpression;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.model.domain.TaskDetailInfoDto;
@@ -21,6 +22,7 @@ import com.share.auth.api.ShareAuthInterface;
 import com.share.auth.api.TaskInfoInterface;
 import com.share.auth.api.UemUserInterface;
 import com.share.auth.center.api.AuthCenterInterface;
+import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.support.model.User;
 import com.share.support.result.CommonResult;
@@ -44,7 +46,6 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Autowired
     private UemUserInterface uemUserInterface;
 
-
     @Autowired
     private AuthCenterInterface authCenterInterface;
 
@@ -54,10 +55,26 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Autowired
     private TaskInfoInterface taskInfoInterface;
 
-    private Snowflake snowflake = IdUtil.createSnowflake(RandomUtil.randomLong(1, 31), 1L);
+    private final Snowflake snowflake = IdUtil.createSnowflake(RandomUtil.randomLong(1, 31), 1L);
 
+    private final List<String> taskTypes1 = Arrays.asList("试用任务", "培训任务", "学习任务", "其他任务");
+    private final List<String> taskTypes2 = Arrays.asList("员工转正", "员工离职");
+
+    /**
+     * 任务管理模块条件查询
+     * @param taskInfoDto 查询参数
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     @Override
     public ResultHelper<Page<TaskInfoDto>> queryTaskInfoPage(TaskInfoDto taskInfoDto) {
+        ResultHelper<UemUserDto> uemUserDtoResultHelper = shareAuthInterface.getLoginUserInfo();
+        UemUserDto uemUserDto = uemUserDtoResultHelper.getData();
+        Long uemUserId = uemUserDto.getUemUserId();
+        if (!uemUserDtoResultHelper.getSuccess() || uemUserDto == null || uemUserId == null) {
+            return CommonResult.getFaildResultData("用户未登录或没有权限！");
+        }
         String taskTitle = taskInfoDto.getTaskTitle();
         if (!Objects.isNull(taskTitle)) {
             taskInfoDto.setTaskTitle("%" + taskTitle + "%");
@@ -70,11 +87,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                         .and(QTaskInfo.taskType.eq(":taskType"))
                         .and(QTaskInfo.executor.eq(":executor"))
                         .and(QTaskInfo.status.eq(":status"))
-                        .and(QTaskInfo.taskType.eq$("试用任务")
-                                .or(QTaskInfo.taskType.eq$("学习任务"))
-                                .or(QTaskInfo.taskType.eq$("培训任务"))
-                                .or(QTaskInfo.taskType.eq$("其他任务"))
-                        ))
+                        .and(QTaskInfo.dispatchers.eq$(uemUserId))
+                        .and(QTaskInfo.taskType.in$(taskTypes1)))
                 .paging(pageNo, pageSize)
                 .mapperTo(TaskInfoDto.class)
                 .sorting(QTaskInfo.createTime.desc())
@@ -104,14 +118,18 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return null;
     }
 
+    /**
+     * 新增和更新（培训任务、学习任务、试用任务、其他任务）逻辑
+     * @param [taskInfoDto, retTaskInfo, retTaskDetailInfoList, isUpdate]
+     * @return java.lang.String
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     private String setTaskDetailInfoByStandardDetail(
             TaskInfoDto taskInfoDto, TaskInfo retTaskInfo, List<TaskDetailInfo> retTaskDetailInfoList, boolean isUpdate
     ) {
         String taskType = taskInfoDto.getTaskType();
-        if (!"试用任务".equals(taskType)
-                && !"培训任务".equals(taskType)
-                && !"学习任务".equals(taskType)
-                && !"其他任务".equals(taskType)) {
+        if (!taskTypes1.contains(taskType)) {
             return "任务类型不存在";
         }
         // 获取执行人信息
@@ -209,6 +227,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return null;
     }
 
+    /**
+     * 新增培训任务、学习任务、试用任务、其他任务
+     * @param taskInfoDto 入参
+     * @return com.share.support.result.ResultHelper<java.lang.Object>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResultHelper<Object> saveTaskInfo(TaskInfoDto taskInfoDto) {
@@ -230,6 +255,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return CommonResult.getSuccessResultData("新增条目成功");
     }
 
+    /**
+     * 更新培训任务、学习任务、试用任务、其他任务
+     * @param taskInfoDto 入参
+     * @return com.share.support.result.ResultHelper<java.lang.Object>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResultHelper<Object> updateTaskInfo(TaskInfoDto taskInfoDto) {
@@ -266,6 +298,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return CommonResult.getSuccessResultData("更新条目成功");
     }
 
+    /**
+     * 获取任务详情
+     * @param taskInfoId 任务主表ID
+     * @return com.share.support.result.ResultHelper<com.gillion.model.domain.TaskInfoDto>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResultHelper<TaskInfoDto> getTaskInfoDetail(Long taskInfoId) {
@@ -287,6 +326,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return CommonResult.getSuccessResultData(taskInfoDto);
     }
 
+    /**
+     * 删除任务
+     * @param taskInfoId 任务主表ID
+     * @return com.share.support.result.ResultHelper<java.lang.Object>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResultHelper<Object> deleteTaskInfo(Long taskInfoId) {
@@ -298,6 +344,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return CommonResult.getSuccessResultData("删除条目成功");
     }
 
+    /**
+     * 根据任务类型查询任务细则
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     @Override
     public ResultHelper<Page<StandardDetailVo>> queryStandardFullDetailByTaskType(TaskInfoDto taskInfoDto) {
         if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
@@ -314,6 +367,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return CommonResult.getSuccessResultData(standardDetailVoPage);
     }
 
+    /**
+     * 根据任务类型查询必选任务细则
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     @Override
     public ResultHelper<List<StandardDetailVo>> queryNeedStandardFullDetailByTaskType(TaskInfoDto taskInfoDto) {
         if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
@@ -327,6 +387,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return CommonResult.getSuccessResultData(standardDetailVoList);
     }
 
+    /**
+     * 根据任务类型查询非必选任务细则
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-19
+     */
     @Override
     public ResultHelper<Page<StandardDetailVo>> queryNotNeedStandardFullDetailByTaskType(TaskInfoDto taskInfoDto) {
         if (StrUtil.isEmpty(taskInfoDto.getTaskType())) {
@@ -360,11 +427,15 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         if (StrUtil.isNotBlank(taskInfoDto.getTaskTitle())) {
             taskInfoDto.setTaskTitle("%" + taskInfoDto.getTaskTitle() + "%");
         }
+        AndExpression expression1 = QTaskInfo.executor.eq$(userModelInfo.getUemUserId())
+                .and(QTaskInfo.taskType.in$(taskTypes1));
+        AndExpression expression2 = QTaskInfo.dispatchers.eq$(userModelInfo.getUemUserId())
+                .and(QTaskInfo.taskType.in$(taskTypes2));
         Page<TaskInfoDto> taskInfoDtoList = QTaskInfo.taskInfo
                 .select(QTaskInfo.taskInfo.fieldContainer())
-                .where(QTaskInfo.executor.eq$(userModelInfo.getUemUserId())
-                        .and(QTaskInfo.taskTitle.like(":taskTitle"))
-                        .and(QTaskInfo.status.eq(":status")))
+                .where(QTaskInfo.taskTitle.like(":taskTitle")
+                        .and(QTaskInfo.status.eq(":status"))
+                        .and(expression1.or(expression2)))
                 .sorting(QTaskInfo.createTime.desc())
                 .paging(taskInfoDto.getPageNo(), taskInfoDto.getPageSize())
                 .mapperTo(TaskInfoDto.class)
