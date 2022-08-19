@@ -541,7 +541,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         String ordinator = "%" + userModelInfo.getUemUserId() + "%";
         List<Integer> status;
         if (Objects.isNull(taskInfoDto.getStatus())) {
-            status = Arrays.asList(0, 1, 2);
+            status = Arrays.asList(0, 1, 2, 3);
         } else {
             status = Arrays.asList(taskInfoDto.getStatus());
         }
