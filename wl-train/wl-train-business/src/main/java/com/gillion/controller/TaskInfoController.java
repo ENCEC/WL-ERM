@@ -18,6 +18,7 @@ import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -231,16 +232,22 @@ public class TaskInfoController {
         taskInfo.setStatus(2);
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         //关联查出用户id，name 插入任务表，生成新任务
-        QTaskInfo.taskInfo.save(taskInfo);
-        Long taskInfoId = taskInfo.getTaskInfoId();
-        TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
-        taskDetailInfo.setTaskInfoId(taskInfoId);
-        taskDetailInfo.setStandardEntryId(6960875859204194304L);
-        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
-        taskDetailInfoDTO.setTaskInfoId(taskInfo.getTaskInfoId());
-        taskDetailInfoDTO.setTaskDetailId(taskDetailInfo.getTaskDetailId());
-        return taskInfoService.savePositiveInfoByStaff(taskDetailInfoDTO);
+        List<TaskInfo> execute = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskInfo.getTaskTitle())).execute();
+        if (execute.size() > 1) {
+            return CommonResult.getFaildResultData("该员工已经提交过申请");
+        } else {
+            QTaskInfo.taskInfo.save(taskInfo);
+            Long taskInfoId = taskInfo.getTaskInfoId();
+            TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
+            taskDetailInfo.setTaskInfoId(taskInfoId);
+            taskDetailInfo.setStandardEntryId(6960875859204194304L);
+            taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+            QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+            taskDetailInfoDTO.setTaskInfoId(taskInfo.getTaskInfoId());
+            taskDetailInfoDTO.setTaskDetailId(taskDetailInfo.getTaskDetailId());
+            return taskInfoService.savePositiveInfoByStaff(taskDetailInfoDTO);
+        }
+
     }
 
     @PostMapping("/saveResignInfo")
@@ -259,20 +266,25 @@ public class TaskInfoController {
         taskInfo.setTaskTitle(name + "离职申请");
         taskInfo.setStatus(2);
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        List<TaskInfo> execute = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskInfo.getTaskTitle())).execute();
         //关联查出用户id，name 插入任务表，生成新任务
-        int taskResult = QTaskInfo.taskInfo.save(taskInfo);
-        Long taskInfoId = taskInfo.getTaskInfoId();
-        TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
-        taskDetailInfo.setTaskInfoId(taskInfoId);
-        taskDetailInfo.setStandardEntryId(6960875859204194304L);
-        taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        int taskDetailResult = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
-        taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
-        taskDetailInfo.setTaskDetailId(taskDetailInfo.getTaskDetailId());
-        if ((taskResult == 1) && (taskDetailResult == 1)) {
-            return CommonResult.getSuccessResultData("添加成功！");
+        if (execute.size() > 1) {
+            return CommonResult.getFaildResultData("该员工已经提交过申请");
         } else {
-            return CommonResult.getFaildResultData("添加失败！");
+            int taskResult = QTaskInfo.taskInfo.save(taskInfo);
+            Long taskInfoId = taskInfo.getTaskInfoId();
+            TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
+            taskDetailInfo.setTaskInfoId(taskInfoId);
+            taskDetailInfo.setStandardEntryId(6960875859204194304L);
+            taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+            int taskDetailResult = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
+            taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
+            taskDetailInfo.setTaskDetailId(taskDetailInfo.getTaskDetailId());
+            if ((taskResult == 1) && (taskDetailResult == 1)) {
+                return CommonResult.getSuccessResultData("添加成功！");
+            } else {
+                return CommonResult.getFaildResultData("添加失败！");
+            }
         }
     }
 
@@ -313,5 +325,35 @@ public class TaskInfoController {
     @ApiOperation("我的任务 员工撤回申请")
     public ResultHelper<?> deletedApplyByStaff(@RequestParam Long taskInfoId) {
         return taskInfoService.deletedApplyByStaff(taskInfoId);
+    }
+
+    @PostMapping("/queryTaskInfoByPage")
+    @ApiOperation("我的任务 分页查询任务信息")
+    public ResultHelper<TaskInfoDto> queryTaskInfoByPage(@RequestBody TaskInfoDto taskInfoDto) {
+        return taskInfoService.queryTaskInfoByPage(taskInfoDto);
+    }
+
+    @GetMapping("/queryPositiveInfo")
+    @ApiOperation("员工管理查询员工转正信息")
+    public List<TaskInfoDto> queryPositiveInfo(@RequestParam Long dispatchers) {
+        return taskInfoService.queryPositiveInfo(dispatchers);
+    }
+
+    @GetMapping("/queryPositiveInfoByTaskId")
+    @ApiOperation("员工管理查询员工转正信息")
+    public TaskDetailInfoDTO queryPositiveInfoByTaskId(@RequestParam Long taskInfoId) {
+        return taskInfoService.queryPositiveInfoByTaskId(taskInfoId);
+    }
+
+    @GetMapping("/queryTaskInfoByUser")
+    @ApiOperation("根据任务id查询该申请人的转正申请以及简历")
+    public List queryPositiveApply(@RequestParam Long taskInfoId, @RequestParam Long dispatchers) {
+        List list = new ArrayList<>();
+        ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId);
+        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(dispatchers));
+        //String resume = uemUserDto.getResume();
+        list.add(taskDetailInfoDtoResultHelper);
+        list.add(uemUserDto);
+        return list;
     }
 }

@@ -233,6 +233,14 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
     private String offerType;
 
     /**
+     * 转正时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Column(name = "offer_date")
+    private Date offerDate;
+
+    /**
      * 统筹人ID列表
      */
     @Column(name = "ordinator")

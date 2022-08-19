@@ -142,6 +142,8 @@ public class TaskDetailInfoDto implements Serializable {
     @ApiModelProperty("面谈人ID")
     private Long interviewerId;
 
+    private String interviewerName;
+
     /**
      * 面谈评语
      */
@@ -214,6 +216,13 @@ public class TaskDetailInfoDto implements Serializable {
     @ApiModelProperty("转正类型")
     private String offerType;
 
+    /**
+     * 转正时间
+     */
+    @ApiModelProperty("转正时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date offerDate;
     /**
      * 统筹人ID
      */
@@ -306,4 +315,20 @@ public class TaskDetailInfoDto implements Serializable {
 
     @ApiModelProperty("页码")
     private Integer pageNo;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date createTime;
+
+    /**
+     * 创建人id
+     */
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long creatorId;
+
+    /**
+     * 创建人名称
+     */
+    private String creatorName;
 }

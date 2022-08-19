@@ -193,7 +193,6 @@ public class SysResourceController {
     public ResultHelper<?> uploadExternalFile(@RequestParam("systemId") String systemId,
                                               @RequestParam("fileType") String fileType,
                                               @RequestParam("fileName") String fileName,
-                                              @RequestParam("type") String type,
                                               @RequestParam("sysResourceId") Long sysResourceId,
                                               @RequestPart("file") MultipartFile file) {
         return sysResourceService.uploadExternalFile(sysResourceId, systemId, fileType, fileName,file);

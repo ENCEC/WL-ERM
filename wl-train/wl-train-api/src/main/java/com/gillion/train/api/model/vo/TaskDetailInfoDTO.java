@@ -177,6 +177,14 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
     private String offerType;
 
     /**
+     * 转正时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Column(name = "offer_date")
+    private Date offerDate;
+
+    /**
      * 统筹人ID
      */
     @Column(name = "ordinator")
@@ -284,5 +292,26 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
      * 离职理由
      */
     private String leaveReason;
+
+    /**
+     * 任务主表用户id
+     */
+    private Long dispatchers;
+
+
+    /**
+     * 审批人姓名
+     */
+    @ApiModelProperty("审批人姓名")
+    private String approverName;
+
+    /**
+     * 面谈人ID
+     */
+    @ApiModelProperty("面谈人ID")
+    private Long interviewerId;
+
+    private String interviewerName;
+
 
 }

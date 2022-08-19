@@ -6,6 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.client.DSContext;
+import com.gillion.ds.client.api.queryobject.command.customization.CustomizationCommand;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.model.domain.TaskDetailInfoDto;
@@ -25,6 +26,7 @@ import com.share.auth.domain.UemUserDto;
 import com.share.support.model.User;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -709,6 +711,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     public ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDTO taskDetailInfoDTO) {
         Long taskDetailId = taskDetailInfoDTO.getTaskDetailId();
         Long taskInfoId = taskDetailInfoDTO.getTaskInfoId();
+        Date offerDate = taskDetailInfoDTO.getOfferDate();
         String offerType = taskDetailInfoDTO.getOfferType();
         String faceScore = taskDetailInfoDTO.getFaceScore();
         List<String> uemUserIds = taskDetailInfoDTO.getUemUserIds();
@@ -754,6 +757,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         }
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+        taskDetailInfo.setOfferDate(offerDate);
         taskDetailInfo.setOfferType(offerType);
         taskDetailInfo.setFaceScore(faceScore);
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
@@ -782,4 +786,55 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         }
     }
 
+    /**
+     * 我的任务 --分页查询员工信息
+     *
+     * @author wzr
+     * @date 2022-08-18
+     */
+    @Override
+    public ResultHelper<TaskInfoDto> queryTaskInfoByPage(TaskInfoDto taskInfoDto) {
+        String taskTitle = taskInfoDto.getTaskTitle();
+        if (!Objects.isNull(taskTitle)) {
+            taskInfoDto.setTaskTitle("%" + taskTitle + "%");
+        }
+        int pageNo = taskInfoDto.getPageNo() == null ? 1 : taskInfoDto.getPageNo();
+        int pageSize = taskInfoDto.getPageSize() == null ? 10 : taskInfoDto.getPageSize();
+        Page<TaskInfoDto> taskInfoDtoPage = QTaskInfo.taskInfo
+                .select(QTaskInfo.taskInfo.fieldContainer())
+                .where(QTaskInfo.taskTitle.like(":taskTitle")
+                        .and(QTaskInfo.status.eq(":status"))
+                        .and(QTaskInfo.taskType.notIn$("员工辞退")))
+                .paging(pageNo, pageSize)
+                .mapperTo(TaskInfoDto.class)
+                .sorting(QTaskInfo.createTime.desc())
+                .execute(taskInfoDto);
+        return CommonResult.getSuccessResultData(taskInfoDtoPage);
+    }
+
+    @Override
+    public List<TaskInfoDto> queryPositiveInfo(Long dispatchers) {
+        List<TaskInfoDto> list = QTaskInfo.taskInfo
+                .select(QTaskInfo.taskInfoId, QTaskInfo.taskTitle, QTaskInfo.dispatchers)
+                .where(QTaskInfo.dispatchers.eq$(dispatchers)
+                        .and(QTaskInfo.taskType.eq$("员工转正"))).mapperTo(TaskInfoDto.class).execute();
+        if (CollectionUtils.isNotEmpty(list)) {
+            return list;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public TaskDetailInfoDTO queryPositiveInfoByTaskId(Long taskInfoId) {
+        HashMap<String, Long> params = new HashMap<>();
+        params.put("taskInfoId", taskInfoId);
+        TaskDetailInfoDTO execute = DSContext.customization("WL-ERM_queryPositiveInfo").selectOne()
+                .mapperTo(TaskDetailInfoDTO.class).execute(params);
+        if (execute != null) {
+            return execute;
+        } else {
+            return null;
+        }
+    }
 }

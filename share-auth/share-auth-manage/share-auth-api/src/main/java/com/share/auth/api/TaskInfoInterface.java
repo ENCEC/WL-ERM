@@ -2,7 +2,6 @@ package com.share.auth.api;
 
 import com.share.auth.domain.UemUserDto;
 import com.share.support.result.ResultHelper;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
