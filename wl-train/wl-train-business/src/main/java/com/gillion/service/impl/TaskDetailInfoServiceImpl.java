@@ -4,8 +4,10 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.model.domain.TaskInfoDto;
+import com.gillion.model.entity.StandardEntry;
 import com.gillion.model.entity.TaskDetailInfo;
 import com.gillion.model.entity.TaskInfo;
+import com.gillion.model.querymodels.QStandardEntry;
 import com.gillion.model.querymodels.QTaskDetailInfo;
 import com.gillion.model.querymodels.QTaskInfo;
 import com.gillion.service.TaskDetailInfoService;
@@ -16,6 +18,7 @@ import com.share.auth.api.TaskInfoInterface;
 import com.share.auth.domain.UemUserDto;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +58,10 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
                 || Objects.isNull(taskDetailInfoDTO.getApprover()) ) {
             return CommonResult.getFaildResultData("必填项不能为空");
         }
+        List<TaskInfo> taskInfos = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskDetailInfoDTO.getUemUserName() + "转正申请")).execute();
+        if (CollectionUtils.isNotEmpty(taskInfos)) {
+            return CommonResult.getFaildResultData("该员工已经申请了");
+        }
         TaskInfo taskInfo = new TaskInfo();
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskInfo.setDispatchers(taskDetailInfoDTO.getUemUserId());
@@ -68,7 +75,11 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
         taskDetailInfo.setOfferType(taskDetailInfoDTO.getOfferType());
         taskDetailInfo.setApprover(taskDetailInfoDTO.getApprover());
-        taskDetailInfo.setStandardEntryId(taskDetailInfoDTO.getStandardEntryId());
+        UemUserDto uemUserDto = taskInfoInterface.queryUemUserById(taskDetailInfoDTO.getApprover());
+        taskDetailInfo.setApproverName(uemUserDto.getName());
+        StandardEntry standardEntry = QStandardEntry.standardEntry.selectOne().where(QStandardEntry.entryName.eq$("员工转正")).execute();
+        taskDetailInfo.setStandardEntryId(standardEntry.getStandardEntryId());
+        taskDetailInfo.setStandardEntryName(standardEntry.getEntryName());
         taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         return CommonResult.getSuccessResultData("提交转正申请成功");
@@ -87,6 +98,10 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         ||StrUtil.isEmpty(taskDetailInfoDTO.getLeaveReason())) {
             return CommonResult.getFaildResultData("必填项不能为空");
         }
+        List<TaskInfo> taskInfos = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskDetailInfoDTO.getUemUserName() + "离职申请")).execute();
+        if (CollectionUtils.isNotEmpty(taskInfos)) {
+            return CommonResult.getFaildResultData("该员工已经申请了");
+        }
         TaskInfo taskInfo = new TaskInfo();
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskInfo.setDispatchers(taskDetailInfoDTO.getUemUserId());
@@ -100,7 +115,11 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
         taskDetailInfo.setApprover(taskDetailInfoDTO.getApprover());
-        taskDetailInfo.setStandardEntryId(taskDetailInfoDTO.getStandardEntryId());
+        UemUserDto uemUserDto = taskInfoInterface.queryUemUserById(taskDetailInfoDTO.getApprover());
+        taskDetailInfo.setApproverName(uemUserDto.getName());
+        StandardEntry standardEntry = QStandardEntry.standardEntry.selectOne().where(QStandardEntry.entryName.eq$("员工离职")).execute();
+        taskDetailInfo.setStandardEntryId(standardEntry.getStandardEntryId());
+        taskDetailInfo.setStandardEntryName(standardEntry.getEntryName());
         taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         return CommonResult.getSuccessResultData("提交离职申请成功");
