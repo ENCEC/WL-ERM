@@ -4,6 +4,8 @@ package com.share.auth.service;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.share.auth.domain.UemProjectDTO;
 import com.share.auth.domain.UemUserDto;
+import com.share.auth.domain.UemUserProjectDto;
+import com.share.auth.model.entity.UemUserProject;
 import com.share.support.result.ResultHelper;
 
 import java.util.List;
@@ -79,4 +81,12 @@ public interface UemProjectService {
      * @date 2022/7/29
      */
     ResultHelper<List<String>> selectViewDetailById(String ViewDetailID);
+    /**
+     * @Description: 数据权限测试例子
+     * @Author: ecchen
+     * @Date: 2022/8/21 17:41
+     * @Param: [pageNo, pageSize]
+     * @Return: com.gillion.ds.client.api.queryobject.model.Page<com.share.auth.domain.UemUserProjectDto>
+     **/
+    Page<UemUserProjectDto> selectUserProject(int pageNo, int pageSize);
 }

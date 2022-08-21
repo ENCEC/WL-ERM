@@ -7,9 +7,12 @@ import com.gillion.ds.entity.base.RowStatusConstants;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.UemProjectDTO;
 import com.share.auth.domain.UemUserDto;
+import com.share.auth.domain.UemUserProjectDto;
 import com.share.auth.model.entity.UemProject;
 import com.share.auth.model.entity.UemUser;
+import com.share.auth.model.entity.UemUserProject;
 import com.share.auth.model.querymodels.QUemProject;
+import com.share.auth.model.querymodels.QUemUserProject;
 import com.share.auth.model.querymodels.QUemUser;
 import com.share.auth.service.UemProjectService;
 import com.share.support.result.CommonResult;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -262,6 +266,17 @@ public class UemProjectServiceImpl implements UemProjectService {
                 .byId(list);
 
         return CommonResult.getSuccessResultData(uemUserList);
+    }
+
+    @Override
+    public Page<UemUserProjectDto> selectUserProject(int pageNo, int pageSize){
+        Page<UemUserProjectDto> uemUserProjects = QUemUserProject.uemUserProject.select(
+                QUemUserProject.uemProjectId,QUemUserProject.uemUserId)
+                .where(QUemUserProject.creatorId.eq$(999L))
+                .paging(pageNo,pageSize)
+                .mapperTo(UemUserProjectDto.class)
+                .execute();
+        return uemUserProjects;
     }
 
 }
