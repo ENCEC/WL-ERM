@@ -224,4 +224,17 @@ public interface TaskInfoService {
      */
     ResultHelper<?> deletedApplyByStaff(Long taskInfoId);
 
+    /**
+     * 我的任务  --分页查询任务信息
+     *
+     * @author wzr
+     * @date 2022-08-18
+     */
+    ResultHelper<TaskInfoDto> queryTaskInfoByPage(TaskInfoDto taskInfoDto);
+
+    List<TaskInfoDto> queryPositiveInfo(Long dispatchers);
+
+    TaskDetailInfoDTO queryPositiveInfoByTaskId(Long taskInfoId);
+
+
 }

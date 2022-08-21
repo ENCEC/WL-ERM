@@ -772,8 +772,10 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.uemDeptId,
                         QUemUser.staffDutyId,
                         QUemUser.leaveDate,
-                        QUemUser.leaveReason
-                )
+                        QUemUser.leaveReason,
+                        QUemUser.creatorId,
+                        QUemUser.creatorName
+                        )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
@@ -1009,6 +1011,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     /**
      * 设置数据库resume为空
+     *
      * @param uemUserId
      * @return
      */

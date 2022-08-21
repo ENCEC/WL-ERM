@@ -431,12 +431,11 @@ public class SysRoleServiceImpl implements SysRoleService {
                         QSysRole.sysRoleId,
                         QSysRole.remark,
                         QSysRole.creatorName,
-                        QSysRole.createTime,
-                        QSysRole.isValid).
+                        QSysRole.createTime).
                 where(QSysRole.roleName._like$_(sysRoleDTO.getRoleName())
-                        .and(QSysRole.isValid.eq(":isValid")))
+                        .and(QSysRole.isValid.eq(IS_VALID_PLACEHOLDER)))
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
-                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysRoleDTO.class).sorting(QSysRole.sysRoleId.asc())
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(SysRoleDTO.class).sorting(QSysRole.createTime.desc())
                 .execute();
     }
 

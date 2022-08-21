@@ -3,6 +3,7 @@ package com.share.auth.controller;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.train.api.AuthInfoInterface;
 import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
+import com.gillion.train.api.model.vo.TaskInfoDto;
 import com.share.auth.center.api.AuthCenterInterface;
 import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
@@ -19,6 +20,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -357,7 +359,6 @@ public class UemUserManageController {
      */
     @GetMapping("/queryStaffInfo")
     @ApiOperation(value = "转正，离职，辞退---查看信息")
-
     public UemUserDto queryStaffInfo(@RequestParam Long uemUserId) {
         return uemUserManageService.queryStaffInfo(uemUserId);
     }
@@ -368,17 +369,20 @@ public class UemUserManageController {
      * @author wzr
      * @date 2022-08-04
      */
-    @GetMapping("/queryPositiveStaffInfo")  
+    @GetMapping("/queryPositiveStaffInfo")
     @ApiOperation(value = "服务调用查看转正信息")
-    public List queryPositiveStaffInfo(@RequestParam Long dispatchers) {
-        UemUserDto uemUserDto = uemUserManageService.queryStaffInfo(dispatchers);
-        Map<String, Object> params = new HashMap<>(1);
-        params.put("dispatchers", dispatchers);
-        ResultHelper<Object> objectResultHelper = authInfoInterface.queryPositiveApply(dispatchers);
-        List list = new ArrayList();
-        list.add(uemUserDto);
-        list.add(objectResultHelper);
-        return list;
+    public List queryPositiveStaffInfo(@RequestParam Long uemUserId) {
+        List newResultList = new ArrayList();
+        UemUserDto uemUserDto = uemUserManageService.queryStaffInfo(uemUserId);
+        List<TaskInfoDto> taskInfoDtos = authInfoInterface.queryPositiveInfo(uemUserId);
+        if (CollectionUtils.isNotEmpty(taskInfoDtos)) {
+            Long taskInfoId = taskInfoDtos.get(0).getTaskInfoId();
+            TaskDetailInfoDTO taskDetailInfoDTOS = authInfoInterface.queryPositiveInfoByTaskId(taskInfoId);
+            newResultList.add(taskDetailInfoDTOS);
+        }
+        newResultList.add(uemUserDto);
+        return newResultList;
+
     }
 
     /**
@@ -546,6 +550,7 @@ public class UemUserManageController {
 
     /**
      * 设置数据库resume为空
+     *
      * @param uemUserId
      * @return
      */
