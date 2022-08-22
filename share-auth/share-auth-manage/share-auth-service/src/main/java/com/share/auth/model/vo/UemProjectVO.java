@@ -11,6 +11,7 @@ import lombok.Data;
 
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -81,7 +82,7 @@ private static final long serialVersionUID=1;
     private String dutyName;
 
     /**项目金额*/
-    private Integer fcy;
+    private BigDecimal fcy;
 
     /**需求组员ID（逗号分隔）*/
     private String genDemandUsers;

@@ -13,6 +13,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -105,7 +106,7 @@ private static final long serialVersionUID=1;
 
     /**项目金额*/
     @ApiModelProperty("项目金额")
-    private Integer fcy;
+    private BigDecimal fcy;
 
     /**需求组员ID（逗号分隔）*/
     @ApiModelProperty("需求组员ID（逗号分隔）")
