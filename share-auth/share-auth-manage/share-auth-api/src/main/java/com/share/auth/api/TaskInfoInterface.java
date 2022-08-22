@@ -70,5 +70,5 @@ public interface TaskInfoInterface {
      */
 
     @GetMapping("/uemUserManage/updateJobStatus")
-    ResultHelper<Object> updateJobStatus(@RequestParam Long uemUserId);
+    ResultHelper<Object> updateJobStatus(@RequestParam(value = "uemUserId") Long uemUserId);
 }

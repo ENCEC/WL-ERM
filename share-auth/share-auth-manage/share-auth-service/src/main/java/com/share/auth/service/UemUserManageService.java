@@ -281,17 +281,19 @@ public interface UemUserManageService {
     /**
      * 服务调用（任务模块通过查询用户id 取到name）
      *
-     * @param
-     * @return
+     * @param uemUserId
+     * @author wzr
+     * @date 2022-08-11
      */
 
     UemUserDto queryUemUserById(Long uemUserId);
 
     /**
-     * 服务调用（更改转正员工状态）
+     * 服务调用（更改员工状态）
      *
-     * @param
-     * @return
+     * @param uemUserId
+     * @author wzr
+     * @date 2022-08-22
      */
     ResultHelper<?> updateJobStatus(Long uemUserId);
 
