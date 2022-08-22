@@ -61,4 +61,14 @@ public interface TaskInfoInterface {
      */
     @PostMapping("/uemUserManage/saveDismissInfo")
     ResultHelper<Object> saveDismissInfo(@RequestBody UemUserDto uemUserDto);
+
+    /**
+     * 更改员工状态
+     *
+     * @param uemUserId
+     * @date 2022-08-22
+     */
+
+    @GetMapping("/uemUserManage/updateJobStatus")
+    ResultHelper<Object> updateJobStatus(@RequestParam Long uemUserId);
 }

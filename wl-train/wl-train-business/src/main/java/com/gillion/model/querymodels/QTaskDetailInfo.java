@@ -59,6 +59,7 @@ public class QTaskDetailInfo extends BaseModelExpression<TaskDetailInfo, Long> {
     public static final FieldExpression<String> standardEntryName = taskDetailInfo.fieldOf("standardEntryName", String.class);
     public static final FieldExpression<Date> startDate = taskDetailInfo.fieldOf("startDate", Date.class);
     public static final FieldExpression<Integer> status = taskDetailInfo.fieldOf("status", Integer.class);
+    public static final FieldExpression<Long> jobStatus = taskDetailInfo.fieldOf("jobStatus", Long.class);
     public static final FieldExpression<Long> taskDetailId = taskDetailInfo.fieldOf("taskDetailId", Long.class);
     public static final FieldExpression<Long> taskInfoId = taskDetailInfo.fieldOf("taskInfoId", Long.class);
     public static final FieldExpression<String> taskName = taskDetailInfo.fieldOf("taskName", String.class);

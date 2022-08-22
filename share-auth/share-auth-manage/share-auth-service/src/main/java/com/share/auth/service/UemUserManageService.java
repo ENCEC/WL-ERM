@@ -200,6 +200,7 @@ public interface UemUserManageService {
 
     /**
      * 查看转正评语部分信息
+     *
      * @param uemUserId
      * @return
      */
@@ -207,6 +208,7 @@ public interface UemUserManageService {
 
     /**
      * 查看离职原因
+     *
      * @param uemUserId
      * @return
      */
@@ -214,6 +216,7 @@ public interface UemUserManageService {
 
     /**
      * 查看辞退原因
+     *
      * @param uemUserId
      * @return
      */
@@ -221,6 +224,7 @@ public interface UemUserManageService {
 
     /**
      * 保存员工信息
+     *
      * @param uemUserDto
      * @return
      */
@@ -228,13 +232,15 @@ public interface UemUserManageService {
 
     /**
      * 离职申请添加离职理由
+     *
      * @param
      * @return
      */
-    ResultHelper<?> updateLeaveReason(Long uemUserId,String leaveReason);
+    ResultHelper<?> updateLeaveReason(Long uemUserId, String leaveReason);
 
     /**
      * 上传文件
+     *
      * @param uemUserId
      * @param systemId
      * @param fileType
@@ -246,27 +252,31 @@ public interface UemUserManageService {
 
     /**
      * 下拉框查询所有岗位的信息
+     *
      * @return
      */
-    List<SysPost> querySysPost ();
+    List<SysPost> querySysPost();
 
     /**
      * 下拉框查询所有职称的信息
+     *
      * @return
      */
-    List<SysTechnicalTitle> querySysTechnicalTitle ();
+    List<SysTechnicalTitle> querySysTechnicalTitle();
 
     /**
      * 下拉框查询所有项目的信息
+     *
      * @return
      */
-    List<UemProject> queryUemProject ();
+    List<UemProject> queryUemProject();
 
     /**
      * 下拉框查询所有部门的信息
+     *
      * @return
      */
-    List<UemDept> queryUemDept ();
+    List<UemDept> queryUemDept();
 
     /**
      * 服务调用（任务模块通过查询用户id 取到name）
@@ -278,7 +288,16 @@ public interface UemUserManageService {
     UemUserDto queryUemUserById(Long uemUserId);
 
     /**
+     * 服务调用（更改转正员工状态）
+     *
+     * @param
+     * @return
+     */
+    ResultHelper<?> updateJobStatus(Long uemUserId);
+
+    /**
      * 设置数据库resume为空
+     *
      * @param uemUserId
      * @return
      */

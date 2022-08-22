@@ -311,7 +311,17 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
     @ApiModelProperty("面谈人ID")
     private Long interviewerId;
 
+    /**
+     * 面谈人评语
+     */
+    @ApiModelProperty("面谈人评语")
     private String interviewerName;
+
+    /**
+     * 员工在职状态
+     */
+    @ApiModelProperty("员工在职状态")
+    private Long jobStatus;
 
 
 }

@@ -64,8 +64,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 任务管理模块条件查询
+     *
      * @param taskInfoDto 查询参数
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.domain.TaskInfoDto>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-19
      */
@@ -122,10 +123,11 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 新增和更新（培训任务、学习任务、试用任务、其他任务）逻辑
-     * @param taskInfoDto 上传数据
-     * @param retTaskInfo 生成任务主表数据
+     *
+     * @param taskInfoDto           上传数据
+     * @param retTaskInfo           生成任务主表数据
      * @param retTaskDetailInfoList 生成任务子表数据
-     * @param isUpdate 是否为更新
+     * @param isUpdate              是否为更新
      * @return java.lang.String
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-19
@@ -234,6 +236,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 新增培训任务、学习任务、试用任务、其他任务
+     *
      * @param taskInfoDto 入参
      * @return com.share.support.result.ResultHelper<java.lang.Object>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -262,6 +265,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 更新培训任务、学习任务、试用任务、其他任务
+     *
      * @param taskInfoDto 入参
      * @return com.share.support.result.ResultHelper<java.lang.Object>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -305,6 +309,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 获取任务详情
+     *
      * @param taskInfoId 任务主表ID
      * @return com.share.support.result.ResultHelper<com.gillion.model.domain.TaskInfoDto>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -333,6 +338,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 删除任务
+     *
      * @param taskInfoId 任务主表ID
      * @return com.share.support.result.ResultHelper<java.lang.Object>
      * @author xuzt <xuzt@gillion.com.cn>
@@ -351,8 +357,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 根据任务类型查询任务细则
+     *
      * @param taskInfoDto 查询入参
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.vo.StandardDetailVo>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-19
      */
@@ -374,8 +381,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 根据任务类型查询必选任务细则
+     *
      * @param taskInfoDto 查询入参
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.vo.StandardDetailVo>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-19
      */
@@ -394,8 +402,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     /**
      * 根据任务类型查询非必选任务细则
+     *
      * @param taskInfoDto 查询入参
-     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page<com.gillion.model.vo.StandardDetailVo>>
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.vo.StandardDetailVo>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-19
      */
@@ -801,6 +810,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     @Override
     public ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDTO taskDetailInfoDTO) {
+        Long uemUserId = taskDetailInfoDTO.getUemUserId();
         Long taskInfoId = taskDetailInfoDTO.getTaskInfoId();
         Date offerDate = taskDetailInfoDTO.getOfferDate();
         String offerType = taskDetailInfoDTO.getOfferType();
@@ -808,7 +818,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         List<String> uemUserIds = taskDetailInfoDTO.getUemUserIds();
         int i = 0;
         //获取用户表的主键作数组，分别插入任务子表审批人id以及面谈人id
-        for (String uemUserId : uemUserIds) {
+        for (String s : uemUserIds) {
             String ids = uemUserIds.get(i);
             if (i == 0) {
                 UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(ids);
@@ -848,6 +858,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         }
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+        //更改员工在职状态，转正之后改为正式员工
+        taskInfoInterface.updateJobStatus(uemUserId);
         taskDetailInfo.setOfferDate(offerDate);
         taskDetailInfo.setOfferType(offerType);
         taskDetailInfo.setFaceScore(faceScore);

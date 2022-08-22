@@ -348,5 +348,11 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
     @Column(name = "interviewer_name")
     private String interviewerName;
 
+    /**
+     * 员工在在职状态
+     */
+    @Column(name = "job_status")
+    private Long jobStatus;
+
 
 }

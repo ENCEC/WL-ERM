@@ -693,6 +693,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         uemUser.setLeaveDate(leaveDate);
         uemUser.setLeaveReason(leaveReason);
+        //添加员工离职状态，改为离职员工
         uemUser.setJobStatus(2L);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int result = QUemUser.uemUser.save(uemUser);
@@ -1010,6 +1011,24 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .execute();
         return result;
 
+    }
+
+    @Override
+    public ResultHelper<?> updateJobStatus(Long uemUserId) {
+        UemUser uemUser = QUemUser.uemUser.
+                selectOne()
+                .byId(uemUserId);
+        String account = uemUser.getAccount();
+        //点击转正之后更新员工状态为转正员工
+        uemUser.setJobStatus(1L);
+        uemUser.setAccount(account);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        int result = QUemUser.uemUser.save(uemUser);
+        if (result == 1) {
+            return CommonResult.getSuccessResultData("员工状态修改成功");
+        } else {
+            return CommonResult.getFaildResultData("员工状态修改失败");
+        }
     }
 
     /**
