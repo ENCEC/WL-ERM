@@ -22,6 +22,7 @@ import com.share.auth.service.SysRoleService;
 import com.share.auth.service.UemUserService;
 import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
+import com.share.auth.user.UserInfoModel;
 import com.share.auth.util.MessageUtil;
 import com.share.message.api.EmailTemplateService;
 import com.share.message.api.MsgApiService;
@@ -867,7 +868,7 @@ public class UemUserServiceImpl implements UemUserService {
      */
     @Override
     public ResultHelper<UemUserDto> getLoginUserInfo() {
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        UserInfoModel userInfoModel = (UserInfoModel) userService.getCurrentLoginUser();
         if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
             return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
         }
@@ -875,15 +876,13 @@ public class UemUserServiceImpl implements UemUserService {
                 .selectOne()
                 .mapperTo(UemUserDto.class)
                 .byId(userInfoModel.getUemUserId());
-        if (userInfoModel != null) {
-            List<SysRoleDTO> sysRoleDTOList = DSContext
-                    .customization("WL-ERM_selectRoleByUser")
-                    .select()
-                    .mapperTo(SysRoleDTO.class)
-                    .execute(userInfoModel);
-            uemUserDto.setRoleList(sysRoleDTOList);
-        }
-//        if (Objects.nonNull(uemUserDto)) {
+        List<SysRoleDTO> sysRoleDTOList = DSContext
+                .customization("WL-ERM_selectRoleByUser")
+                .select()
+                .mapperTo(SysRoleDTO.class)
+                .execute(userInfoModel);
+        uemUserDto.setRoleList(sysRoleDTOList);
+        //        if (Objects.nonNull(uemUserDto)) {
 //            // 判断缓存中的用户信息与查询到的用户信息是否一致（版本号是否一致）
 //            if (!userInfoModel.getRecordVersion().equals(uemUserDto.getRecordVersion())) {
 //                userService.updateCurrentLoginUser();

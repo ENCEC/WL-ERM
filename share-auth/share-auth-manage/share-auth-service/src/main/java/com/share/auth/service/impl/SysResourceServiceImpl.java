@@ -14,8 +14,8 @@ import com.share.auth.domain.SysResourceQueryVO;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.service.SysResourceService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
+import com.share.auth.user.UserInfoModel;
 import com.share.file.api.ShareFileInterface;
 import com.share.file.domain.FastDfsUploadResult;
 import com.share.support.result.CommonResult;
@@ -91,8 +91,8 @@ public class SysResourceServiceImpl implements SysResourceService {
             log.info("入参用户id为空");
             return CommonResult.getFaildResultData("入参用户id为空，请确认！");
         }
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) defaultUserService.getCurrentLoginUser();
-        if (!uemUserId.equals(userInfoModel.getUemUserId())) {
+        UserInfoModel userInfoModel = (UserInfoModel) defaultUserService.getCurrentLoginUser();
+        if (Objects.isNull(userInfoModel) || !uemUserId.equals(userInfoModel.getUemUserId())) {
             return CommonResult.getFaildResultData("用户未登录！");
         }
         // 根据clientId查出应用id
