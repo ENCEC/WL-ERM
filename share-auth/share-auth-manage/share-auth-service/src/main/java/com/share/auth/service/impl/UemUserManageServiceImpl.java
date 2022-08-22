@@ -746,7 +746,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.jobStatus,
                         QUemUser.uemDeptId,
                         QUemUser.staffDutyId,
-                        QUemUser.offerDate,
                         QUemUser.staffApplication
                 )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
@@ -804,7 +803,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.uemDeptId,
                         QUemUser.staffDutyId,
                         QUemUser.dismissDate,
-                        QUemUser.dismissReason
+                        QUemUser.dismissReason,
+                        QUemUser.dismissApplication
                 )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)

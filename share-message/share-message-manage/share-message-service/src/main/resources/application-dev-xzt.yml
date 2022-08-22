@@ -27,9 +27,9 @@ spring:
   datasource:
     name: basicDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://172.16.0.178:3309/zhwl_lip_share_message?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
-    username: zhwl_lip_share_message
-    password: zhwl_lip_share_message
+    url: jdbc:mysql://172.16.0.23:3306/zhwl_lip_share_message?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: root
     type: com.alibaba.druid.pool.DruidDataSource
     maxActive: 30
     validationQuery: select 1 FROM DUAL
