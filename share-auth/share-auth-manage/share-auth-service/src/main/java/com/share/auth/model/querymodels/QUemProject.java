@@ -8,6 +8,7 @@ import com.share.auth.model.entity.UemProject;
 import java.lang.Integer;
 import java.lang.Long;
 import java.lang.String;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import com.share.auth.model.entity.UemUser;
@@ -35,7 +36,7 @@ public class QUemProject extends BaseModelExpression<UemProject, Long> {
     public static final FieldExpression<String> devDirectorName = uemProject.fieldOf("devDirectorName", String.class);
     public static final FieldExpression<Long> dutyId = uemProject.fieldOf("dutyId", Long.class);
     public static final FieldExpression<String> dutyName = uemProject.fieldOf("dutyName", String.class);
-    public static final FieldExpression<Integer> fcy = uemProject.fieldOf("fcy", Integer.class);
+    public static final FieldExpression<BigDecimal> fcy = uemProject.fieldOf("fcy", BigDecimal.class);
     public static final FieldExpression<String> genDemandUsers = uemProject.fieldOf("genDemandUsers", String.class);
     public static final FieldExpression<String> genDevUsers = uemProject.fieldOf("genDevUsers", String.class);
     public static final FieldExpression<Long> modifierId = uemProject.fieldOf("modifierId", Long.class);

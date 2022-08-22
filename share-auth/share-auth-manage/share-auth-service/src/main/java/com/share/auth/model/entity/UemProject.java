@@ -18,6 +18,7 @@ import javax.persistence.Version;
 import java.lang.Integer;
 import java.lang.Long;
 import java.lang.String;
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -108,7 +109,7 @@ private static final long serialVersionUID=1;
 
     /**项目金额*/
     @Column(name = "fcy")
-    private Integer fcy;
+    private BigDecimal fcy;
 
     /**需求组员ID（逗号分隔）*/
     @Column(name = "gen_demand_users")
