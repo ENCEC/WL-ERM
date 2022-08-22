@@ -518,6 +518,7 @@ application:
     file: share-file-cec
     portal: share-portal-cec
     center: share-auth-center-cec
+    train: wl-train-cec
 
 # 验证码图片路径
 imgPath: /image/picture/*.jpg

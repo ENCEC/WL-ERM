@@ -15,50 +15,53 @@ import java.util.Collection;
  * @author xuzt <xuzt@gillion.com.cn>
  * @date 2022-08-17
  */
-@Data
-@Builder
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
+//@Data
+//@Builder
+//@ToString
+//@AllArgsConstructor
+//@NoArgsConstructor
+@Value
 public class TablePermission implements ITable {
 
     private String tableName;
 
     private AclMode aclMode;
 
-    @Singular
-    private Collection<IDataPermission> dataPermissions;
+    Collection<IDataPermission> dataPermissions;
 
-    @Override
-    public String getTableName() {
-        return this.tableName;
-    }
-
-    public TablePermission(SysAclTable table) {
-        this.tableName = table.getTableName();
-        if (table.getAclMode() == 0) {
-            this.aclMode = AclMode.WHITE_LIST;
-        } else {
-            this.aclMode = AclMode.BLACK_LIST;
-        }
-    }
-
-    public void setDataPermissions(Collection<DataPermission> dataPermissions) {
-        this.dataPermissions = Lists.newArrayList();
-        Seq.seq(dataPermissions)
-                .forEach(this.dataPermissions::add);
-    }
-
-    @Override
-    public AclMode getAclMode() {
-        return this.aclMode;
-    }
-
-    @Override
-    public Collection<IDataPermission> getDataPermissions() {
-        if (this.dataPermissions == null) {
-            this.dataPermissions = Lists.newArrayList();
-        }
-        return this.dataPermissions;
-    }
+//    @Singular
+//    private Collection<IDataPermission> dataPermissions;
+//
+//    @Override
+//    public String getTableName() {
+//        return this.tableName;
+//    }
+//
+//    public TablePermission(SysAclTable table) {
+//        this.tableName = table.getTableName();
+//        if (table.getAclMode() == 0) {
+//            this.aclMode = AclMode.WHITE_LIST;
+//        } else {
+//            this.aclMode = AclMode.BLACK_LIST;
+//        }
+//    }
+//
+//    public void setDataPermissions(Collection<DataPermission> dataPermissions) {
+//        this.dataPermissions = Lists.newArrayList();
+//        Seq.seq(dataPermissions)
+//                .forEach(this.dataPermissions::add);
+//    }
+//
+//    @Override
+//    public AclMode getAclMode() {
+//        return this.aclMode;
+//    }
+//
+//    @Override
+//    public Collection<IDataPermission> getDataPermissions() {
+//        if (this.dataPermissions == null) {
+//            this.dataPermissions = Lists.newArrayList();
+//        }
+//        return this.dataPermissions;
+//    }
 }

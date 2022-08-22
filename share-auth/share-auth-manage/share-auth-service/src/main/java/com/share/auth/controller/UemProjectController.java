@@ -3,7 +3,9 @@ package com.share.auth.controller;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.share.auth.domain.UemProjectDTO;
 import com.share.auth.domain.UemUserDto;
+import com.share.auth.domain.UemUserProjectDto;
 import com.share.auth.service.UemProjectService;
+import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -11,7 +13,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.share.auth.model.entity.UemUserProject;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -120,6 +124,14 @@ public class UemProjectController {
     })
     ResultHelper<List<String>> selectViewDetailById(@RequestParam String ViewDetailID) {
         return  uemProjectService.selectViewDetailById(ViewDetailID);
+    }
+
+    @PostMapping("/selectUemUserProject")
+    public ResultHelper<Page<UemUserProjectDto>> selectUserProject(@RequestBody UemUserDto uemUserDto){
+        int pageSize = uemUserDto.getPageSize();
+        int pageNo = uemUserDto.getPageNo();
+        Page<UemUserProjectDto> uemUserProjectPage= uemProjectService.selectUserProject(pageNo,pageSize);
+        return CommonResult.getSuccessResultData(uemUserProjectPage);
     }
 
 }
