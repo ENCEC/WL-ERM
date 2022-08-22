@@ -801,7 +801,6 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     @Override
     public ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDTO taskDetailInfoDTO) {
-        Long taskDetailId = taskDetailInfoDTO.getTaskDetailId();
         Long taskInfoId = taskDetailInfoDTO.getTaskInfoId();
         Date offerDate = taskDetailInfoDTO.getOfferDate();
         String offerType = taskDetailInfoDTO.getOfferType();

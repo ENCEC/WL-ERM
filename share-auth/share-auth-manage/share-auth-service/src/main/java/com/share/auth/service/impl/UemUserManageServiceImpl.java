@@ -5,8 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.expressions.CombinableExpression;
-import com.gillion.ds.client.api.queryobject.expressions.ConditionExpression;
-import com.gillion.ds.client.api.queryobject.expressions.Expression;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.share.auth.constants.CodeFinal;
@@ -18,7 +16,6 @@ import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.service.UemUserManageService;
 import com.share.auth.service.UemUserService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.file.api.ShareFileInterface;
 import com.share.file.domain.FastDfsUploadResult;
@@ -40,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 用户信息管理
@@ -591,7 +587,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         // String account = uemUserDto.getAccount();
         String name = uemUserDto.getName();
         Boolean sex = uemUserDto.getSex();
-        String date = uemUserDto.getBirthday();
+        String birthday = uemUserDto.getBirthday();
         Long jobStatus = uemUserDto.getJobStatus();
         String idCard = uemUserDto.getIdCard();
         String mobile = uemUserDto.getMobile();
@@ -611,6 +607,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         String email = uemUserDto.getEmail();
         BigDecimal seniority = uemUserDto.getSeniority();
         Long projectId = uemUserDto.getProjectId();
+        Long staffDutyId = uemUserDto.getStaffDutyId();
         //根据id查询出对应的员工信息，避免空字段
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
@@ -618,7 +615,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setPoliticalStatus(politicalStatus);
         //  uemUser.setAccount(account);
         uemUser.setSex(sex);
-        uemUser.setBirthday(date);
+        uemUser.setBirthday(birthday);
         uemUser.setJobStatus(jobStatus);
         uemUser.setIdCard(idCard);
         uemUser.setName(name);
@@ -636,9 +633,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne(QSysTechnicalTitle.technicalName).byId(technicalTitleId);
         uemUser.setTechnicalName(sysTechnicalTitle.getTechnicalName());
         uemUser.setTechnicalTitleId(technicalTitleId);
-        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postName).where(QSysPost.postCode.eq$(staffDutyCode)).execute();
+        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postName).where(QSysPost.postId.eq$(staffDutyId)).execute();
         uemUser.setStaffDuty(sysPost.getPostName());
-        uemUser.setStaffDutyCode(staffDutyCode);
+        uemUser.setStaffDutyId(staffDutyId);
         UemProject uemProject = QUemProject.uemProject.selectOne(QUemProject.projectName).byId(projectId);
         uemUser.setProjectName(uemProject.getProjectName());
         uemUser.setProjectId(projectId);
@@ -696,6 +693,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         uemUser.setLeaveDate(leaveDate);
         uemUser.setLeaveReason(leaveReason);
+        uemUser.setJobStatus(2L);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int result = QUemUser.uemUser.save(uemUser);
         if (result == 1) {
@@ -719,6 +717,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         uemUser.setDismissDate(dismissDate);
         uemUser.setDismissReason(dismissReason);
+        //添加辞退申请，员工状态改为离职员工
+        uemUser.setJobStatus(2L);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int result = QUemUser.uemUser.save(uemUser);
         if (result == 1) {
@@ -775,7 +775,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.leaveReason,
                         QUemUser.creatorId,
                         QUemUser.creatorName
-                        )
+                )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
                 .mapperTo(UemUserDto.class)
                 .execute();
@@ -927,8 +927,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         //返回带后缀的文件名称
         String originFile = fileName + "." + fileType;
         //获取fileKey 映射fileName
-     /*   HashMap<String, String> map = new HashMap<>(2);
-        map.put(fileKey, originFile);*/
+        HashMap<String, String> map = new HashMap<>(2);
+        map.put(fileKey, originFile);
         UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         if ("个人简历".equals(type)) {
@@ -937,10 +937,13 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         if ("转正申请表".equals(type)) {
             uemUser.setStaffApplication(fileKey);
         }
+        if ("离职申请表".equals(type)) {
+            uemUser.setDismissApplication(fileKey);
+        }
         int count = QUemUser.uemUser.save(uemUser);
         if (count == 1) {
-            //return CommonResult.getSuccessResultData(map);
-            return CommonResult.getSuccessResultData(fileKey);
+            return CommonResult.getSuccessResultData(map);
+            //return CommonResult.getSuccessResultData(fileKey);
         } else {
             return CommonResult.getFaildResultData("上传失败");
         }

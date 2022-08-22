@@ -118,8 +118,29 @@ public class UemProjectServiceImpl implements UemProjectService {
         if (Objects.isNull(uemProjectDTO.getPlanEndTime())) {
             return CommonResult.getFaildResultData("计划结束时间不能为空");
         }
-        uemProjectDTO.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-        int save = QUemProject.uemProject.save(uemProjectDTO);
+        UemProject uemProject = new UemProject();
+        uemProject.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        uemProject.setProjectName(uemProjectDTO.getProjectName());
+        uemProject.setCustomer(uemProjectDTO.getCustomer());
+        uemProject.setFcy(uemProjectDTO.getFcy());
+        uemProject.setStatus(uemProjectDTO.getStatus());
+        uemProject.setChiefId(uemProjectDTO.getChiefId());
+        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getChiefId());
+        uemProject.setChiefName(uemUser.getName());
+        uemProject.setDutyId(uemProjectDTO.getDutyId());
+        UemUser uemUser1 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDutyId());
+        uemProject.setDutyName(uemUser1.getName());
+        uemProject.setDevDirectorId(uemProjectDTO.getDevDirectorId());
+        UemUser uemUser2 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDevDirectorId());
+        uemProject.setDevDirectorName(uemUser2.getName());
+        uemProject.setDemandId(uemProjectDTO.getDemandId());
+        UemUser uemUser3 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDemandId());
+        uemProject.setDemandName(uemUser3.getName());
+        uemProject.setGenDevUsers(uemProjectDTO.getGenDevUsers());
+        uemProject.setGenDemandUsers(uemProjectDTO.getGenDemandUsers());
+        uemProject.setPlanStartTime(uemProjectDTO.getPlanStartTime());
+        uemProject.setPlanEndTime(uemProjectDTO.getPlanEndTime());
+        int save = QUemProject.uemProject.save(uemProject);
         if (save > 0) {
             return CommonResult.getSuccessResultData("项目新增成功");
         } else {
@@ -196,10 +217,28 @@ public class UemProjectServiceImpl implements UemProjectService {
             return CommonResult.getFaildResultData("不存在");
         }
         //更新信息
-        BeanUtils.copyProperties(uemProjectDTO, uemProject);
         uemProject.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        uemProject.setProjectName(uemProjectDTO.getProjectName());
+        uemProject.setCustomer(uemProjectDTO.getCustomer());
+        uemProject.setFcy(uemProjectDTO.getFcy());
+        uemProject.setStatus(uemProjectDTO.getStatus());
+        uemProject.setChiefId(uemProjectDTO.getChiefId());
+        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getChiefId());
+        uemProject.setChiefName(uemUser.getName());
+        uemProject.setDutyId(uemProjectDTO.getDutyId());
+        UemUser uemUser1 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDutyId());
+        uemProject.setDutyName(uemUser1.getName());
+        uemProject.setDevDirectorId(uemProjectDTO.getDevDirectorId());
+        UemUser uemUser2 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDevDirectorId());
+        uemProject.setDevDirectorName(uemUser2.getName());
+        uemProject.setDemandId(uemProjectDTO.getDemandId());
+        UemUser uemUser3 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDemandId());
+        uemProject.setDemandName(uemUser3.getName());
+        uemProject.setGenDevUsers(uemProjectDTO.getGenDevUsers());
+        uemProject.setGenDemandUsers(uemProjectDTO.getGenDemandUsers());
+        uemProject.setPlanStartTime(uemProjectDTO.getPlanStartTime());
+        uemProject.setPlanEndTime(uemProjectDTO.getPlanEndTime());
         int row = QUemProject.uemProject.save(uemProject);
-
         if (row > CodeFinal.SAVE_OR_UPDATE_FAIL_ROW_NUM) {
             return CommonResult.getSuccessResultData("用户修改成功");
         } else {

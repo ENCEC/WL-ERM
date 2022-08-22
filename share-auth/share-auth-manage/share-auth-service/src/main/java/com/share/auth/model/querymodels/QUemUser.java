@@ -81,6 +81,7 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<String> sourceAddress = uemUser.fieldOf("sourceAddress", String.class);
     public static final FieldExpression<String> speciality = uemUser.fieldOf("speciality", String.class);
     public static final FieldExpression<String> staffApplication = uemUser.fieldOf("staffApplication", String.class);
+    public static final FieldExpression<String> dismissApplication = uemUser.fieldOf("dismissApplication", String.class);
     public static final FieldExpression<String> staffDuty = uemUser.fieldOf("staffDuty", String.class);
     public static final FieldExpression<String> staffDutyCode = uemUser.fieldOf("staffDutyCode", String.class);
     public static final FieldExpression<Long> staffDutyId = uemUser.fieldOf("staffDutyId", Long.class);
