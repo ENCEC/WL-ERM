@@ -745,7 +745,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         QUemUser.jobStatus,
                         QUemUser.uemDeptId,
                         QUemUser.staffDutyId,
-                        QUemUser.offerDate,
                         QUemUser.staffApplication
                 )
                 .where(QUemUser.uemUserId.eq$(uemUserId))
