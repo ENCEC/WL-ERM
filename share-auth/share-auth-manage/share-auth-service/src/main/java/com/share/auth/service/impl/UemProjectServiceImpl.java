@@ -106,12 +106,6 @@ public class UemProjectServiceImpl implements UemProjectService {
         if (Objects.isNull(uemProjectDTO.getDutyId())) {
             return CommonResult.getFaildResultData("项目经理不能为空");
         }
-        if (StrUtil.isEmpty(uemProjectDTO.getGenDemandUsers())) {
-            return CommonResult.getFaildResultData("需求组员不能为空");
-        }
-        if (StrUtil.isEmpty(uemProjectDTO.getGenDevUsers())) {
-            return CommonResult.getFaildResultData("开发组员不能为空");
-        }
         if (Objects.isNull(uemProjectDTO.getPlanStartTime())) {
             return CommonResult.getFaildResultData("计划开始时间不能为空");
         }
@@ -125,17 +119,23 @@ public class UemProjectServiceImpl implements UemProjectService {
         uemProject.setFcy(uemProjectDTO.getFcy());
         uemProject.setStatus(uemProjectDTO.getStatus());
         uemProject.setChiefId(uemProjectDTO.getChiefId());
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getChiefId());
-        uemProject.setChiefName(uemUser.getName());
+        if (uemProjectDTO.getChiefId() != null) {
+            UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getChiefId());
+            uemProject.setChiefName(uemUser.getName());
+        }
         uemProject.setDutyId(uemProjectDTO.getDutyId());
         UemUser uemUser1 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDutyId());
         uemProject.setDutyName(uemUser1.getName());
         uemProject.setDevDirectorId(uemProjectDTO.getDevDirectorId());
-        UemUser uemUser2 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDevDirectorId());
-        uemProject.setDevDirectorName(uemUser2.getName());
+        if (uemProjectDTO.getDevDirectorId() != null) {
+            UemUser uemUser2 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDevDirectorId());
+            uemProject.setDevDirectorName(uemUser2.getName());
+        }
         uemProject.setDemandId(uemProjectDTO.getDemandId());
-        UemUser uemUser3 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDemandId());
-        uemProject.setDemandName(uemUser3.getName());
+        if (uemProjectDTO.getDemandId() != null) {
+            UemUser uemUser3 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDemandId());
+            uemProject.setDemandName(uemUser3.getName());
+        }
         uemProject.setGenDevUsers(uemProjectDTO.getGenDevUsers());
         uemProject.setGenDemandUsers(uemProjectDTO.getGenDemandUsers());
         uemProject.setPlanStartTime(uemProjectDTO.getPlanStartTime());
@@ -223,17 +223,29 @@ public class UemProjectServiceImpl implements UemProjectService {
         uemProject.setFcy(uemProjectDTO.getFcy());
         uemProject.setStatus(uemProjectDTO.getStatus());
         uemProject.setChiefId(uemProjectDTO.getChiefId());
-        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getChiefId());
-        uemProject.setChiefName(uemUser.getName());
+        if (uemProjectDTO.getChiefId() == null ) {
+            uemProject.setChiefName("");
+        } else {
+            UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getChiefId());
+            uemProject.setChiefName(uemUser.getName());
+        }
         uemProject.setDutyId(uemProjectDTO.getDutyId());
         UemUser uemUser1 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDutyId());
         uemProject.setDutyName(uemUser1.getName());
         uemProject.setDevDirectorId(uemProjectDTO.getDevDirectorId());
-        UemUser uemUser2 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDevDirectorId());
-        uemProject.setDevDirectorName(uemUser2.getName());
+        if (uemProjectDTO.getDevDirectorId() == null) {
+            uemProject.setDevDirectorName("");
+        } else {
+            UemUser uemUser2 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDevDirectorId());
+            uemProject.setDevDirectorName(uemUser2.getName());
+        }
         uemProject.setDemandId(uemProjectDTO.getDemandId());
-        UemUser uemUser3 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDemandId());
-        uemProject.setDemandName(uemUser3.getName());
+        if (uemProjectDTO.getDemandId() == null) {
+            uemProject.setDemandName("");
+        } else {
+            UemUser uemUser3 = QUemUser.uemUser.selectOne().byId(uemProjectDTO.getDemandId());
+            uemProject.setDemandName(uemUser3.getName());
+        }
         uemProject.setGenDevUsers(uemProjectDTO.getGenDevUsers());
         uemProject.setGenDemandUsers(uemProjectDTO.getGenDemandUsers());
         uemProject.setPlanStartTime(uemProjectDTO.getPlanStartTime());
