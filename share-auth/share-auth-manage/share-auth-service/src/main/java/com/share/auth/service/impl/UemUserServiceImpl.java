@@ -20,7 +20,6 @@ import com.share.auth.model.vo.UserAndCompanyVo;
 import com.share.auth.service.MsgSendService;
 import com.share.auth.service.SysRoleService;
 import com.share.auth.service.UemUserService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.auth.user.UserInfoModel;
 import com.share.auth.util.MessageUtil;
@@ -300,7 +299,7 @@ public class UemUserServiceImpl implements UemUserService {
     private String sign3Validate(List<UemUser> uemUserMobileList, String telephone, List<SysPlatformUser> sysPlatformUserList) {
         if (CollectionUtils.isNotEmpty(uemUserMobileList)) {
             //获取当前用户信息
-            AuthUserInfoModel user = (AuthUserInfoModel) userService.getCurrentLoginUser();
+            UserInfoModel user = (UserInfoModel) userService.getCurrentLoginUser();
             if (Objects.isNull(user) || Objects.isNull(user.getUemUserId())) {
                 return "未获取到登录信息";
             }
@@ -497,7 +496,7 @@ public class UemUserServiceImpl implements UemUserService {
         }catch (Exception e){
             return CommonResult.getFaildResultData(DECODE_FAIL_PROMPT);
         }
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        UserInfoModel userInfoModel = (UserInfoModel) userService.getCurrentLoginUser();
         if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
             return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
         }
@@ -759,7 +758,7 @@ public class UemUserServiceImpl implements UemUserService {
         if (uemUserDto == null) {
             return CommonResult.getFaildResultData("空参数，更新失败");
         }
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        UserInfoModel userInfoModel = (UserInfoModel) userService.getCurrentLoginUser();
         if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
             return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
         }
@@ -832,7 +831,7 @@ public class UemUserServiceImpl implements UemUserService {
      * @author huanghwh
      * @date 2021/5/7 上午10:18
      */
-    private String accountValidate(UemUserDto uemUserDto, UemUser uemUser, AuthUserInfoModel userInfoModel) {
+    private String accountValidate(UemUserDto uemUserDto, UemUser uemUser, UserInfoModel userInfoModel) {
         if (uemUserDto.getAccount() != null) {
             List<UemUser> userList = QUemUser.uemUser
                     .select()
@@ -902,7 +901,7 @@ public class UemUserServiceImpl implements UemUserService {
     @Override
     public Boolean validatePassword(String password) {
         password = MD5EnCodeUtils.MD5EnCode(password);
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        UserInfoModel userInfoModel = (UserInfoModel) userService.getCurrentLoginUser();
         if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
             return true;
         }

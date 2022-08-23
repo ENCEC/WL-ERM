@@ -20,7 +20,6 @@ import com.share.support.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.utils.Lists;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -77,13 +76,13 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
 
     @Override
     public Object getUserId() {
-        final AuthUserInfoModel currentLoginUser = (AuthUserInfoModel) getCurrentLoginUser();
+        final UserInfoModel currentLoginUser = (UserInfoModel) getCurrentLoginUser();
         return currentLoginUser.getUemUserId();
     }
 
     @Override
     public String getOfficeId() {
-        final AuthUserInfoModel currentLoginUser = (AuthUserInfoModel) getCurrentLoginUser();
+        final UserInfoModel currentLoginUser = (UserInfoModel) getCurrentLoginUser();
         return currentLoginUser.getBlindCompanny() == null ? "" : currentLoginUser.getBlindCompanny().toString();
     }
 
