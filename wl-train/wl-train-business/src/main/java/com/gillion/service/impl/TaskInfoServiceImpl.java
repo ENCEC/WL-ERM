@@ -7,7 +7,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.expressions.AndExpression;
-import com.gillion.ds.client.api.queryobject.command.customization.CustomizationCommand;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.model.domain.TaskDetailInfoDto;
@@ -23,7 +22,6 @@ import com.share.auth.api.ShareAuthInterface;
 import com.share.auth.api.TaskInfoInterface;
 import com.share.auth.api.UemUserInterface;
 import com.share.auth.center.api.AuthCenterInterface;
-import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
 import com.share.support.model.User;
 import com.share.support.result.CommonResult;
@@ -443,13 +441,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         }
         AndExpression expression1 = QTaskInfo.executor.eq$(userModelInfo.getUemUserId())
                 .and(QTaskInfo.taskType.in$(taskTypes1));
-        AndExpression expression2 = QTaskInfo.dispatchers.eq$(userModelInfo.getUemUserId())
-                .and(QTaskInfo.taskType.in$(taskTypes2));
+//        AndExpression expression2 = QTaskInfo.dispatchers.eq$(userModelInfo.getUemUserId())
+//                .and(QTaskInfo.taskType.in$(taskTypes2));
         Page<TaskInfoDto> taskInfoDtoList = QTaskInfo.taskInfo
                 .select(QTaskInfo.taskInfo.fieldContainer())
                 .where(QTaskInfo.taskTitle.like(":taskTitle")
                         .and(QTaskInfo.status.eq(":status"))
-                        .and(expression1.or(expression2)))
+                        .and(expression1))
                 .sorting(QTaskInfo.createTime.desc())
                 .paging(taskInfoDto.getPageNo(), taskInfoDto.getPageSize())
                 .mapperTo(TaskInfoDto.class)
