@@ -60,7 +60,7 @@ public class TaskDetailInfoController {
      */
     @ApiOperation("查看转正评语")
     @RequestMapping ("/queryOffer")
-    public List queryOffer(Long dispatchers,String name) {
+    public ResultHelper<List> queryOffer(Long dispatchers,String name) {
         return taskDetailInfoService.queryOffer(dispatchers,name);
     }
 
