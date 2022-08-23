@@ -735,6 +735,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         taskDetailInfo.setAuditDate(auditDate);
         taskDetailInfo.setAuditRemark(auditRemark);
         taskDetailInfo.setAuditResult(auditResult);
+        taskDetailInfo.setStatus(2);
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int reslut = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         if (reslut > 0) {
@@ -760,6 +761,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         String offerRemark = taskDetailInfoDto.getOfferRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+        TaskInfo taskInfo = QTaskInfo.taskInfo.selectOne().where(QTaskInfo.taskInfoId.eq$(taskInfoId)).execute();
+        taskInfo.setStatus(2);
+        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        QTaskInfo.taskInfo.save(taskInfo);
         taskDetailInfo.setApprovalDate(approvalDate);
         taskDetailInfo.setResultAccess(resultAccess);
         taskDetailInfo.setOfferRemark(offerRemark);
@@ -792,6 +797,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         taskDetailInfo.setApprovalDate(approvalDate);
         taskDetailInfo.setResultAccess(resultAccess);
         taskDetailInfo.setApprovalRemark(approvalRemark);
+        TaskInfo taskInfo = QTaskInfo.taskInfo.selectOne().where(QTaskInfo.taskInfoId.eq$(taskInfoId)).execute();
+        taskInfo.setStatus(2);
+        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        QTaskInfo.taskInfo.save(taskInfo);
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         int result = QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         if (result > 0) {
