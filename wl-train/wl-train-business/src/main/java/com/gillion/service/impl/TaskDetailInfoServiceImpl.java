@@ -68,7 +68,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskInfo.setDispatchersName(taskDetailInfoDTO.getUemUserName());
         taskInfo.setTaskType("员工转正");
         taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"转正申请");
-        taskInfo.setStatus(0);
+        taskInfo.setStatus(1);
         QTaskInfo.taskInfo.save(taskInfo);
         TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
@@ -108,7 +108,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskInfo.setDispatchersName(taskDetailInfoDTO.getUemUserName());
         taskInfo.setTaskType("员工离职");
         taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"离职申请");
-        taskInfo.setStatus(0);
+        taskInfo.setStatus(1);
         QTaskInfo.taskInfo.save(taskInfo);
         taskDetailInfoInterface.updateLeaveReason(taskDetailInfoDTO.getUemUserId(),taskDetailInfoDTO.getLeaveReason());
         TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
@@ -132,21 +132,31 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List queryOffer(Long dispatchers,String name) {
+    public ResultHelper<List> queryOffer(Long dispatchers,String name) {
         String taskTitle = name+"转正申请";
-        TaskInfoDto taskInfoDto = QTaskInfo.taskInfo.selectOne(
-                QTaskInfo.taskInfoId)
-                .where(QTaskInfo.dispatchers.eq$(dispatchers).and(QTaskInfo.taskTitle.eq$(taskTitle)))
-                .mapperTo(TaskInfoDto.class)
-                .execute();
-        TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
-                .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId()))
-                .execute();
-        UemUserDto uemUserDto = taskDetailInfoInterface.queryOfferInfo(dispatchers);
-        List list = new LinkedList();
-        list.add(taskDetailInfo);
-        list.add(uemUserDto);
-
-        return list;
+        List<TaskInfo> taskInfos = QTaskInfo.taskInfo.select().where(QTaskInfo.taskInfoId.goe$(1L)).execute();
+        List lists = new LinkedList();
+        for (TaskInfo taskInfo : taskInfos) {
+            if (taskInfo.getTaskTitle().equals(taskTitle)) {
+                lists.add(taskInfo);
+            }
+        }
+        if (lists.size() == 1) {
+            UemUserDto uemUserDto = taskDetailInfoInterface.queryOfferInfo(dispatchers);
+            TaskInfoDto taskInfoDto = QTaskInfo.taskInfo.selectOne(
+                    QTaskInfo.taskInfoId)
+                    .where(QTaskInfo.dispatchers.eq$(dispatchers).and(QTaskInfo.taskTitle.eq$(taskTitle)))
+                    .mapperTo(TaskInfoDto.class)
+                    .execute();
+            TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
+                    .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId()))
+                    .execute();
+            List list = new LinkedList();
+            list.add(taskDetailInfo);
+            list.add(uemUserDto);
+            return CommonResult.getSuccessResultData(list);
+        } else {
+            return CommonResult.getFaildResultData("查询失败");
+        }
     }
 }
