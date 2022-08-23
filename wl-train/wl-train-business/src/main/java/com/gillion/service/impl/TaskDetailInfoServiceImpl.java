@@ -142,10 +142,6 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoDto.getTaskInfoId()))
                 .execute();
-        UemUserDto uemUserDto1 = taskInfoInterface.queryUemUserById(taskDetailInfo.getInterviewerId());
-        taskDetailInfo.setInterviewerName(uemUserDto1.getName());
-        UemUserDto uemUserDto2 = taskInfoInterface.queryUemUserById(taskDetailInfo.getApprover());
-        taskDetailInfo.setApproverName(uemUserDto2.getName());
         UemUserDto uemUserDto = taskDetailInfoInterface.queryOfferInfo(dispatchers);
         List list = new LinkedList();
         list.add(taskDetailInfo);
