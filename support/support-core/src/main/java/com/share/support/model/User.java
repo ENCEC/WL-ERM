@@ -2,6 +2,7 @@ package com.share.support.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -11,153 +12,201 @@ import java.util.Map;
  * @Author:chenxf
  * @Description: 用户信息表
  * @Date: 15:56 2020/12/10
- * @Param: 
+ * @Param:
  * @Return:
- *
  */
 public class User implements Serializable,com.gillion.eds.sso.IUser {
     private static final long serialVersionUID = 1;
 
-    /**id*/
+    /**
+     * id
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long uemUserId;
 
-    /**用户名*/
+    /**
+     * 用户名
+     */
     private String account;
 
     private String appCode;
 
-    /**审批客服*/
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long auditor;
+//    /**审批客服*/
+//    @JsonSerialize(using = ToStringSerializer.class)
+//    private Long auditor;
+//
+//    /**审批备注*/
+//    private String auditRemark;
+//
+//    /**审批状态（0待审批，1审批通过，2审批失败）*/
+//    private String auditStatus;
+//
+//    /**审批时间*/
+//    private Date auditTime;
+//
+//    /**绑定企业*/
+//    @JsonSerialize(using = ToStringSerializer.class)
+//    private Long blindCompanny;
+//
+//    /**绑定企业时间*/
+//    private Date blindCompannyTime;
+//
+//    /**身份证反面图片地址id*/
+//    private String cardBackUrlId;
+//
+//    /**身份证正面图片地址id*/
+//    private String cardPositiveUrlId;
 
-    /**审批备注*/
-    private String auditRemark;
-
-    /**审批状态（0待审批，1审批通过，2审批失败）*/
-    private String auditStatus;
-
-    /**审批时间*/
-    private Date auditTime;
-
-    /**绑定企业*/
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long blindCompanny;
-
-    /**绑定企业时间*/
-    private Date blindCompannyTime;
-
-    /**身份证反面图片地址id*/
-    private String cardBackUrlId;
-
-    /**身份证正面图片地址id*/
-    private String cardPositiveUrlId;
-
-    /**创建时间*/
+    /**
+     * 创建时间
+     */
     private Date createTime;
 
-    /**创建人id*/
+    /**
+     * 创建人id
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long creatorId;
 
-    /**创建人名称*/
+    /**
+     * 创建人名称
+     */
     private String creatorName;
 
-    /**邮箱*/
+    /**
+     * 邮箱
+     */
     private String email;
 
-    /**政务账号绑定ID*/
-    private String gvmId;
+//    /**政务账号绑定ID*/
+//    private String gvmId;
 
-    /**身份证号码*/
-    private String idCard;
+//    /**身份证号码*/
+//    private String idCard;
 
-    /**启/禁用时间*/
+    /**
+     * 启/禁用时间
+     */
     private Date invalidTime;
 
-    /**是否同意协议(0不同意，1同意)*/
-    private Boolean isAgreemeent;
+//    /**是否同意协议(0不同意，1同意)*/
+//    private Boolean isAgreemeent;
 
-    /**是否显示（0显示，1隐藏）*/
+    /**
+     * 是否显示（0显示，1隐藏）
+     */
     private Boolean isDisplayed;
 
-    /**是否禁用(0禁用,1启用)*/
+    /**
+     * 是否禁用(0禁用,1启用)
+     */
     private Boolean isValid;
 
-    /**手机号*/
+    /**
+     * 手机号
+     */
     private String mobile;
 
     /**修改人id*/
     @JsonSerialize(using = ToStringSerializer.class)
     private Long modifierId;
 
-    /**修改人名称*/
+    /**
+     * 修改人名称
+     */
     private String modifierName;
 
-    /**修改时间*/
+    /**
+     * 修改时间
+     */
     private Date modifyTime;
 
-    /**姓名*/
+    /**
+     * 姓名
+     */
     private String name;
 
-    /**来源应用*/
+    /**
+     * 来源应用
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long oriApplication;
 
-    /**密码*/
+    /**
+     * 密码
+     */
     private String password;
 
-    /**QQ绑定ID*/
-    private String qqId;
+//    /**QQ绑定ID*/
+//    private String qqId;
 
-    /**版本号*/
+    /**
+     * 版本号
+     */
     private Integer recordVersion;
 
-    /**用户评分*/
-    private Integer score;
+//    /**用户评分*/
+//    private Integer score;
 
-    /**性别（0男，1女）*/
+    /**
+     * 性别（0男，1女）
+     */
     private Boolean sex;
 
-    /**用户来源*/
-    private String source;
+//    /**用户来源*/
+//    private String source;
 
-    /**实名信息ID*/
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long uemIdCardId;
+//    /**实名信息ID*/
+//    @JsonSerialize(using = ToStringSerializer.class)
+//    private Long uemIdCardId;
 
-    /**用户类型（0-普通用户，1-企业用户，2-企业管理员）*/
+    /**
+     * 用户类型（0-普通用户，1-企业用户，2-企业管理员）
+     */
     private String userType;
 
-    /**微信绑定ID*/
-    private String wxId;
-    /** jwt解析出来的角色信息和企业信息*/
-    private Long sysRoleId;
+//    /**微信绑定ID*/
+//    private String wxId;
+//    /** jwt解析出来的角色信息和企业信息*/
+//    private Long sysRoleId;
+//
+//    private String sysRoleName;
+//
+//    private String roleCode;
 
-    private String sysRoleName;
+//    private String companyName;
 
-    private String roleCode;
+//    /** 以下加个实体的信息需要另外调用账号权限接口查询之后才有数据*/
+//    private Role role;
 
-    private String companyName;
-
-    /** 以下加个实体的信息需要另外调用账号权限接口查询之后才有数据*/
-    private Role role;
-
-    /** 角色列表 */
+    /**
+     * 角色列表
+     */
     private List<Role> roleList;
 
-    private Company company;
+    /**
+     * 项目列表
+     */
+    private List<Project> projectList;
 
-    /**所属企业的下级企业*/
-    private List<Company> childrenCompanyList;
+//    private Company company;
+//
+//    /**所属企业的下级企业*/
+//    private List<Company> childrenCompanyList;
 
-    /**当前访问应用id*/
+    /**
+     * 当前访问应用id
+     */
     private String clientId;
 
-    /** 当前访问应用角色对应关系*/
+    /**
+     * 当前访问应用角色对应关系
+     */
     private Map<String, String> currentClientRoleMap;
 
-    /** 过期时间*/
+    /**
+     * 过期时间
+     */
     private Long expireTime;
 
     public Long getUemUserId() {
@@ -176,69 +225,69 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.account = account;
     }
 
-    public Long getAuditor() {
-        return auditor;
-    }
-
-    public void setAuditor(Long auditor) {
-        this.auditor = auditor;
-    }
-
-    public String getAuditRemark() {
-        return auditRemark;
-    }
-
-    public void setAuditRemark(String auditRemark) {
-        this.auditRemark = auditRemark;
-    }
-
-    public String getAuditStatus() {
-        return auditStatus;
-    }
-
-    public void setAuditStatus(String auditStatus) {
-        this.auditStatus = auditStatus;
-    }
-
-    public Date getAuditTime() {
-        return auditTime;
-    }
-
-    public void setAuditTime(Date auditTime) {
-        this.auditTime = auditTime;
-    }
-
-    public Long getBlindCompanny() {
-        return blindCompanny;
-    }
-
-    public void setBlindCompanny(Long blindCompanny) {
-        this.blindCompanny = blindCompanny;
-    }
-
-    public Date getBlindCompannyTime() {
-        return blindCompannyTime;
-    }
-
-    public void setBlindCompannyTime(Date blindCompannyTime) {
-        this.blindCompannyTime = blindCompannyTime;
-    }
-
-    public String getCardBackUrlId() {
-        return cardBackUrlId;
-    }
-
-    public void setCardBackUrlId(String cardBackUrlId) {
-        this.cardBackUrlId = cardBackUrlId;
-    }
-
-    public String getCardPositiveUrlId() {
-        return cardPositiveUrlId;
-    }
-
-    public void setCardPositiveUrlId(String cardPositiveUrlId) {
-        this.cardPositiveUrlId = cardPositiveUrlId;
-    }
+//    public Long getAuditor() {
+//        return auditor;
+//    }
+//
+//    public void setAuditor(Long auditor) {
+//        this.auditor = auditor;
+//    }
+//
+//    public String getAuditRemark() {
+//        return auditRemark;
+//    }
+//
+//    public void setAuditRemark(String auditRemark) {
+//        this.auditRemark = auditRemark;
+//    }
+//
+//    public String getAuditStatus() {
+//        return auditStatus;
+//    }
+//
+//    public void setAuditStatus(String auditStatus) {
+//        this.auditStatus = auditStatus;
+//    }
+//
+//    public Date getAuditTime() {
+//        return auditTime;
+//    }
+//
+//    public void setAuditTime(Date auditTime) {
+//        this.auditTime = auditTime;
+//    }
+//
+//    public Long getBlindCompanny() {
+//        return blindCompanny;
+//    }
+//
+//    public void setBlindCompanny(Long blindCompanny) {
+//        this.blindCompanny = blindCompanny;
+//    }
+//
+//    public Date getBlindCompannyTime() {
+//        return blindCompannyTime;
+//    }
+//
+//    public void setBlindCompannyTime(Date blindCompannyTime) {
+//        this.blindCompannyTime = blindCompannyTime;
+//    }
+//
+//    public String getCardBackUrlId() {
+//        return cardBackUrlId;
+//    }
+//
+//    public void setCardBackUrlId(String cardBackUrlId) {
+//        this.cardBackUrlId = cardBackUrlId;
+//    }
+//
+//    public String getCardPositiveUrlId() {
+//        return cardPositiveUrlId;
+//    }
+//
+//    public void setCardPositiveUrlId(String cardPositiveUrlId) {
+//        this.cardPositiveUrlId = cardPositiveUrlId;
+//    }
 
     public Date getCreateTime() {
         return createTime;
@@ -272,21 +321,21 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.email = email;
     }
 
-    public String getGvmId() {
-        return gvmId;
-    }
-
-    public void setGvmId(String gvmId) {
-        this.gvmId = gvmId;
-    }
-
-    public String getIdCard() {
-        return idCard;
-    }
-
-    public void setIdCard(String idCard) {
-        this.idCard = idCard;
-    }
+//    public String getGvmId() {
+//        return gvmId;
+//    }
+//
+//    public void setGvmId(String gvmId) {
+//        this.gvmId = gvmId;
+//    }
+//
+//    public String getIdCard() {
+//        return idCard;
+//    }
+//
+//    public void setIdCard(String idCard) {
+//        this.idCard = idCard;
+//    }
 
     public Date getInvalidTime() {
         return invalidTime;
@@ -296,13 +345,13 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.invalidTime = invalidTime;
     }
 
-    public Boolean getIsAgreemeent() {
-        return isAgreemeent;
-    }
-
-    public void setIsAgreemeent(Boolean agreemeent) {
-        isAgreemeent = agreemeent;
-    }
+//    public Boolean getIsAgreemeent() {
+//        return isAgreemeent;
+//    }
+//
+//    public void setIsAgreemeent(Boolean agreemeent) {
+//        isAgreemeent = agreemeent;
+//    }
 
     public Boolean getIsDisplayed() {
         return isDisplayed;
@@ -376,13 +425,13 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.password = password;
     }
 
-    public String getQqId() {
-        return qqId;
-    }
-
-    public void setQqId(String qqId) {
-        this.qqId = qqId;
-    }
+//    public String getQqId() {
+//        return qqId;
+//    }
+//
+//    public void setQqId(String qqId) {
+//        this.qqId = qqId;
+//    }
 
     public Integer getRecordVersion() {
         return recordVersion;
@@ -392,13 +441,13 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.recordVersion = recordVersion;
     }
 
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
+//    public Integer getScore() {
+//        return score;
+//    }
+//
+//    public void setScore(Integer score) {
+//        this.score = score;
+//    }
 
     public Boolean getSex() {
         return sex;
@@ -408,21 +457,21 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.sex = sex;
     }
 
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public Long getUemIdCardId() {
-        return uemIdCardId;
-    }
-
-    public void setUemIdCardId(Long uemIdCardId) {
-        this.uemIdCardId = uemIdCardId;
-    }
+//    public String getSource() {
+//        return source;
+//    }
+//
+//    public void setSource(String source) {
+//        this.source = source;
+//    }
+//
+//    public Long getUemIdCardId() {
+//        return uemIdCardId;
+//    }
+//
+//    public void setUemIdCardId(Long uemIdCardId) {
+//        this.uemIdCardId = uemIdCardId;
+//    }
 
     public String getUserType() {
         return userType;
@@ -432,21 +481,21 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.userType = userType;
     }
 
-    public String getWxId() {
-        return wxId;
-    }
-
-    public void setWxId(String wxId) {
-        this.wxId = wxId;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
+//    public String getWxId() {
+//        return wxId;
+//    }
+//
+//    public void setWxId(String wxId) {
+//        this.wxId = wxId;
+//    }
+//
+//    public Role getRole() {
+//        return role;
+//    }
+//
+//    public void setRole(Role role) {
+//        this.role = role;
+//    }
 
     public List<Role> getRoleList() {
         return roleList;
@@ -456,21 +505,29 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.roleList = roleList;
     }
 
-    public Company getCompany() {
-        return company;
+    public List<Project> getProjectList() {
+        return projectList;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setProjectList(List<Project> projectList) {
+        this.projectList = projectList;
     }
 
-    public List<Company> getChildrenCompanyList() {
-        return childrenCompanyList;
-    }
-
-    public void setChildrenCompanyList(List<Company> childrenCompanyList) {
-        this.childrenCompanyList = childrenCompanyList;
-    }
+//    public Company getCompany() {
+//        return company;
+//    }
+//
+//    public void setCompany(Company company) {
+//        this.company = company;
+//    }
+//
+//    public List<Company> getChildrenCompanyList() {
+//        return childrenCompanyList;
+//    }
+//
+//    public void setChildrenCompanyList(List<Company> childrenCompanyList) {
+//        this.childrenCompanyList = childrenCompanyList;
+//    }
 
     public String getAppCode() {
         return appCode;
@@ -480,37 +537,37 @@ public class User implements Serializable,com.gillion.eds.sso.IUser {
         this.appCode = appCode;
     }
 
-    public Long getSysRoleId() {
-        return sysRoleId;
-    }
-
-    public void setSysRoleId(Long sysRoleId) {
-        this.sysRoleId = sysRoleId;
-    }
-
-    public String getSysRoleName() {
-        return sysRoleName;
-    }
-
-    public void setSysRoleName(String sysRoleName) {
-        this.sysRoleName = sysRoleName;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getRoleCode() {
-        return roleCode;
-    }
-
-    public void setRoleCode(String roleCode) {
-        this.roleCode = roleCode;
-    }
+//    public Long getSysRoleId() {
+//        return sysRoleId;
+//    }
+//
+//    public void setSysRoleId(Long sysRoleId) {
+//        this.sysRoleId = sysRoleId;
+//    }
+//
+//    public String getSysRoleName() {
+//        return sysRoleName;
+//    }
+//
+//    public void setSysRoleName(String sysRoleName) {
+//        this.sysRoleName = sysRoleName;
+//    }
+//
+//    public String getCompanyName() {
+//        return companyName;
+//    }
+//
+//    public void setCompanyName(String companyName) {
+//        this.companyName = companyName;
+//    }
+//
+//    public String getRoleCode() {
+//        return roleCode;
+//    }
+//
+//    public void setRoleCode(String roleCode) {
+//        this.roleCode = roleCode;
+//    }
 
     public String getClientId() {
         return clientId;

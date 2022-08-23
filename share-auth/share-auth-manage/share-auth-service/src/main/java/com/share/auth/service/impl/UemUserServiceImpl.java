@@ -20,7 +20,6 @@ import com.share.auth.model.vo.UserAndCompanyVo;
 import com.share.auth.service.MsgSendService;
 import com.share.auth.service.SysRoleService;
 import com.share.auth.service.UemUserService;
-import com.share.auth.user.AuthUserInfoModel;
 import com.share.auth.user.DefaultUserService;
 import com.share.auth.user.UserInfoModel;
 import com.share.auth.util.MessageUtil;
@@ -300,7 +299,7 @@ public class UemUserServiceImpl implements UemUserService {
     private String sign3Validate(List<UemUser> uemUserMobileList, String telephone, List<SysPlatformUser> sysPlatformUserList) {
         if (CollectionUtils.isNotEmpty(uemUserMobileList)) {
             //获取当前用户信息
-            AuthUserInfoModel user = (AuthUserInfoModel) userService.getCurrentLoginUser();
+            UserInfoModel user = (UserInfoModel) userService.getCurrentLoginUser();
             if (Objects.isNull(user) || Objects.isNull(user.getUemUserId())) {
                 return "未获取到登录信息";
             }
@@ -497,7 +496,7 @@ public class UemUserServiceImpl implements UemUserService {
         }catch (Exception e){
             return CommonResult.getFaildResultData(DECODE_FAIL_PROMPT);
         }
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        UserInfoModel userInfoModel = (UserInfoModel) userService.getCurrentLoginUser();
         if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
             return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
         }
@@ -596,22 +595,22 @@ public class UemUserServiceImpl implements UemUserService {
         if (Objects.nonNull(user)) {
             // 不返回密码信息
             user.setPassword(null);
-            if (Objects.nonNull(user.getBlindCompanny())){
-                Company company = QUemCompany.uemCompany.selectOne().mapperTo(Company.class).byId(user.getBlindCompanny());
-                if(Objects.nonNull(company) && Objects.nonNull(company.getOrganizationType())){
-                    SysDictType sysDictType = QSysDictType.sysDictType.selectOne().where(QSysDictType.dictTypeCode.eq$("LOGIN_ORGANIZATION_TYPE").and(QSysDictType.isValid.eq$(true))).execute();
-                    SysDictCode sysDictCode = QSysDictCode.sysDictCode.selectOne().where(QSysDictCode.sysDictTypeId.eq$(sysDictType.getSysDictTypeId()).and(QSysDictCode.dictCode.eq$(company.getOrganizationType()).and(QSysDictCode.isValid.eq$(true)))).execute();
-                    if (Objects.nonNull(sysDictCode)){
-                        company.setOrganizationTypeName(sysDictCode.getDictName());
-                    }
-                    user.setCompanyName(company.getCompanyNameCn());
-                }
-                user.setCompany(company);
-                if (Objects.nonNull(company) && Objects.nonNull(company.getIsSuperior()) && company.getIsSuperior()){
-                    List<Company> companyList = this.queryChildrenCompany(company.getUemCompanyId(), 1);
-                    user.setChildrenCompanyList(companyList);
-                }
-            }
+//            if (Objects.nonNull(user.getBlindCompanny())){
+//                Company company = QUemCompany.uemCompany.selectOne().mapperTo(Company.class).byId(user.getBlindCompanny());
+//                if(Objects.nonNull(company) && Objects.nonNull(company.getOrganizationType())){
+//                    SysDictType sysDictType = QSysDictType.sysDictType.selectOne().where(QSysDictType.dictTypeCode.eq$("LOGIN_ORGANIZATION_TYPE").and(QSysDictType.isValid.eq$(true))).execute();
+//                    SysDictCode sysDictCode = QSysDictCode.sysDictCode.selectOne().where(QSysDictCode.sysDictTypeId.eq$(sysDictType.getSysDictTypeId()).and(QSysDictCode.dictCode.eq$(company.getOrganizationType()).and(QSysDictCode.isValid.eq$(true)))).execute();
+//                    if (Objects.nonNull(sysDictCode)){
+//                        company.setOrganizationTypeName(sysDictCode.getDictName());
+//                    }
+//                    user.setCompanyName(company.getCompanyNameCn());
+//                }
+//                user.setCompany(company);
+//                if (Objects.nonNull(company) && Objects.nonNull(company.getIsSuperior()) && company.getIsSuperior()){
+//                    List<Company> companyList = this.queryChildrenCompany(company.getUemCompanyId(), 1);
+//                    user.setChildrenCompanyList(companyList);
+//                }
+//            }
             if (StringUtils.isNotEmpty(clientId)) {
                 // 根据clientId查询应用id
                 OauthClientDetails oauthClientDetail = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
@@ -626,14 +625,14 @@ public class UemUserServiceImpl implements UemUserService {
             user.setMobile(sysPlatformUser.getTel());
             user.setEmail(sysPlatformUser.getMail());
             user.setName(sysPlatformUser.getName());
-            user.setSysRoleId(CodeFinal.ADMIN_DEFAULT_ROLE_ID);
-            user.setSysRoleName("PlateFormUser");
-            user.setRoleCode("SYSADMIN");
+//            user.setSysRoleId(CodeFinal.ADMIN_DEFAULT_ROLE_ID);
+//            user.setSysRoleName("PlateFormUser");
+//            user.setRoleCode("SYSADMIN");
             Role role = new Role();
             role.setSysRoleId(CodeFinal.ADMIN_DEFAULT_ROLE_ID);
             role.setRoleName("PlateFormUser");
             role.setRoleCode("SYSADMIN");
-            user.setRole(role);
+//            user.setRole(role);
             // 将角色添加到角色列表
             List<Role> roleList = new ArrayList<>();
             roleList.add(role);
@@ -659,15 +658,15 @@ public class UemUserServiceImpl implements UemUserService {
                 }
                 List<Role> roleList = QSysRole.sysRole.select().mapperTo(Role.class).byId(roleIds);
                 // 默认设置第一个角色
-                user.setRole(roleList.get(0));
+//                user.setRole(roleList.get(0));
                 // 将所有角色添加到列表
                 user.setRoleList(roleList);
                 // 只有一个角色时，设置角色信息
-                if (roleIds.size() == 1) {
-                    user.setSysRoleId(roleList.get(0).getSysRoleId());
-                    user.setSysRoleName(roleList.get(0).getRoleName());
-                    user.setRoleCode(roleList.get(0).getRoleCode());
-                }
+//                if (roleIds.size() == 1) {
+//                    user.setSysRoleId(roleList.get(0).getSysRoleId());
+//                    user.setSysRoleName(roleList.get(0).getRoleName());
+//                    user.setRoleCode(roleList.get(0).getRoleCode());
+//                }
             }
         }
     }
@@ -759,7 +758,7 @@ public class UemUserServiceImpl implements UemUserService {
         if (uemUserDto == null) {
             return CommonResult.getFaildResultData("空参数，更新失败");
         }
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        UserInfoModel userInfoModel = (UserInfoModel) userService.getCurrentLoginUser();
         if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
             return CommonResult.getFaildResultData(GET_USER_INFO_FAIL_PROMPT);
         }
@@ -832,7 +831,7 @@ public class UemUserServiceImpl implements UemUserService {
      * @author huanghwh
      * @date 2021/5/7 上午10:18
      */
-    private String accountValidate(UemUserDto uemUserDto, UemUser uemUser, AuthUserInfoModel userInfoModel) {
+    private String accountValidate(UemUserDto uemUserDto, UemUser uemUser, UserInfoModel userInfoModel) {
         if (uemUserDto.getAccount() != null) {
             List<UemUser> userList = QUemUser.uemUser
                     .select()
@@ -902,7 +901,7 @@ public class UemUserServiceImpl implements UemUserService {
     @Override
     public Boolean validatePassword(String password) {
         password = MD5EnCodeUtils.MD5EnCode(password);
-        AuthUserInfoModel userInfoModel = (AuthUserInfoModel) userService.getCurrentLoginUser();
+        UserInfoModel userInfoModel = (UserInfoModel) userService.getCurrentLoginUser();
         if (Objects.isNull(userInfoModel) || Objects.isNull(userInfoModel.getUemUserId())) {
             return true;
         }
