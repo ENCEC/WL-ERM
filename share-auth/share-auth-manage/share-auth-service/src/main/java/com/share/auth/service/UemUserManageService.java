@@ -303,6 +303,6 @@ public interface UemUserManageService {
      * @param uemUserId
      * @return
      */
-    ResultHelper<?> deleteResume(Long uemUserId);
+    ResultHelper<?> deleteResume(Long uemUserId, String type);
 
 }

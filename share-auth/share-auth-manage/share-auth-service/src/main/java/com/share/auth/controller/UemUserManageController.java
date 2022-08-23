@@ -555,8 +555,8 @@ public class UemUserManageController {
      * @return
      */
     @GetMapping("/deleteResume")
-    public ResultHelper<?> deleteResume(Long uemUserId) {
-        return uemUserManageService.deleteResume(uemUserId);
+    public ResultHelper<?> deleteResume(Long uemUserId, String type) {
+        return uemUserManageService.deleteResume(uemUserId, type);
     }
 
     @GetMapping("/updateJobStatus")

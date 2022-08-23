@@ -639,7 +639,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         UemProject uemProject = QUemProject.uemProject.selectOne(QUemProject.projectName).byId(projectId);
         uemUser.setProjectName(uemProject.getProjectName());
         uemUser.setProjectId(projectId);
-        UemDept uemDept = QUemDept.uemDept.selectOne(QUemDept.deptName,QUemDept.uemDeptId).byId(uemDeptId);
+        UemDept uemDept = QUemDept.uemDept.selectOne(QUemDept.deptName, QUemDept.uemDeptId).byId(uemDeptId);
         uemUser.setDeptName(uemDept.getDeptName());
         uemUser.setUemDeptId(uemDept.getUemDeptId());
 
@@ -942,7 +942,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         if ("转正申请表".equals(type)) {
             uemUser.setStaffApplication(fileKey);
         }
-        if ("离职申请表".equals(type)) {
+        if ("辞退申请表".equals(type)) {
             uemUser.setDismissApplication(fileKey);
         }
         int count = QUemUser.uemUser.save(uemUser);
@@ -1045,10 +1045,18 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @return
      */
     @Override
-    public ResultHelper<?> deleteResume(Long uemUserId) {
+    public ResultHelper<?> deleteResume(Long uemUserId, String type) {
         UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUser.setResume("");
+        if ("个人简历".equals(type)) {
+            uemUser.setResume("");
+        }
+        if ("转正申请表".equals(type)) {
+            uemUser.setStaffApplication("");
+        }
+        if ("辞退申请表".equals(type)) {
+            uemUser.setDismissApplication("");
+        }
         int count = QUemUser.uemUser.save(uemUser);
         if (count > 0) {
             return CommonResult.getSuccessResultData("编辑成功");
