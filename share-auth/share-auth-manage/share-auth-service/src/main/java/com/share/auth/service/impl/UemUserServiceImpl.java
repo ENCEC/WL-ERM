@@ -595,22 +595,22 @@ public class UemUserServiceImpl implements UemUserService {
         if (Objects.nonNull(user)) {
             // 不返回密码信息
             user.setPassword(null);
-            if (Objects.nonNull(user.getBlindCompanny())){
-                Company company = QUemCompany.uemCompany.selectOne().mapperTo(Company.class).byId(user.getBlindCompanny());
-                if(Objects.nonNull(company) && Objects.nonNull(company.getOrganizationType())){
-                    SysDictType sysDictType = QSysDictType.sysDictType.selectOne().where(QSysDictType.dictTypeCode.eq$("LOGIN_ORGANIZATION_TYPE").and(QSysDictType.isValid.eq$(true))).execute();
-                    SysDictCode sysDictCode = QSysDictCode.sysDictCode.selectOne().where(QSysDictCode.sysDictTypeId.eq$(sysDictType.getSysDictTypeId()).and(QSysDictCode.dictCode.eq$(company.getOrganizationType()).and(QSysDictCode.isValid.eq$(true)))).execute();
-                    if (Objects.nonNull(sysDictCode)){
-                        company.setOrganizationTypeName(sysDictCode.getDictName());
-                    }
-                    user.setCompanyName(company.getCompanyNameCn());
-                }
-                user.setCompany(company);
-                if (Objects.nonNull(company) && Objects.nonNull(company.getIsSuperior()) && company.getIsSuperior()){
-                    List<Company> companyList = this.queryChildrenCompany(company.getUemCompanyId(), 1);
-                    user.setChildrenCompanyList(companyList);
-                }
-            }
+//            if (Objects.nonNull(user.getBlindCompanny())){
+//                Company company = QUemCompany.uemCompany.selectOne().mapperTo(Company.class).byId(user.getBlindCompanny());
+//                if(Objects.nonNull(company) && Objects.nonNull(company.getOrganizationType())){
+//                    SysDictType sysDictType = QSysDictType.sysDictType.selectOne().where(QSysDictType.dictTypeCode.eq$("LOGIN_ORGANIZATION_TYPE").and(QSysDictType.isValid.eq$(true))).execute();
+//                    SysDictCode sysDictCode = QSysDictCode.sysDictCode.selectOne().where(QSysDictCode.sysDictTypeId.eq$(sysDictType.getSysDictTypeId()).and(QSysDictCode.dictCode.eq$(company.getOrganizationType()).and(QSysDictCode.isValid.eq$(true)))).execute();
+//                    if (Objects.nonNull(sysDictCode)){
+//                        company.setOrganizationTypeName(sysDictCode.getDictName());
+//                    }
+//                    user.setCompanyName(company.getCompanyNameCn());
+//                }
+//                user.setCompany(company);
+//                if (Objects.nonNull(company) && Objects.nonNull(company.getIsSuperior()) && company.getIsSuperior()){
+//                    List<Company> companyList = this.queryChildrenCompany(company.getUemCompanyId(), 1);
+//                    user.setChildrenCompanyList(companyList);
+//                }
+//            }
             if (StringUtils.isNotEmpty(clientId)) {
                 // 根据clientId查询应用id
                 OauthClientDetails oauthClientDetail = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
@@ -625,14 +625,14 @@ public class UemUserServiceImpl implements UemUserService {
             user.setMobile(sysPlatformUser.getTel());
             user.setEmail(sysPlatformUser.getMail());
             user.setName(sysPlatformUser.getName());
-            user.setSysRoleId(CodeFinal.ADMIN_DEFAULT_ROLE_ID);
-            user.setSysRoleName("PlateFormUser");
-            user.setRoleCode("SYSADMIN");
+//            user.setSysRoleId(CodeFinal.ADMIN_DEFAULT_ROLE_ID);
+//            user.setSysRoleName("PlateFormUser");
+//            user.setRoleCode("SYSADMIN");
             Role role = new Role();
             role.setSysRoleId(CodeFinal.ADMIN_DEFAULT_ROLE_ID);
             role.setRoleName("PlateFormUser");
             role.setRoleCode("SYSADMIN");
-            user.setRole(role);
+//            user.setRole(role);
             // 将角色添加到角色列表
             List<Role> roleList = new ArrayList<>();
             roleList.add(role);
@@ -658,15 +658,15 @@ public class UemUserServiceImpl implements UemUserService {
                 }
                 List<Role> roleList = QSysRole.sysRole.select().mapperTo(Role.class).byId(roleIds);
                 // 默认设置第一个角色
-                user.setRole(roleList.get(0));
+//                user.setRole(roleList.get(0));
                 // 将所有角色添加到列表
                 user.setRoleList(roleList);
                 // 只有一个角色时，设置角色信息
-                if (roleIds.size() == 1) {
-                    user.setSysRoleId(roleList.get(0).getSysRoleId());
-                    user.setSysRoleName(roleList.get(0).getRoleName());
-                    user.setRoleCode(roleList.get(0).getRoleCode());
-                }
+//                if (roleIds.size() == 1) {
+//                    user.setSysRoleId(roleList.get(0).getSysRoleId());
+//                    user.setSysRoleName(roleList.get(0).getRoleName());
+//                    user.setRoleCode(roleList.get(0).getRoleCode());
+//                }
             }
         }
     }

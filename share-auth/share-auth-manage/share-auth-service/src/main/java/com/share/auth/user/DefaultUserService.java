@@ -1,5 +1,6 @@
 package com.share.auth.user;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.gillion.ec.core.security.IThreadLoggedUserPorter;
 import com.gillion.ec.core.security.IUser;
@@ -16,6 +17,8 @@ import com.share.auth.service.UemUserService;
 import com.share.auth.util.RedisUtil;
 import com.share.auth.util.ThreadLocalUtil;
 import com.share.support.constants.UserConstant;
+import com.share.support.model.Project;
+import com.share.support.model.Role;
 import com.share.support.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -28,10 +31,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author liaowj
@@ -83,7 +83,8 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
     @Override
     public String getOfficeId() {
         final UserInfoModel currentLoginUser = (UserInfoModel) getCurrentLoginUser();
-        return currentLoginUser.getBlindCompanny() == null ? "" : currentLoginUser.getBlindCompanny().toString();
+        return null;
+//        return currentLoginUser.getBlindCompanny() == null ? "" : currentLoginUser.getBlindCompanny().toString();
     }
 
     @Override
@@ -108,10 +109,10 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
             }
             /* 从session里获取用户，如果获取不到，就先调用认证权限获取用户信息，并将用户信息保存到session */
 //            AuthUserInfoModel authUserInfoModel = new AuthUserInfoModel();
-            if (user == null) {
+//            if (user == null) {
                 user = authCenterInterface.getUserInfo();
                 session.setAttribute(USER, user);
-            }
+//            }
             if (user == null) {
                 return spUser;
             }
@@ -122,7 +123,7 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
 
             final ArrayList<IDataPermission> dataPermissions = new ArrayList<>();
             final ArrayList<ITable> permissionTables = new ArrayList<>(0);
-            checkSelectDataPermissions(dataPermissions,user.getUemUserId());
+            checkSelectDataPermissions(dataPermissions, user);
             checkTablePermissions(permissionTables, dataPermissions);
             spUser.setPermissionTables(permissionTables);
             ThreadLocalUtil.set(CURRENT_LOGIN_USER, spUser);
@@ -133,13 +134,64 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
         }
     }
 
-    private void checkSelectDataPermissions(ArrayList<IDataPermission> dataPermissions,Long userId) {
-        dataPermissions.add(new DataPermission("uem_user_id = "+userId, CrudType.SELECT));
+    private List<Long> parseIdList(String idStr) {
+        String[] ids = idStr.split(",");
+        List<Long> idList = new ArrayList<>();
+        for (String id : ids) {
+            idList.add(Long.parseLong(id));
+        }
+        return idList;
+    }
+
+    private void checkSelectDataPermissions(ArrayList<IDataPermission> dataPermissions, User user) {
+        List<Role> roleList = user.getRoleList();
+        for (Role role : roleList) {
+            if ("ADMIN".equals(role.getRoleName())) {
+                dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.SELECT));
+                return;
+            }
+        }
+        List<Project> projectList = user.getProjectList();
+        Set<Long> uemUserIdSet = new HashSet<>();
+        for (Project project : projectList) {
+            for (Role role : roleList) {
+                String roleName = role.getRoleName();
+                switch (roleName) {
+                    case "DEMAND_LEADER":
+                        uemUserIdSet.addAll(parseIdList(project.getGenDemandUsers()));
+                        break;
+                    case "DM":
+                        uemUserIdSet.addAll(parseIdList(project.getGenDevUsers()));
+                        break;
+                    case "MD":
+                    case "PD":
+                    case "PM":
+                    case "GM":
+                    case "VGM":
+                        uemUserIdSet.addAll(parseIdList(project.getGenDemandUsers()));
+                        uemUserIdSet.addAll(parseIdList(project.getGenDemandUsers()));
+                        uemUserIdSet.add(project.getChiefId());
+                        uemUserIdSet.add(project.getDutyId());
+                        uemUserIdSet.add(project.getDevDirectorId());
+                        uemUserIdSet.add(project.getDemandId());
+                        break;
+                    case "DEV_STAFF":
+                    case "DEMAND_STAFF":
+                    default:
+                        uemUserIdSet.add(user.getUemUserId());
+                }
+            }
+        }
+        if (!uemUserIdSet.isEmpty()) {
+            String idListStr = StrUtil.join(",", uemUserIdSet);
+            idListStr = StrUtil.wrap(idListStr, "(", ")");
+            dataPermissions.add(new DataPermission("uem_user_id IN " + idListStr, CrudType.SELECT));
+        }
     }
 
     private void checkTablePermissions(ArrayList<ITable> permissionTables, ArrayList<IDataPermission> dataPermissions) {
-        permissionTables.add(new TablePermission("uem_user_project", AclMode.BLACK_LIST, dataPermissions));
-        //permissionTables.add(new TablePermission("sdr_anomaly_warning", AclMode.BLACK_LIST, dataPermissions));
+        permissionTables.add(new TablePermission("uem_user", AclMode.WHITE_LIST, dataPermissions));
+//        permissionTables.add(new TablePermission("uem_user", AclMode.BLACK_LIST, dataPermissions));
     }
 
     /**

@@ -1,4 +1,5 @@
 package com.share.auth.center.service.impl;
+
 import com.gillion.utils.CommonResult;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -10,11 +11,9 @@ import com.share.auth.center.enums.GlobalEnum;
 import com.share.auth.center.model.entity.OauthClientDetails;
 import com.share.auth.center.model.entity.SysPlatformUser;
 import com.share.auth.center.model.entity.UemUser;
-import com.share.auth.center.model.entity.UemUserRole;
 import com.share.auth.center.model.querymodels.QOauthClientDetails;
 import com.share.auth.center.model.querymodels.QSysPlatformUser;
 import com.share.auth.center.model.querymodels.QUemUser;
-import com.share.auth.center.model.querymodels.QUemUserRole;
 import com.share.auth.center.service.ResourcePermissionService;
 import com.share.auth.center.service.SysResourceService;
 import com.share.auth.center.util.OauthClientUtils;
@@ -33,9 +32,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @Author:chenxf
@@ -197,9 +197,9 @@ public class ResourcePermissionServiceImpl implements ResourcePermissionService,
         List<Long> allowAllClientIdList = OauthClientUtils.getAllowAllClientId();
         if (allowAllClientIdList.contains(sysApplicationId)) {
             // 国家综合交通运输信息平台只允许访问申请权限接口
-            if (Objects.equals(GlobalEnum.UserSource.NTIP.getCode(), userInfoModel.getSource()) && !this.isImtpUserAllowPath(path)) {
-                return CommonResult.failure().errorMessages("302", this.getRedirectUrlByError(GlobalEnum.AuthErrorEnum.ACCESS_LIMIT, sysApplicationId));
-            }
+//            if (Objects.equals(GlobalEnum.UserSource.NTIP.getCode(), userInfoModel.getSource()) && !this.isImtpUserAllowPath(path)) {
+//                return CommonResult.failure().errorMessages("302", this.getRedirectUrlByError(GlobalEnum.AuthErrorEnum.ACCESS_LIMIT, sysApplicationId));
+//            }
             // 其他用户可以访问
             return CommonResult.success();
         }
@@ -212,26 +212,26 @@ public class ResourcePermissionServiceImpl implements ResourcePermissionService,
         Long customerServiceRoleId = 0L;
         if (allowAdminClientIdList.contains(sysApplicationId)) {
             // 国家综合交通运输信息平台不允许访问公共服务
-            if (Objects.equals(GlobalEnum.UserSource.NTIP.getCode(), userInfoModel.getSource())) {
-                return CommonResult.failure().errorMessages("302", this.getRedirectUrlByError(GlobalEnum.AuthErrorEnum.ACCESS_LIMIT, sysApplicationId));
-            }
-            // 系统其它用户
-            if (!customerServiceRoleId.equals(userInfoModel.getSysRoleId())) {
-                return CommonResult.failure().errorMessages("访问受限，非平台客服登录公共服务系统"  + path);
-            } else {
-                return CommonResult.success();
-            }
+//            if (Objects.equals(GlobalEnum.UserSource.NTIP.getCode(), userInfoModel.getSource())) {
+//                return CommonResult.failure().errorMessages("302", this.getRedirectUrlByError(GlobalEnum.AuthErrorEnum.ACCESS_LIMIT, sysApplicationId));
+//            }
+//            // 系统其它用户
+//            if (!customerServiceRoleId.equals(userInfoModel.getSysRoleId())) {
+//                return CommonResult.failure().errorMessages("访问受限，非平台客服登录公共服务系统"  + path);
+//            } else {
+//                return CommonResult.success();
+//            }
         }
         // 允许没有角色的账号登录
         List<Long> allowNoRoleClientIdList = OauthClientUtils.getAllowNoRoleClientId();
         // 平台客服登录应急系统
         Long loginkEmergency = 6742407760051060736L;
-        if (customerServiceRoleId.equals(userInfoModel.getSysRoleId())) {
-            // 客服是否登录需要角色的应用
-            if (!allowNoRoleClientIdList.contains(sysApplicationId) && !Objects.equals(loginkEmergency, sysApplicationId)) {
-                return CommonResult.failure().errorMessages("平台客服无法访问其它系统。");
-            }
-        }
+//        if (customerServiceRoleId.equals(userInfoModel.getSysRoleId())) {
+//            // 客服是否登录需要角色的应用
+//            if (!allowNoRoleClientIdList.contains(sysApplicationId) && !Objects.equals(loginkEmergency, sysApplicationId)) {
+//                return CommonResult.failure().errorMessages("平台客服无法访问其它系统。");
+//            }
+//        }
         //4.当未配置资源时，两种策略处理判定，1、直接返回成功 2、返回失败
         Set<PatternPathMatcher> allResourceMatchers = resourcePermissionCaches.getUnchecked(ALL_RESOURCE_KEY);
         boolean requestInDefinitions = Seq.seq(allResourceMatchers)
@@ -255,59 +255,60 @@ public class ResourcePermissionServiceImpl implements ResourcePermissionService,
      * @return
      */
     private CommonResult validateUserResourcePermission(String path, User userInfoModel, Long sysApplicationId) {
-        Long sysRoleId = userInfoModel.getSysRoleId();
-        List<Long> roleList = new ArrayList<>();
-        if (Objects.nonNull(sysRoleId)) {
-            roleList.add(sysRoleId);
-        }
-        // 系统跳转，获取跳转后的系统角色信息
-        if (!Objects.equals(sysApplicationId.toString(), userInfoModel.getAppCode()) || Objects.isNull(sysRoleId)) {
-            List<UemUserRole> userRoleList = QUemUserRole.uemUserRole.select().where(
-                    QUemUserRole.uemUserId.eq$(userInfoModel.getUemUserId())
-                            .and(QUemUserRole.sysApplicationId.eq$(sysApplicationId)
-                                    .and(QUemUserRole.isValid.eq$(true)))
-            ).execute();
-            roleList = userRoleList.stream().map(UemUserRole::getSysRoleId).collect(Collectors.toList());
-        }
-        if (CollectionUtils.isEmpty(roleList)) {
-            // 平台客服登录设置默认角色
-            Long customerServiceRoleId = 0L;
-            // 允许没有角色的账号登录，默认角色id 为1
-            List<Long> allowNoRoleClientIdList = OauthClientUtils.getAllowNoRoleClientId();
-			 if (customerServiceRoleId.equals(userInfoModel.getSysRoleId())) {
-                roleList.add(userInfoModel.getSysRoleId());
-            } else if (allowNoRoleClientIdList.contains(sysApplicationId)) {
-                roleList.add(customerServiceRoleId.equals(userInfoModel.getSysRoleId()) ? customerServiceRoleId : 1L);
-            }  else {
-                return CommonResult.failure().errorMessages("访问受限，用户没有访问权限" + path);
-            }
-        }
-        boolean isAllowAccessResource;
-        Set<PatternPathMatcher> permissionMatchers = new HashSet<>();
-        //3.获取用户角色权限
-        if (StringUtils.isEmpty(userInfoModel.getAppCode()) && Objects.nonNull(sysRoleId)) {
-            permissionMatchers = resourcePermissionCaches.getUnchecked(sysRoleId.toString());
-        } else {
-            // 所有角色进行权限匹配
-            for (Long roleId : roleList) {
-                permissionMatchers = resourcePermissionByAppCodeCaches.getUnchecked(Pair.of(sysApplicationId.toString(), roleId.toString()));
-                isAllowAccessResource = Seq.seq(permissionMatchers).anyMatch(matcher -> matcher.match(path));
-                if (isAllowAccessResource) {
-                    // 匹配成功
-                    break;
-                }
-            }
-        }
-
-        //5.验证权限是否在准许范围
-        isAllowAccessResource = Seq.seq(permissionMatchers)
-                .anyMatch(matcher -> matcher.match(path));
-        if (isAllowAccessResource) {
-            log.info("获取接口权限成功");
-            return CommonResult.success();
-        } else {
-            return CommonResult.failure().errorMessages("访问受限，无法访问地址" + path);
-        }
+//        Long sysRoleId = userInfoModel.getSysRoleId();
+//        List<Long> roleList = new ArrayList<>();
+//        if (Objects.nonNull(sysRoleId)) {
+//            roleList.add(sysRoleId);
+//        }
+//        // 系统跳转，获取跳转后的系统角色信息
+//        if (!Objects.equals(sysApplicationId.toString(), userInfoModel.getAppCode()) || Objects.isNull(sysRoleId)) {
+//            List<UemUserRole> userRoleList = QUemUserRole.uemUserRole.select().where(
+//                    QUemUserRole.uemUserId.eq$(userInfoModel.getUemUserId())
+//                            .and(QUemUserRole.sysApplicationId.eq$(sysApplicationId)
+//                                    .and(QUemUserRole.isValid.eq$(true)))
+//            ).execute();
+//            roleList = userRoleList.stream().map(UemUserRole::getSysRoleId).collect(Collectors.toList());
+//        }
+//        if (CollectionUtils.isEmpty(roleList)) {
+//            // 平台客服登录设置默认角色
+//            Long customerServiceRoleId = 0L;
+//            // 允许没有角色的账号登录，默认角色id 为1
+//            List<Long> allowNoRoleClientIdList = OauthClientUtils.getAllowNoRoleClientId();
+//			 if (customerServiceRoleId.equals(userInfoModel.getSysRoleId())) {
+//                roleList.add(userInfoModel.getSysRoleId());
+//            } else if (allowNoRoleClientIdList.contains(sysApplicationId)) {
+//                roleList.add(customerServiceRoleId.equals(userInfoModel.getSysRoleId()) ? customerServiceRoleId : 1L);
+//            }  else {
+//                return CommonResult.failure().errorMessages("访问受限，用户没有访问权限" + path);
+//            }
+//        }
+//        boolean isAllowAccessResource;
+//        Set<PatternPathMatcher> permissionMatchers = new HashSet<>();
+//        //3.获取用户角色权限
+//        if (StringUtils.isEmpty(userInfoModel.getAppCode()) && Objects.nonNull(sysRoleId)) {
+//            permissionMatchers = resourcePermissionCaches.getUnchecked(sysRoleId.toString());
+//        } else {
+//            // 所有角色进行权限匹配
+//            for (Long roleId : roleList) {
+//                permissionMatchers = resourcePermissionByAppCodeCaches.getUnchecked(Pair.of(sysApplicationId.toString(), roleId.toString()));
+//                isAllowAccessResource = Seq.seq(permissionMatchers).anyMatch(matcher -> matcher.match(path));
+//                if (isAllowAccessResource) {
+//                    // 匹配成功
+//                    break;
+//                }
+//            }
+//        }
+//
+//        //5.验证权限是否在准许范围
+//        isAllowAccessResource = Seq.seq(permissionMatchers)
+//                .anyMatch(matcher -> matcher.match(path));
+//        if (isAllowAccessResource) {
+//            log.info("获取接口权限成功");
+//            return CommonResult.success();
+//        } else {
+//            return CommonResult.failure().errorMessages("访问受限，无法访问地址" + path);
+//        }
+        return CommonResult.failure().errorMessages("");
     }
 
     /**
