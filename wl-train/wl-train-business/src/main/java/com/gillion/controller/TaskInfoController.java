@@ -233,7 +233,7 @@ public class TaskInfoController {
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         //关联查出用户id，name 插入任务表，生成新任务
         List<TaskInfo> execute = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskInfo.getTaskTitle())).execute();
-        if (execute.size() > 1) {
+        if (execute.size() >= 1) {
             return CommonResult.getFaildResultData("该员工已经提交过申请");
         } else {
             QTaskInfo.taskInfo.save(taskInfo);
