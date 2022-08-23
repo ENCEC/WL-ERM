@@ -75,8 +75,9 @@ public class SysResourceController {
 
     /**
      * 根据角色ID获取资源列表
+     *
      * @param sysRoleIdList 角色ID列表
-     * @return ResultHelper<List<Long>>
+     * @return ResultHelper<List < Long>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
@@ -89,7 +90,8 @@ public class SysResourceController {
 
     /**
      * 获取所有未禁用菜单
-     * @return com.share.support.result.ResultHelper<java.util.List<com.share.auth.domain.SysResourceDTO>>
+     *
+     * @return com.share.support.result.ResultHelper<java.util.List < com.share.auth.domain.SysResourceDTO>>
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-07-28
      */
@@ -190,11 +192,12 @@ public class SysResourceController {
      * @return
      */
     @RequestMapping(value = "/uploadExternalFile")
-    public ResultHelper<?> uploadExternalFile(@RequestParam("systemId") String systemId,
-                                              @RequestParam("fileType") String fileType,
-                                              @RequestParam("fileName") String fileName,
-                                              @RequestParam("sysResourceId") Long sysResourceId,
-                                              @RequestPart("file") MultipartFile file) {
-        return sysResourceService.uploadExternalFile(sysResourceId, systemId, fileType, fileName,file);
+    public ResultHelper<?> uploadExternalFile(
+            @RequestParam("sysResourceId") Long sysResourceId,
+            @RequestParam("systemId") String systemId,
+            @RequestParam("fileType") String fileType,
+            @RequestParam("fileName") String fileName,
+            @RequestPart("file") MultipartFile file) {
+        return sysResourceService.uploadExternalFile(sysResourceId, systemId, fileType, fileName, file);
     }
 }

@@ -114,6 +114,8 @@ public class SysRoleDTO implements Serializable {
 
     private String sysRoleResourceId;
 
+    private String resourcePid;
+
     /**
      * 优先级
      */

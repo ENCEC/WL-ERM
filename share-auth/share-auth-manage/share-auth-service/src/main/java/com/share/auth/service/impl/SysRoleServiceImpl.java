@@ -512,13 +512,29 @@ public class SysRoleServiceImpl implements SysRoleService {
                     //更新中间表
                     QSysRoleResource.sysRoleResource.save(sysRoleResource);
                 }
-            }
+                //减少对应权限
+            } /*else if (sysResourceIdList.size() < resourceList) {
+                //需要循环的次数
+                int size = sysResourceIdList.size() - resourceList;
+                //逐个存入中间表中
+                for (int i = 0; i < size; ++i) {
+                    SysRoleResource sysRoleResource = new SysRoleResource();
+                    sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_DELETED);
+                    //截取需要增加的权限数组
+                    List<String> newResourceIds = sysResourceIdList.stream().skip(resourceList).collect(Collectors.toList());
+                    String s = newResourceIds.get(i);
+                    sysRoleResource.setSysRoleId(sysRoleId);
+                    sysRoleResource.setSysResourceId(Long.valueOf(s));
+                    //插入中间表
+                    QSysRoleResource.sysRoleResource.deleteById(sysRoleResource);
+                }
+            }*/
             //编辑角色添加权限
             else if (sysResourceIdList.size() > resourceList) {
                 //需要循环的次数
                 int size = sysResourceIdList.size() - resourceList;
                 //逐个存入中间表中
-                for ( int i = 0; i < size; ++i) {
+                for (int i = 0; i < size; ++i) {
                     SysRoleResource sysRoleResource = new SysRoleResource();
                     sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
                     //截取需要增加的权限数组
