@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.expressions.CombinableExpression;
-import com.gillion.ds.client.api.queryobject.expressions.OperatorExpression;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.share.auth.constants.CodeFinal;
@@ -640,6 +639,10 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         UemProject uemProject = QUemProject.uemProject.selectOne(QUemProject.projectName).byId(projectId);
         uemUser.setProjectName(uemProject.getProjectName());
         uemUser.setProjectId(projectId);
+        UemDept uemDept = QUemDept.uemDept.selectOne(QUemDept.deptName,QUemDept.uemDeptId).byId(uemDeptId);
+        uemUser.setDeptName(uemDept.getDeptName());
+        uemUser.setUemDeptId(uemDept.getUemDeptId());
+
         QUemUser.uemUser.save(uemUser);
         return CommonResult.getSuccessResultData("修改成功!");
     }
@@ -967,7 +970,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      *
      * @return
      */
-    /*(OperatorExpression<?>) QSysPost.sysPost.select().where(QSysPost.postId).execute()*/
     @Override
     public List<SysTechnicalTitle> querySysTechnicalTitle() {
         List<SysTechnicalTitle> sysTechnicalTitles = QSysTechnicalTitle
