@@ -2,7 +2,6 @@ package com.share.auth;
 
 
 import com.gillion.ds.cache.config.RedisConfig;
-import com.gillion.ec.core.data.BaseMapper;
 import com.gillion.ec.mybatis.ECMybatisConfiguration;
 import com.gillion.eds.client.authentication.HttpRequestJWTUserProvider;
 import com.gillion.eds.client.authentication.JWTEdsUserInfoCollector;
@@ -13,10 +12,10 @@ import com.gillion.saas.redis.SassRedisClusterImpl;
 import com.gillion.saas.redis.SassRedisImpl;
 import com.gillion.saas.redis.SassRedisInterface;
 import com.google.common.collect.Lists;
+import com.share.auth.user.MyHttpRequestJWTUserProvider;
 import com.share.support.model.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -163,7 +162,8 @@ public class AuthApplication extends SpringBootServletInitializer {
 
     @Bean
     HttpRequestJWTUserProvider httpRequestJWTUserProvider() {
-        return new HttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
+//        return new HttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
+        return new MyHttpRequestJWTUserProvider("access-token", User.class, SECRET_KEY);
     }
 
     @Bean

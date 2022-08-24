@@ -75,15 +75,17 @@ public class JwtCredentialProcessor implements CredentialProcessor {
         //申请票据
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         long expireTime = System.currentTimeMillis() + credentialExpireSeconds * 1000L;
+        // 创建用户信息压缩数据
+        byte[] data = StrUtil.bytes(EntityUtils.toJsonString(userInfo), StandardCharsets.US_ASCII);
+        byte[] zip = GZipUtils.gZip(data);
         JwtBuilder builder = Jwts.builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(expireTime))
-                .setSubject(EntityUtils.toJsonString(userInfo))
+                .setSubject(Base64.encode(zip))
                 .signWith(signatureAlgorithm, secretKey);
-        byte[] jwtZip = GZipUtils.gZip(StrUtil.bytes(builder.compact(), StandardCharsets.US_ASCII));
         User userInfoModel = (User) userInfo;
         userInfoModel.setExpireTime(expireTime);
-        return Base64.encode(jwtZip);
+        return builder.compact();
     }
 
     @Override
@@ -129,12 +131,6 @@ public class JwtCredentialProcessor implements CredentialProcessor {
         if (org.apache.commons.lang3.StringUtils.isEmpty(credential)) {
             return null;
         }
-        try {
-            byte[] jsonBytes = GZipUtils.unGZip(Base64.decode(credential));
-            credential = new String(jsonBytes, StandardCharsets.US_ASCII);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
         StringBuilder sb = new StringBuilder(128);
         int delimiterCount = 0;
         String base64UrlEncodedPayload = null;
@@ -156,7 +152,10 @@ public class JwtCredentialProcessor implements CredentialProcessor {
         if (payload.charAt(0) == '{' && payload.charAt(payload.length() - 1) == '}') {
             Map<String, Object> claimsMap = EntityUtils.readObject(payload, Map.class);
             Claims claims = new DefaultClaims(claimsMap);
-            String subject = claims.getSubject();
+            // 解压用户信息
+            byte[] zip = Base64.decode(claims.getSubject());
+            byte[] data = GZipUtils.unGZip(zip);
+            String subject = new String(data, StandardCharsets.US_ASCII);
             user = EntityUtils.readObject(subject, User.class);
             if (Objects.nonNull(user)) {
                 user.setExpireTime(claims.getExpiration().getTime());

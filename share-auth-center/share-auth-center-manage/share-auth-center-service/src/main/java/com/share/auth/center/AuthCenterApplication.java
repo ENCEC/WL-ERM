@@ -10,7 +10,10 @@ import com.gillion.eds.client.authentication.RpcRequestJWTUserProvider;
 import com.gillion.eds.sso.IUser;
 import com.gillion.eds.sso.session.DefaultSessionIdentityParser;
 import com.gillion.saas.redis.SassRedisClusterImpl;
+import com.gillion.saas.redis.SassRedisImpl;
+import com.gillion.saas.redis.SassRedisInterface;
 import com.google.common.collect.Lists;
+import com.share.auth.center.credential.MyHttpRequestJWTUserProvider;
 import com.share.support.model.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -33,8 +36,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import redis.clients.jedis.*;
-import com.gillion.saas.redis.SassRedisImpl;
-import com.gillion.saas.redis.SassRedisInterface;
 
 import java.util.HashSet;
 import java.util.List;
@@ -113,7 +114,7 @@ public class AuthCenterApplication {
 
     @Bean
     HttpRequestJWTUserProvider httpRequestJWTUserProvider() {
-        return new HttpRequestJWTUserProvider("access-token", User.class, SECRET_KEY);
+        return new MyHttpRequestJWTUserProvider("access-token", User.class, SECRET_KEY);
     }
 
     @Bean

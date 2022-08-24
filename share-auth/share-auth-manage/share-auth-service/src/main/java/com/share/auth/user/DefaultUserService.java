@@ -147,6 +147,9 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
         for (Role role : roleList) {
             if ("ADMIN".equals(role.getRoleName())) {
                 dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.SELECT));
+                dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.DELETE));
+                dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.UPDATE));
+                dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.INSERT));
                 return;
             }
         }
@@ -186,11 +189,13 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
             String idListStr = StrUtil.join(",", uemUserIdSet);
             idListStr = StrUtil.wrap(idListStr, "(", ")");
             dataPermissions.add(new DataPermission("uem_user_id IN " + idListStr, CrudType.SELECT));
+            dataPermissions.add(new DataPermission("uem_user_id IN " + idListStr, CrudType.DELETE));
+            dataPermissions.add(new DataPermission("uem_user_id IN " + idListStr, CrudType.UPDATE));
         }
     }
 
     private void checkTablePermissions(ArrayList<ITable> permissionTables, ArrayList<IDataPermission> dataPermissions) {
-        permissionTables.add(new TablePermission("uem_user", AclMode.WHITE_LIST, dataPermissions));
+        permissionTables.add(new TablePermission("uem_user", AclMode.BLACK_LIST, dataPermissions));
     }
 
     /**
