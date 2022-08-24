@@ -428,6 +428,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         Integer pageSize = sysRoleDTO.getPageSize();
         return QSysRole.sysRole.select(
                         QSysRole.roleName,
+                        QSysRole.isValid,
                         QSysRole.sysRoleId,
                         QSysRole.remark,
                         QSysRole.creatorName,
@@ -496,9 +497,10 @@ public class SysRoleServiceImpl implements SysRoleService {
                     .where(QSysRoleResource.sysRoleId.eq$(sysRoleId)).execute();
             List<SysRoleResource> sysRoleResourceList = QSysRoleResource.sysRoleResource.select(QSysRoleResource.sysRoleResourceId)
                     .where(QSysRoleResource.sysRoleId.eq$(sysRoleId)).execute();
+            System.out.println(sysRoleRourceIdList.size());
             int resourceList = list.size();
-            //给对应的角色 减少相应的权限
-            if (sysResourceIdList.size() <= resourceList) {
+            //若获取到的权限id等于该角色所拥有的权限id个数，则直接根据主键修改对应权限即可
+            if (sysResourceIdList.size() == resourceList) {
                 for (int i = 0; i < sysResourceIdList.size(); i++) {
                     //中间表对象
                     SysRoleResource sysRoleResource = new SysRoleResource();
@@ -512,23 +514,23 @@ public class SysRoleServiceImpl implements SysRoleService {
                     //更新中间表
                     QSysRoleResource.sysRoleResource.save(sysRoleResource);
                 }
-                //减少对应权限
-            } /*else if (sysResourceIdList.size() < resourceList) {
-                //需要循环的次数
-                int size = sysResourceIdList.size() - resourceList;
-                //逐个存入中间表中
-                for (int i = 0; i < size; ++i) {
-                    SysRoleResource sysRoleResource = new SysRoleResource();
-                    sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_DELETED);
-                    //截取需要增加的权限数组
-                    List<String> newResourceIds = sysResourceIdList.stream().skip(resourceList).collect(Collectors.toList());
-                    String s = newResourceIds.get(i);
-                    sysRoleResource.setSysRoleId(sysRoleId);
-                    sysRoleResource.setSysResourceId(Long.valueOf(s));
-                    //插入中间表
-                    QSysRoleResource.sysRoleResource.deleteById(sysRoleResource);
+                //若需要减少该角色所对应的权限操作，则执行以下
+            } else if (sysResourceIdList.size() < resourceList) {
+                for (int i = 0; i < sysRoleResourceList.size(); ++i) {
+                    //删除角色所有权限之后重新添加新权限
+                    Long sysRoleResourceId = sysRoleResourceList.get(i).getSysRoleResourceId();
+                    QSysRoleResource.sysRoleResource.deleteById(sysRoleResourceId);
                 }
-            }*/
+                //重新获取权限数组,并插入到中间表
+                for (int i = 0; i < sysResourceIdList.size(); ++i) {
+                    SysRoleResource sysRoleResource = new SysRoleResource();
+                    sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+                    String sysResourceId = sysResourceIdList.get(i);
+                    sysRoleResource.setSysRoleId(sysRoleId);
+                    sysRoleResource.setSysResourceId(Long.valueOf(sysResourceId));
+                    QSysRoleResource.sysRoleResource.save(sysRoleResource);
+                }
+            }
             //编辑角色添加权限
             else if (sysResourceIdList.size() > resourceList) {
                 //需要循环的次数
