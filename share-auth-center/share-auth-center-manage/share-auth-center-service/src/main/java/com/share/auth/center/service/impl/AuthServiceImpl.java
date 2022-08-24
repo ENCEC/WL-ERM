@@ -8,18 +8,8 @@ import com.share.auth.center.enums.GlobalEnum;
 import com.share.auth.center.model.dto.OauthTokenDto;
 import com.share.auth.center.model.dto.OpenIdResponseDto;
 import com.share.auth.center.model.dto.SsoUserInfoDto;
-import com.share.auth.center.model.entity.OauthClientDetails;
-import com.share.auth.center.model.entity.SysApplication;
-import com.share.auth.center.model.entity.SysRole;
-import com.share.auth.center.model.entity.UemCompany;
-import com.share.auth.center.model.entity.UemUser;
-import com.share.auth.center.model.entity.UemUserRole;
-import com.share.auth.center.model.querymodels.QOauthClientDetails;
-import com.share.auth.center.model.querymodels.QSysApplication;
-import com.share.auth.center.model.querymodels.QSysRole;
-import com.share.auth.center.model.querymodels.QUemCompany;
-import com.share.auth.center.model.querymodels.QUemUser;
-import com.share.auth.center.model.querymodels.QUemUserRole;
+import com.share.auth.center.model.entity.*;
+import com.share.auth.center.model.querymodels.*;
 import com.share.auth.center.service.AuthService;
 import com.share.auth.center.util.EntityUtils;
 import com.share.auth.center.util.HttpsClientUtil;
@@ -480,13 +470,13 @@ public class AuthServiceImpl implements AuthService {
         // 登录信息
         User userInfoModel = new User();
         BeanUtils.copyProperties(uemUser, userInfoModel);
-        userInfoModel.setCompanyName(uemCompany.getCompanyNameCn());
+//        userInfoModel.setCompanyName(uemCompany.getCompanyNameCn());
         userInfoModel.setAppCode(oauthClientDetails.getSysApplicationId().toString());
-        if (Objects.nonNull(loginRole)) {
-            userInfoModel.setSysRoleId(loginRole.getSysRoleId());
-            userInfoModel.setSysRoleName(loginRole.getRoleName());
-            userInfoModel.setRoleCode(loginRole.getRoleCode());
-        }
+//        if (Objects.nonNull(loginRole)) {
+//            userInfoModel.setSysRoleId(loginRole.getSysRoleId());
+//            userInfoModel.setSysRoleName(loginRole.getRoleName());
+//            userInfoModel.setRoleCode(loginRole.getRoleCode());
+//        }
         // 内部登录
         this.login(userInfoModel, applicationCode, request, response);
         // 跳转首页

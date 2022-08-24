@@ -186,12 +186,23 @@ public class LoginController {
         }
         HttpServletRequest request = servletRequestAttributes.getRequest();
         User user = credentialProcessor.parseCredential(request);
-        if (Objects.nonNull(user) && Objects.nonNull(user.getExpireTime())) {
-            long expireTime = user.getExpireTime();
-            long currentTime = System.currentTimeMillis();
-            if (expireTime - currentTime <= CodeFinal.MILLIS_MINUTE_TEN) {
-                Cookie jwt = CookieUtils.getCookie(CodeFinal.ACCESS_TOKEN_NAME);
-                credentialProcessor.refreshCredential(response, jwt.getValue());
+//        if (Objects.nonNull(user) && Objects.nonNull(user.getExpireTime())) {
+//            long expireTime = user.getExpireTime();
+//            long currentTime = System.currentTimeMillis();
+//            if (expireTime - currentTime <= CodeFinal.MILLIS_MINUTE_TEN) {
+//                Cookie jwt = CookieUtils.getCookie(CodeFinal.ACCESS_TOKEN_NAME);
+//                credentialProcessor.refreshCredential(response, jwt.getValue());
+//            }
+//        }
+        if (Objects.nonNull(user)) {
+            user = uemUserService.getUserInfo(user.getUemUserId(), user.getClientId());
+            if (Objects.nonNull(user.getExpireTime())) {
+                long expireTime = user.getExpireTime();
+                long currentTime = System.currentTimeMillis();
+                if (expireTime - currentTime <= CodeFinal.MILLIS_MINUTE_TEN) {
+                    Cookie jwt = CookieUtils.getCookie(CodeFinal.ACCESS_TOKEN_NAME);
+                    credentialProcessor.refreshCredential(response, jwt.getValue());
+                }
             }
         }
         return user;

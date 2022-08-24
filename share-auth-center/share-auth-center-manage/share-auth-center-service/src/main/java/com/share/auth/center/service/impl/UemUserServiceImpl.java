@@ -3,6 +3,7 @@ package com.share.auth.center.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.gillion.ds.client.DSContext;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.ec.core.utils.CookieUtils;
 import com.gillion.ec.snowflakeid.SnowFlakeGenerator;
@@ -15,8 +16,14 @@ import com.share.auth.center.constants.RedisMqConstant;
 import com.share.auth.center.credential.CredentialProcessor;
 import com.share.auth.center.model.dto.TokenModel;
 import com.share.auth.center.model.dto.UserDTO;
-import com.share.auth.center.model.entity.*;
-import com.share.auth.center.model.querymodels.*;
+import com.share.auth.center.model.entity.OauthClientDetails;
+import com.share.auth.center.model.entity.SysApplication;
+import com.share.auth.center.model.entity.UemLog;
+import com.share.auth.center.model.entity.UemUser;
+import com.share.auth.center.model.querymodels.QOauthClientDetails;
+import com.share.auth.center.model.querymodels.QSysApplication;
+import com.share.auth.center.model.querymodels.QUemLog;
+import com.share.auth.center.model.querymodels.QUemUser;
 import com.share.auth.center.queue.dto.DelayTaskDTO;
 import com.share.auth.center.queue.listener.UemUserUnlockListener;
 import com.share.auth.center.queue.service.RedisDelayedQueue;
@@ -24,6 +31,8 @@ import com.share.auth.center.service.UemUserService;
 import com.share.auth.center.util.EntityUtils;
 import com.share.auth.center.util.HttpsClientUtil;
 import com.share.auth.center.util.RequestUtil;
+import com.share.support.model.Project;
+import com.share.support.model.Role;
 import com.share.support.model.User;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -31,7 +40,6 @@ import com.share.support.util.AES128Util;
 import com.share.support.util.CookieUtil;
 import com.share.support.util.MD5EnCodeUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +62,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @author chenxf
@@ -156,11 +163,13 @@ public class UemUserServiceImpl implements UemUserService {
     }
 
     /**
-     * @Author:chenxf
-     * @Description: 根据用户id和应用id返回用户信息
-     * @Date: 9:48 2020/11/16
-     * @Param: [uid, clientId]
-     * @Return:com.share.auth.center.model.UserInfoModel
+     * 获取用户信息
+     *
+     * @param uid      -
+     * @param clientId -
+     * @return com.share.support.model.User
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-23
      */
     @Override
     public User getUserInfo(Long uid, String clientId) {
@@ -173,31 +182,23 @@ public class UemUserServiceImpl implements UemUserService {
         } else {
             return null;
         }
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("uemUserId", userInfoModel.getUemUserId());
+        List<Project> uemProjectList = DSContext
+                .customization("ERM_selectProjectByUser")
+                .select()
+                .mapperTo(Project.class)
+                .execute(params);
+        List<Role> sysRoleDTOList = DSContext
+                .customization("WL-ERM_queryRoleInfoListByUser")
+                .select()
+                .mapperTo(Role.class)
+                .execute(params);
+        userInfoModel.setProjectList(uemProjectList);
+        userInfoModel.setRoleList(sysRoleDTOList);
         // 根据clientId查询应用id
-        OauthClientDetails oauthClientDetail = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
-        if (Objects.nonNull(oauthClientDetail)) {
-            // 根据应用id和用户id查询角色
-            List<UemUserRole> uemUserRoleList = QUemUserRole.uemUserRole.select(
-                    QUemUserRole.uemUserRole.fieldContainer()
-            ).where(
-                    QUemUserRole.uemUserId.eq$(userInfoModel.getUemUserId())
-                            .and(QUemUserRole.sysApplicationId.eq$(oauthClientDetail.getSysApplicationId()))
-                            .and(QUemUserRole.isValid.eq$(true))
-            ).execute();
-            if (CollectionUtils.isNotEmpty(uemUserRoleList)) {
-                List<UemUserRole> validUserRole = uemUserRoleList.stream().filter(UemUserRole::getIsValid).collect(Collectors.toList());
-                if (CollectionUtils.isNotEmpty(validUserRole) && validUserRole.size() == 1) {
-                    // 查询角色名称
-                    SysRole sysRole = QSysRole.sysRole.selectOne().byId(validUserRole.get(0).getSysRoleId());
-                    if (Objects.nonNull(sysRole)) {
-                        userInfoModel.setSysRoleId(sysRole.getSysRoleId());
-                        userInfoModel.setSysRoleName(sysRole.getRoleName());
-                        userInfoModel.setRoleCode(sysRole.getRoleCode());
-                    }
-                }
-            }
-        }
-        userInfoModel.setClientId(clientId);
+//        OauthClientDetails oauthClientDetail = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
+//        userInfoModel.setClientId(oauthClientDetail.getClientId());
         return userInfoModel;
     }
 
@@ -275,6 +276,21 @@ public class UemUserServiceImpl implements UemUserService {
             }
             User userInfoModel = new User();
             BeanUtils.copyProperties(user, userInfoModel);
+            // 查询项目和角色
+//            HashMap<String, Object> params = new HashMap<>();
+//            params.put("uemUserId", userInfoModel.getUemUserId());
+//            List<Project> uemProjectList = DSContext
+//                    .customization("ERM_selectProjectByUser")
+//                    .select()
+//                    .mapperTo(Project.class)
+//                    .execute(params);
+//            List<Role> sysRoleDTOList = DSContext
+//                    .customization("WL-ERM_queryRoleInfoListByUser")
+//                    .select()
+//                    .mapperTo(Role.class)
+//                    .execute(params);
+//            userInfoModel.setProjectList(uemProjectList);
+//            userInfoModel.setRoleList(sysRoleDTOList);
             String credential = credentialProcessor.createCredential(userInfoModel);
             credentialProcessor.deliveryCredential(response, credential, user.getUemUserId().toString());
             // 保存登录日志

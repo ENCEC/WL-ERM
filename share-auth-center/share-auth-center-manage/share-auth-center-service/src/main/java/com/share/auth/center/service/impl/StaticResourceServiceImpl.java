@@ -10,11 +10,9 @@ import com.share.auth.center.service.StaticResourceService;
 import com.share.auth.center.service.SysResourceService;
 import com.share.auth.center.service.UemUserService;
 import com.share.auth.center.util.EntityUtils;
-import com.share.auth.center.util.OauthClientUtils;
 import com.share.auth.center.util.RedisUtil;
 import com.share.support.model.User;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -103,39 +100,40 @@ public class StaticResourceServiceImpl implements StaticResourceService {
      */
     @Override
     public Collection<String> getNoPermissionUrl(User user, String pageUrl, OauthClientDetails oauthClientDetails) {
-        // 允许没有角色的账号登录
-        List<Long> allowNoRoleClientIdList = OauthClientUtils.getAllowNoRoleClientId();
-        // token传来的用户当前角色id
-        Long sysRoleId = user.getSysRoleId();
-        // 查询用户信息（这里用户如果是多角色，查出来的角色信息会为空）
-        user = uemUserService.getUserInfo(user.getUemUserId(), oauthClientDetails.getClientId());
-        // 当查询出来的用户没有角色id时，使用session中的角色id
-        if (Objects.isNull(user.getSysRoleId())) {
-            user.setSysRoleId(sysRoleId);
-        }
-        // 当前登录的应用为允许没有角色时，用户角色为空，则设置默认角色id = 1
-        if (allowNoRoleClientIdList.contains(oauthClientDetails.getSysApplicationId())
-                && Objects.isNull(user.getSysRoleId())) {
-            user.setSysRoleId(1L);
-        }
-
-        Set<String> allUrls;
-        Set<String> roleUrls;
-        if (Objects.isNull(oauthClientDetails.getSysApplicationId())) {
-            // 如果没有应用Id，则获取全部的
-            // 从缓存中获取页面下所有的url
-            allUrls = allLocalResourceCaches.getUnchecked(pageUrl);
-            // 获取该用户角色所有权限url
-        } else {
-            // 如果有应用id，则获取应用下的
-            // 从缓存中获取当前应用下当前页面下的所有url
-            allUrls = allLocalResourceByAppCodeCaches.getUnchecked(Pair.of(oauthClientDetails.getSysApplicationId().toString(), pageUrl));
-        }
-        // 获取该用户角色在该应用下的所有权限url
-        roleUrls = this.initResourcePermissionUrlCaches(user.getSysRoleId()).getUnchecked(user.getSysRoleId().toString());
-
-        Collection<String> noPermitList = CollectionUtils.subtract(allUrls, roleUrls);
-        return noPermitList.isEmpty() ? CollectionUtils.emptyCollection() : noPermitList;
+//        // 允许没有角色的账号登录
+//        List<Long> allowNoRoleClientIdList = OauthClientUtils.getAllowNoRoleClientId();
+//        // token传来的用户当前角色id
+//        Long sysRoleId = user.getSysRoleId();
+//        // 查询用户信息（这里用户如果是多角色，查出来的角色信息会为空）
+//        user = uemUserService.getUserInfo(user.getUemUserId(), oauthClientDetails.getClientId());
+//        // 当查询出来的用户没有角色id时，使用session中的角色id
+//        if (Objects.isNull(user.getSysRoleId())) {
+//            user.setSysRoleId(sysRoleId);
+//        }
+//        // 当前登录的应用为允许没有角色时，用户角色为空，则设置默认角色id = 1
+//        if (allowNoRoleClientIdList.contains(oauthClientDetails.getSysApplicationId())
+//                && Objects.isNull(user.getSysRoleId())) {
+//            user.setSysRoleId(1L);
+//        }
+//
+//        Set<String> allUrls;
+//        Set<String> roleUrls;
+//        if (Objects.isNull(oauthClientDetails.getSysApplicationId())) {
+//            // 如果没有应用Id，则获取全部的
+//            // 从缓存中获取页面下所有的url
+//            allUrls = allLocalResourceCaches.getUnchecked(pageUrl);
+//            // 获取该用户角色所有权限url
+//        } else {
+//            // 如果有应用id，则获取应用下的
+//            // 从缓存中获取当前应用下当前页面下的所有url
+//            allUrls = allLocalResourceByAppCodeCaches.getUnchecked(Pair.of(oauthClientDetails.getSysApplicationId().toString(), pageUrl));
+//        }
+//        // 获取该用户角色在该应用下的所有权限url
+//        roleUrls = this.initResourcePermissionUrlCaches(user.getSysRoleId()).getUnchecked(user.getSysRoleId().toString());
+//
+//        Collection<String> noPermitList = CollectionUtils.subtract(allUrls, roleUrls);
+//        return noPermitList.isEmpty() ? CollectionUtils.emptyCollection() : noPermitList;
+        return null;
     }
 
     private LoadingCache<String, Set<String>> initResourcePermissionUrlCaches(Long roleId) {
