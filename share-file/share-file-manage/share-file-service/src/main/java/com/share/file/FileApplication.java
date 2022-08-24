@@ -15,6 +15,7 @@ import com.gillion.saas.redis.SassRedisClusterImpl;
 import com.gillion.saas.redis.SassRedisImpl;
 import com.gillion.saas.redis.SassRedisInterface;
 import com.google.common.collect.Lists;
+import com.share.file.user.MyHttpRequestJWTUserProvider;
 import com.share.support.model.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -33,16 +34,14 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import redis.clients.jedis.*;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 import java.util.HashSet;
 import java.util.List;
@@ -149,7 +148,7 @@ public class FileApplication extends SpringBootServletInitializer {
 
     @Bean
     HttpRequestJWTUserProvider httpRequestJWTUserProvider() {
-        return new HttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
+        return new MyHttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
     }
 
     @Bean

@@ -9,6 +9,7 @@ import com.gillion.eds.client.authentication.JWTEdsUserInfoCollector;
 import com.gillion.eds.client.authentication.RpcRequestJWTUserProvider;
 import com.gillion.eds.sso.IUser;
 import com.gillion.eds.sso.session.DefaultSessionIdentityParser;
+import com.share.message.user.MyHttpRequestJWTUserProvider;
 import com.share.support.model.User;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +92,7 @@ public class MessageApplication extends SpringBootServletInitializer {
 
     @Bean
     HttpRequestJWTUserProvider httpRequestJWTUserProvider() {
-        return new HttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
+        return new MyHttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
     }
 
     @Bean

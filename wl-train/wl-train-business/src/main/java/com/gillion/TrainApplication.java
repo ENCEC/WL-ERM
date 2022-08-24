@@ -3,8 +3,6 @@ package com.gillion;
 
 import com.gillion.ec.core.exceptions.SystemRuntimeException;
 import com.gillion.ec.mq.EnableMQ;
-import com.gillion.ec.mq.EnableMQConfigServer;
-import com.gillion.ec.mq.EnableMQDashboard;
 import com.gillion.ec.rule.number.generator.client.protocol.EnableFeignRuleNumberClient;
 import com.gillion.ec.scheduler.EnableSchedulerSupervisor;
 import com.gillion.ec.scheduler.controller.EnableSchedulerDashboard;
@@ -14,6 +12,7 @@ import com.gillion.eds.client.authentication.JWTEdsUserInfoCollector;
 import com.gillion.eds.client.authentication.RpcRequestJWTUserProvider;
 import com.gillion.eds.sso.IUser;
 import com.gillion.eds.sso.session.DefaultSessionIdentityParser;
+import com.gillion.user.MyHttpRequestJWTUserProvider;
 import com.share.support.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -78,7 +77,7 @@ public class TrainApplication {
 
     @Bean
     HttpRequestJWTUserProvider httpRequestJWTUserProvider() {
-        return new HttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
+        return new MyHttpRequestJWTUserProvider("access_token", User.class, SECRET_KEY);
     }
 
     @Bean
