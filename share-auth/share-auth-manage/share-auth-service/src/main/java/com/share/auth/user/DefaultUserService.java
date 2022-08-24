@@ -83,8 +83,7 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
     @Override
     public String getOfficeId() {
         final UserInfoModel currentLoginUser = (UserInfoModel) getCurrentLoginUser();
-        return null;
-//        return currentLoginUser.getBlindCompanny() == null ? "" : currentLoginUser.getBlindCompanny().toString();
+        return currentLoginUser.getBlindCompanny() == null ? "" : currentLoginUser.getBlindCompanny().toString();
     }
 
     @Override
@@ -109,10 +108,10 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
             }
             /* 从session里获取用户，如果获取不到，就先调用认证权限获取用户信息，并将用户信息保存到session */
 //            AuthUserInfoModel authUserInfoModel = new AuthUserInfoModel();
-//            if (user == null) {
+            if (user == null) {
                 user = authCenterInterface.getUserInfo();
                 session.setAttribute(USER, user);
-//            }
+            }
             if (user == null) {
                 return spUser;
             }
@@ -178,10 +177,11 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
                     case "DEV_STAFF":
                     case "DEMAND_STAFF":
                     default:
-                        uemUserIdSet.add(user.getUemUserId());
+                        break;
                 }
             }
         }
+        uemUserIdSet.add(user.getUemUserId());
         if (!uemUserIdSet.isEmpty()) {
             String idListStr = StrUtil.join(",", uemUserIdSet);
             idListStr = StrUtil.wrap(idListStr, "(", ")");
@@ -191,7 +191,6 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
 
     private void checkTablePermissions(ArrayList<ITable> permissionTables, ArrayList<IDataPermission> dataPermissions) {
         permissionTables.add(new TablePermission("uem_user", AclMode.WHITE_LIST, dataPermissions));
-//        permissionTables.add(new TablePermission("uem_user", AclMode.BLACK_LIST, dataPermissions));
     }
 
     /**

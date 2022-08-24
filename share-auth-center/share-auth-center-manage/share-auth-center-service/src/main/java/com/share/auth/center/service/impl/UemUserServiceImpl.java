@@ -122,7 +122,7 @@ public class UemUserServiceImpl implements UemUserService {
     private UemUser getUemUser(String username) {
         return QUemUser.uemUser
                 .selectOne()
-                .where(QUemUser.account.eq$(username).and(QUemUser.isDeleted.eq$(false)))
+                .where(QUemUser.account.eq$(username))
                 .execute();
     }
 
@@ -182,20 +182,6 @@ public class UemUserServiceImpl implements UemUserService {
         } else {
             return null;
         }
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("uemUserId", userInfoModel.getUemUserId());
-        List<Project> uemProjectList = DSContext
-                .customization("ERM_selectProjectByUser")
-                .select()
-                .mapperTo(Project.class)
-                .execute(params);
-        List<Role> sysRoleDTOList = DSContext
-                .customization("WL-ERM_queryRoleInfoListByUser")
-                .select()
-                .mapperTo(Role.class)
-                .execute(params);
-        userInfoModel.setProjectList(uemProjectList);
-        userInfoModel.setRoleList(sysRoleDTOList);
         // 根据clientId查询应用id
 //        OauthClientDetails oauthClientDetail = QOauthClientDetails.oauthClientDetails.selectOne().byId(clientId);
 //        userInfoModel.setClientId(oauthClientDetail.getClientId());
@@ -259,10 +245,7 @@ public class UemUserServiceImpl implements UemUserService {
         // 密码加密
         password = MD5EnCodeUtils.encryptionPassword(decPassword);
         // 查询用户信息
-        UemUser user = QUemUser.uemUser
-                .selectOne()
-                .where(QUemUser.account.eq$(account).and(QUemUser.isDeleted.eq$(false)))
-                .execute();
+        UemUser user = this.getUemUser(account);
         // 校验账号是否锁定
         if (user.getIsLocked()) {
             return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
@@ -277,20 +260,20 @@ public class UemUserServiceImpl implements UemUserService {
             User userInfoModel = new User();
             BeanUtils.copyProperties(user, userInfoModel);
             // 查询项目和角色
-//            HashMap<String, Object> params = new HashMap<>();
-//            params.put("uemUserId", userInfoModel.getUemUserId());
-//            List<Project> uemProjectList = DSContext
-//                    .customization("ERM_selectProjectByUser")
-//                    .select()
-//                    .mapperTo(Project.class)
-//                    .execute(params);
-//            List<Role> sysRoleDTOList = DSContext
-//                    .customization("WL-ERM_queryRoleInfoListByUser")
-//                    .select()
-//                    .mapperTo(Role.class)
-//                    .execute(params);
-//            userInfoModel.setProjectList(uemProjectList);
-//            userInfoModel.setRoleList(sysRoleDTOList);
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("uemUserId", userInfoModel.getUemUserId());
+            List<Project> uemProjectList = DSContext
+                    .customization("ERM_selectProjectByUser")
+                    .select()
+                    .mapperTo(Project.class)
+                    .execute(params);
+            List<Role> sysRoleDTOList = DSContext
+                    .customization("WL-ERM_queryRoleInfoListByUser")
+                    .select()
+                    .mapperTo(Role.class)
+                    .execute(params);
+            userInfoModel.setProjectList(uemProjectList);
+            userInfoModel.setRoleList(sysRoleDTOList);
             String credential = credentialProcessor.createCredential(userInfoModel);
             credentialProcessor.deliveryCredential(response, credential, user.getUemUserId().toString());
             // 保存登录日志

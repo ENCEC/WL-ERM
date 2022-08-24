@@ -1,6 +1,5 @@
 package com.share.auth.filter;
 
-import com.gillion.ec.core.utils.CookieUtils;
 import com.share.auth.center.api.AuthCenterInterface;
 import com.share.auth.config.AuthenticationConfig;
 import com.share.auth.config.PatternPathMatcher;
@@ -26,6 +25,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -61,6 +61,8 @@ public class ApiFilter implements Filter {
     @Autowired
     private DefaultUserService defaultUserService;
 
+    private static final String USER = "user";
+
     /**
      * 拦截请求，记录请求信息
      *
@@ -84,6 +86,8 @@ public class ApiFilter implements Filter {
                 String credential = CookieUtil.getCookieByName(requestWrapper, CodeFinal.ACCESS_TOKEN);
                 if (Objects.nonNull(credential)) {
                     User user = authCenterInterface.parseCredential(credential);
+                    HttpSession session = requestWrapper.getSession();
+                    session.setAttribute(USER, user);
                     if (Objects.nonNull(user) && Objects.nonNull(user.getExpireTime())) {
                         refreshCredential(request, response, user);
                     }

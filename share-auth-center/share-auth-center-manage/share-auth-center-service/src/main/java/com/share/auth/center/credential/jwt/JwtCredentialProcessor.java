@@ -1,10 +1,13 @@
 package com.share.auth.center.credential.jwt;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.StrUtil;
 import com.gillion.ec.core.utils.CookieUtils;
 import com.share.auth.center.constants.CodeFinal;
 import com.share.auth.center.constants.RedisMqConstant;
 import com.share.auth.center.credential.CredentialProcessor;
 import com.share.auth.center.util.EntityUtils;
+import com.share.auth.center.util.GZipUtils;
 import com.share.auth.center.util.RedisUtil;
 import com.share.support.model.User;
 import io.jsonwebtoken.*;
@@ -23,6 +26,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -70,17 +74,16 @@ public class JwtCredentialProcessor implements CredentialProcessor {
     public String createCredential(Object userInfo) {
         //申请票据
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-        Long expireTime = System.currentTimeMillis() + credentialExpireSeconds * 1000;
+        long expireTime = System.currentTimeMillis() + credentialExpireSeconds * 1000L;
         JwtBuilder builder = Jwts.builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(expireTime))
                 .setSubject(EntityUtils.toJsonString(userInfo))
                 .signWith(signatureAlgorithm, secretKey);
-        User userInfoModel = (User)userInfo;
+        byte[] jwtZip = GZipUtils.gZip(StrUtil.bytes(builder.compact(), StandardCharsets.US_ASCII));
+        User userInfoModel = (User) userInfo;
         userInfoModel.setExpireTime(expireTime);
-        return builder.compact();
-
-
+        return Base64.encode(jwtZip);
     }
 
     @Override
@@ -125,6 +128,12 @@ public class JwtCredentialProcessor implements CredentialProcessor {
     public User parseCredential(String credential) {
         if (org.apache.commons.lang3.StringUtils.isEmpty(credential)) {
             return null;
+        }
+        try {
+            byte[] jsonBytes = GZipUtils.unGZip(Base64.decode(credential));
+            credential = new String(jsonBytes, StandardCharsets.US_ASCII);
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
         StringBuilder sb = new StringBuilder(128);
         int delimiterCount = 0;
