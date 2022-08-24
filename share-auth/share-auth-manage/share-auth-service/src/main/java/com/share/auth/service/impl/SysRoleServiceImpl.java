@@ -469,25 +469,6 @@ public class SysRoleServiceImpl implements SysRoleService {
         sysRole.setSysRoleId(sysRoleId);
         sysRole.setSysApplicationId(sysApplicationId);
         QSysRole.sysRole.save(sysRole);
-        // 判断是角色id否存在
-           /* if (sysRoleId != null) {
-            //获取前端勾选的权限id
-            List<String> sysResourceIdList = sysRoleDTO.getSysResourceIdList();
-            //临时变量i
-            int i = 0;
-            //逐个存入中间表中
-            for (String s : sysResourceIdList) {
-                //中间表对象
-                SysRoleResource sysRoleResource = new SysRoleResource();
-                sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-                s = sysResourceIdList.get(i);
-                i = ++i;
-                sysRoleResource.setSysRoleId(sysRoleId);
-                sysRoleResource.setSysResourceId(Long.valueOf(s));
-                //插入中间表
-                QSysRoleResource.sysRoleResource.save(sysRoleResource);
-            }
-        }*/
         if (sysRoleId != null) {
             //获取前端勾选权限List
             List<String> sysResourceIdList = sysRoleDTO.getSysResourceIdList();
@@ -497,7 +478,6 @@ public class SysRoleServiceImpl implements SysRoleService {
                     .where(QSysRoleResource.sysRoleId.eq$(sysRoleId)).execute();
             List<SysRoleResource> sysRoleResourceList = QSysRoleResource.sysRoleResource.select(QSysRoleResource.sysRoleResourceId)
                     .where(QSysRoleResource.sysRoleId.eq$(sysRoleId)).execute();
-            System.out.println(sysRoleRourceIdList.size());
             int resourceList = list.size();
             //若获取到的权限id等于该角色所拥有的权限id个数，则直接根据主键修改对应权限即可
             if (sysResourceIdList.size() == resourceList) {
@@ -514,8 +494,8 @@ public class SysRoleServiceImpl implements SysRoleService {
                     //更新中间表
                     QSysRoleResource.sysRoleResource.save(sysRoleResource);
                 }
-                //若需要减少该角色所对应的权限操作，则执行以下
-            } else if (sysResourceIdList.size() < resourceList) {
+                //若编辑需要增加或减少权限
+            } else if (sysResourceIdList.size() < resourceList || sysResourceIdList.size() > resourceList) {
                 for (int i = 0; i < sysRoleResourceList.size(); ++i) {
                     //删除角色所有权限之后重新添加新权限
                     Long sysRoleResourceId = sysRoleResourceList.get(i).getSysRoleResourceId();
@@ -528,23 +508,6 @@ public class SysRoleServiceImpl implements SysRoleService {
                     String sysResourceId = sysResourceIdList.get(i);
                     sysRoleResource.setSysRoleId(sysRoleId);
                     sysRoleResource.setSysResourceId(Long.valueOf(sysResourceId));
-                    QSysRoleResource.sysRoleResource.save(sysRoleResource);
-                }
-            }
-            //编辑角色添加权限
-            else if (sysResourceIdList.size() > resourceList) {
-                //需要循环的次数
-                int size = sysResourceIdList.size() - resourceList;
-                //逐个存入中间表中
-                for (int i = 0; i < size; ++i) {
-                    SysRoleResource sysRoleResource = new SysRoleResource();
-                    sysRoleResource.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
-                    //截取需要增加的权限数组
-                    List<String> newResourceIds = sysResourceIdList.stream().skip(resourceList).collect(Collectors.toList());
-                    String s = newResourceIds.get(i);
-                    sysRoleResource.setSysRoleId(sysRoleId);
-                    sysRoleResource.setSysResourceId(Long.valueOf(s));
-                    //插入中间表
                     QSysRoleResource.sysRoleResource.save(sysRoleResource);
                 }
             }
