@@ -17,7 +17,9 @@ import com.share.auth.service.UemUserManageService;
 import com.share.auth.service.UemUserService;
 import com.share.auth.user.DefaultUserService;
 import com.share.file.api.ShareFileInterface;
+import com.share.file.domain.FastDfsDownloadResult;
 import com.share.file.domain.FastDfsUploadResult;
+import com.share.file.domain.FileInfoVO;
 import com.share.message.api.EmailTemplateService;
 import com.share.message.domain.SendEmailVO;
 import com.share.support.result.CommonResult;
@@ -490,17 +492,17 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             return null;
         }
         return QUemUser.uemUser.select(
-                QUemUser.uemUserId,
-                QUemUser.name,
-                QUemUser.sex,
-                QUemUser.mobile,
-                QUemUser.deptName,
-                QUemUser.uemDeptId,
-                QUemUser.staffDutyId,
-                QUemUser.staffDuty,
-                QUemUser.technicalTitleId,
-                QUemUser.technicalName,
-                QUemUser.jobStatus).
+                        QUemUser.uemUserId,
+                        QUemUser.name,
+                        QUemUser.sex,
+                        QUemUser.mobile,
+                        QUemUser.deptName,
+                        QUemUser.uemDeptId,
+                        QUemUser.staffDutyId,
+                        QUemUser.staffDuty,
+                        QUemUser.technicalTitleId,
+                        QUemUser.technicalName,
+                        QUemUser.jobStatus).
                 where(QUemUser.name._like$_(uemUserDto.getName())
                         .and(QUemUser.uemDeptId.eq$(uemUserDto.getUemDeptId()))
                         .and(QUemUser.technicalTitleId.eq$(uemUserDto.getTechnicalTitleId()))
@@ -508,7 +510,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                         .and(QUemUser.jobStatus.eq$(uemUserDto.getJobStatus()))
                         .and(QUemUser.isDeleted.eq$(false)))
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
-                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).mapperTo(UemUserDto.class)
+                        ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).sorting(QUemUser.createTime.desc()).mapperTo(UemUserDto.class)
                 .execute();
     }
 
@@ -899,6 +901,23 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             //return CommonResult.getSuccessResultData(fileKey);
         } else {
             return CommonResult.getFaildResultData("上传失败");
+        }
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param fileInfoVO
+     * @return
+     */
+    @Override
+    public ResultHelper<?> downloadExternalFile(FileInfoVO fileInfoVO) {
+        FastDfsDownloadResult fastDfsDownloadResult = shareFileInterface.downloadExternalFile(fileInfoVO);
+        String file = fastDfsDownloadResult.getFile();
+        if (StringUtils.isEmpty(file)) {
+            return CommonResult.getFaildResultData("file为空，下载失败！");
+        } else {
+            return CommonResult.getSuccessResultData(file);
         }
     }
 

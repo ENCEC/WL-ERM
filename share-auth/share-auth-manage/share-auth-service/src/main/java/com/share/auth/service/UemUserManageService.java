@@ -9,6 +9,7 @@ import com.share.auth.model.entity.SysPost;
 import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.entity.UemDept;
 import com.share.auth.model.entity.UemProject;
+import com.share.file.domain.FileInfoVO;
 import com.share.support.result.ResultHelper;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -249,6 +250,15 @@ public interface UemUserManageService {
      * @return
      */
     ResultHelper<?> uploadExternalFile(Long uemUserId, String systemId, String fileType, String fileName, String type, MultipartFile file);
+
+
+    /**
+     * 下载文件
+     *
+     * @param fileInfoVO
+     * @return
+     */
+    ResultHelper<?> downloadExternalFile(FileInfoVO fileInfoVO);
 
     /**
      * 下拉框查询所有岗位的信息

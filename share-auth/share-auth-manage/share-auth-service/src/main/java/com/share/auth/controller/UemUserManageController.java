@@ -14,6 +14,7 @@ import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.entity.UemDept;
 import com.share.auth.model.entity.UemProject;
 import com.share.auth.service.UemUserManageService;
+import com.share.file.domain.FileInfoVO;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
@@ -267,91 +268,6 @@ public class UemUserManageController {
 
 
     /**
-     * 下载员工简历
-     *
-     * @author wzr
-     * @date 2022-08-03
-     */
-    @GetMapping("/download")
-    @ApiOperation(value = "下载员工简历")
-    public ResultHelper<?> download(String path, HttpServletResponse response) throws Exception {
-        try {
-            // path是指想要下载的文件的路径
-            File file = new File(path);
-            System.out.println(file);
-            // 获取文件名
-            String filename = file.getName();
-            // 获取文件后缀名
-            String ext = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
-            System.out.println("文件后缀：" + ext);
-            // 将文件写入输入流
-            FileInputStream fileInputStream = new FileInputStream(file);
-            InputStream fis = new BufferedInputStream(fileInputStream);
-            byte[] buffer = new byte[fis.available()];
-            fis.read(buffer);
-            fis.close();
-            // 清空response
-            response.reset();
-            // 设置response的Header
-            response.setCharacterEncoding("UTF-8");
-            response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-            // 告知浏览器文件的大小
-            response.addHeader("Content-Length", "" + file.length());
-            OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
-            response.setContentType("application/octet-stream");
-            outputStream.write(buffer);
-            outputStream.flush();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return CommonResult.getFaildResultData("下载失败");
-        }
-        return CommonResult.getSuccessResultData("下载成功");
-    }
-   /* public Map<String, Object> fileupload(MultipartFile file, HttpServletRequest req) {
-        //首先要给文件找一个目录
-        //先写返回值
-        Map<String, Object> result = new HashMap<>();
-        //再用pdf格式开始书写,先找原始的名字
-        String originName = file.getOriginalFilename();
-        //判断文件类型是不是pdf
-        if (!originName.endsWith(".pdf")) {
-            //如果不是的话，就返回类型
-            result.put("status", "error");
-            result.put("msg", "文件类型不对");
-            return result;
-        }
-        //如果是正确的话，就需要写保存文件的文件夹
-        //.format(new Date())的意思是 也就是格式化一个新的时间
-        //Date会创建一个时间，然后会按照当前的sdf格式调用format将当前时间创建出来 直接调用new Date()可能会出现这种格式
-        //再是getServletContext
-        String format = sdf.format(new Date());
-        //这也是一个临时的路径，项目重启之后，他就会变的
-        String realPath = req.getServletContext().getRealPath("/") + format;
-        //再是保存文件的文件夹
-        File folder = new File(realPath);
-        //如果不存在，就自己创建
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-        System.out.println(folder);
-        //String newName = UUID.randomUUID().toString() + ".pdf";
-        //然后就可以保存了
-        try {
-            file.transferTo(new File(folder, originName));
-            //这个还有一个url
-            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + format + originName;
-            //如果指向成功了
-            result.put("status", "success");
-            result.put("url", url);
-        } catch (IOException e) {
-            //返回异常
-            result.put("status", "error");
-            result.put("msg", e.getMessage());
-        }
-        return result;
-    }*/
-
-    /**
      * 转正，离职，辞退---查看信息
      *
      * @author wzr
@@ -485,12 +401,19 @@ public class UemUserManageController {
         return uemUserManageService.uploadExternalFile(uemUserId, systemId, fileType, fileName, type, file);
     }
 
+    @PostMapping("/downloadExternalFile")
+    public ResultHelper<?> downloadExternalFile(@RequestBody FileInfoVO fileInfoVO) {
+        return uemUserManageService.downloadExternalFile(fileInfoVO);
+
+    }
+
     /**
      * 下拉框查询所有岗位的信息
      *
      * @return
      */
     @GetMapping("querySysPost")
+
     public List<SysPost> querySysPost() {
         return uemUserManageService.querySysPost();
     }
