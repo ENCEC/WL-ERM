@@ -619,6 +619,49 @@
 
 
     <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <outputDirectory>target\classes</outputDirectory>
+        <testOutputDirectory>target\test-classes</testOutputDirectory>
+        <resources>
+            <resource>
+                <directory>src\main\java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.ftl</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.drl</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src\main\resources</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.bpmn</include>
+                    <include>**/*.png</include>
+                    <include>**/**/*.jpg</include>
+                    <include>**/*.html</include>
+                    <include>**/*.json</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.drl</include>
+                    <include>**/*.txt</include>
+                    <include>**/*.xls</include>
+                </includes>
+                <excludes>
+                    <exclude>deploy/**</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src\test\resources</directory>
+            </testResource>
+        </testResources>
+
+        <directory>target</directory>
+        <finalName>wl-train-service</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
