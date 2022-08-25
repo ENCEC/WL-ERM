@@ -120,10 +120,17 @@ public class UemUserServiceImpl implements UemUserService {
      * @date 2022-08-02
      */
     private UemUser getUemUser(String username) {
-        return QUemUser.uemUser
-                .selectOne()
+        List<UemUser> uemUserList = QUemUser.uemUser
+                .select()
                 .where(QUemUser.account.eq$(username))
-                .execute();
+                .paging(1, 2)
+                .execute()
+                .getRecords();
+        if (uemUserList.size() != 1) {
+            return null;
+        } else {
+            return uemUserList.get(0);
+        }
     }
 
     /**
@@ -246,6 +253,9 @@ public class UemUserServiceImpl implements UemUserService {
         password = MD5EnCodeUtils.encryptionPassword(decPassword);
         // 查询用户信息
         UemUser user = this.getUemUser(account);
+        if (Objects.isNull(user)) {
+            return "不存在的用户！";
+        }
         // 校验账号是否锁定
         if (user.getIsLocked()) {
             return CodeFinal.ACCOUNT_LOCKED_MESSAGE;
@@ -313,7 +323,7 @@ public class UemUserServiceImpl implements UemUserService {
         // 查询是否是其他用户登录
         UemUser user = this.getUemUser(account);
         if (Objects.isNull(user)) {
-            return "用户名不存在！";
+            return "不存在的用户！";
         }
         return null;
     }
@@ -611,6 +621,9 @@ public class UemUserServiceImpl implements UemUserService {
     public void lockedUser(String userName) {
         // 查询用户
         UemUser user = this.getUemUser(userName);
+        if (Objects.isNull(user)) {
+            throw new RuntimeException("不存在的用户！");
+        }
         // 设置用户锁定信息
         this.setUserLockedInfo(user);
     }
