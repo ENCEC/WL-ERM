@@ -57,7 +57,7 @@ public class MyHttpRequestJWTUserProvider extends HttpRequestJWTUserProvider {
             Claims claims = new DefaultClaims(claimsMap);
             byte[] zip = Base64.decode(claims.getSubject());
             byte[] data = GZipUtils.unGZip(zip);
-            String subject = new String(data, StandardCharsets.US_ASCII);
+            String subject = new String(data, StandardCharsets.UTF_8);
             user = EntityUtils.readObject(subject, User.class);
             if (Objects.nonNull(user)) {
                 user.setExpireTime(claims.getExpiration().getTime());

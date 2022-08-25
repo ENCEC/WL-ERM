@@ -76,7 +76,7 @@ public class JwtCredentialProcessor implements CredentialProcessor {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         long expireTime = System.currentTimeMillis() + credentialExpireSeconds * 1000L;
         // 创建用户信息压缩数据
-        byte[] data = StrUtil.bytes(EntityUtils.toJsonString(userInfo), StandardCharsets.US_ASCII);
+        byte[] data = StrUtil.bytes(EntityUtils.toJsonString(userInfo), StandardCharsets.UTF_8);
         byte[] zip = GZipUtils.gZip(data);
         JwtBuilder builder = Jwts.builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -155,7 +155,7 @@ public class JwtCredentialProcessor implements CredentialProcessor {
             // 解压用户信息
             byte[] zip = Base64.decode(claims.getSubject());
             byte[] data = GZipUtils.unGZip(zip);
-            String subject = new String(data, StandardCharsets.US_ASCII);
+            String subject = new String(data, StandardCharsets.UTF_8);
             user = EntityUtils.readObject(subject, User.class);
             if (Objects.nonNull(user)) {
                 user.setExpireTime(claims.getExpiration().getTime());
