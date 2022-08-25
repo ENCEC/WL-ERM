@@ -180,6 +180,13 @@ public class SysPostServiceImpl implements SysPostService {
         if (Objects.isNull(sysPost)) {
             return CommonResult.getFaildResultData("不存在");
         }
+        //判断岗位名称是否改变
+        if (sysPost.getPostName().equals(sysPostDTO.getPostName()) == false) {
+            List<SysPost> sysPosts = QSysPost.sysPost.select().where(QSysPost.postName.eq$(sysPostDTO.getPostName())).execute();
+            if (CollectionUtils.isNotEmpty(sysPosts)) {
+                return CommonResult.getFaildResultData("该岗位已存在");
+            }
+        }
         //更新信息
         BeanUtils.copyProperties(sysPostDTO, sysPost);
         sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
