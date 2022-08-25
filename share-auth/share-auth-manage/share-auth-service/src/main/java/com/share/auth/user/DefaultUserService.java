@@ -134,10 +134,12 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
     }
 
     private List<Long> parseIdList(String idStr) {
-        String[] ids = idStr.split(",");
         List<Long> idList = new ArrayList<>();
-        for (String id : ids) {
-            idList.add(Long.parseLong(id));
+        if (StrUtil.isNotBlank(idStr)) {
+            List<String> ids = StrUtil.splitTrim(idStr, ",");
+            for (String id : ids) {
+                idList.add(Long.parseLong(id));
+            }
         }
         return idList;
     }
