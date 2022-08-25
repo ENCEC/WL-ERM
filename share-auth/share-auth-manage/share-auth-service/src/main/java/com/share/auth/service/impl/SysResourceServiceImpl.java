@@ -664,25 +664,4 @@ public class SysResourceServiceImpl implements SysResourceService {
                 .mapperTo(SysResourceDTO.class)
                 .execute();
     }
-
-    @Override
-    public ResultHelper<?> uploadExternalFile(Long sysResourceId, String systemId, String fileType, String fileName, MultipartFile file) {
-        FastDfsUploadResult fastDfsUploadResult = shareFileInterface.uploadExternalFile(systemId, fileType, fileName, file);
-        String fileKey = fastDfsUploadResult.getFileKey();
-        //返回带后缀的文件名称
-        String originFile = fileName + "." + fileType;
-        //获取fileKey 映射fileName
-        HashMap<String, String> map = new HashMap<>(2);
-        map.put(fileKey, originFile);
-        SysResource sysResource = QSysResource.sysResource.selectOne().byId(sysResourceId);
-        sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        sysResource.setResourceLogo(fileKey);
-        int count = QSysResource.sysResource.save(sysResource);
-        if (count == 1) {
-            return CommonResult.getSuccessResultData(map);
-            //return CommonResult.getSuccessResultData(fileKey);
-        } else {
-            return CommonResult.getFaildResultData("上传失败");
-        }
-    }
 }

@@ -6,6 +6,7 @@ import com.share.auth.domain.QueryResourceDTO;
 import com.share.auth.domain.SysResourceDTO;
 import com.share.auth.domain.SysResourceQueryVO;
 import com.share.auth.service.SysResourceService;
+import com.share.auth.util.FileUploadUtils;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
@@ -181,23 +182,25 @@ public class SysResourceController {
         return sysResourceService.queryParentResource();
     }
 
+
     /**
-     * 上传文件
-     *
-     * @param systemId
-     * @param fileType
-     * @param fileName
-     * @param sysResourceId
-     * @param file
-     * @return
+     * 上传菜单图标
      */
-    @RequestMapping(value = "/uploadExternalFile")
-    public ResultHelper<?> uploadExternalFile(
-            @RequestParam("sysResourceId") Long sysResourceId,
-            @RequestParam("systemId") String systemId,
-            @RequestParam("fileType") String fileType,
-            @RequestParam("fileName") String fileName,
-            @RequestPart("file") MultipartFile file) {
-        return sysResourceService.uploadExternalFile(sysResourceId, systemId, fileType, fileName, file);
+    @PostMapping("/uploadResourceLogo")
+    public String uploadResourceLogo(@RequestPart("file") MultipartFile file) {
+        try {
+            String http = "http://172.16.8.147";
+
+            String filePath = "D:\\Upload";
+
+            String fileName = FileUploadUtils.upload(filePath, file);
+            String replaceName = fileName.replace("D:\\Upload", "");
+            String url = http + replaceName;
+            return url;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 }

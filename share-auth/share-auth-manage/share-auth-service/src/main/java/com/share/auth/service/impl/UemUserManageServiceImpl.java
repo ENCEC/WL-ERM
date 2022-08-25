@@ -591,7 +591,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         UemDept uemDept = QUemDept.uemDept.selectOne(QUemDept.deptName, QUemDept.uemDeptId).byId(uemDeptId);
         uemUser.setDeptName(uemDept.getDeptName());
         uemUser.setUemDeptId(uemDept.getUemDeptId());
-
         QUemUser.uemUser.save(uemUser);
         return CommonResult.getSuccessResultData("修改成功!");
     }

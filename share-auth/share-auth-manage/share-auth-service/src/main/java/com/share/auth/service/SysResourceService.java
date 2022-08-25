@@ -124,16 +124,5 @@ public interface SysResourceService {
      */
     List<SysResourceDTO> queryParentResource();
 
-    /**
-     * 上传菜单logo
-     *
-     * @param sysResourceId * @param systemId
-     *                      * @param fileType
-     *                      * @param fileName
-     *                      * @param file
-     *                      * @return
-     */
-    ResultHelper<?> uploadExternalFile(Long sysResourceId, String systemId, String fileType, String fileName, MultipartFile file);
-
 }
 
