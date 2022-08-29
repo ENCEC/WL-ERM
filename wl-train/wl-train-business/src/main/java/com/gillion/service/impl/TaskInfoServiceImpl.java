@@ -59,6 +59,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     private final List<String> taskTypes1 = Arrays.asList("试用任务", "培训任务", "学习任务", "其他任务");
     private final List<String> taskTypes2 = Arrays.asList("员工转正", "员工离职");
+    private final List<String> taskTypesAll = Arrays.asList("试用任务", "培训任务", "学习任务", "其他任务", "员工转正", "员工离职");
 
     /**
      * 任务管理模块条件查询
@@ -431,6 +432,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      * @date 2022-08-05
      */
     @Override
+    @Deprecated
     public ResultHelper<Page<TaskInfoDto>> queryStaffTaskInfo(TaskInfoDto taskInfoDto) {
         User userModelInfo = authCenterInterface.getUserInfo();
         if (Objects.isNull(userModelInfo) || Objects.isNull(userModelInfo.getUemUserId())) {
@@ -464,6 +466,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      * @date 2022-08-08
      */
     @Override
+    @Deprecated
     public ResultHelper<Page<TaskDetailInfoDto>> queryStaffTaskDetail(TaskInfoDto taskInfoDto) {
         Page<TaskDetailInfoDto> taskDetailInfoDtoPage = QTaskDetailInfo.taskDetailInfo
                 .select(QTaskDetailInfo.taskDetailInfo.fieldContainer())
@@ -510,6 +513,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         }
     }
 
+
     /**
      * 查询负责人任务信息
      *
@@ -519,6 +523,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      * @date 2022-08-05
      */
     @Override
+    @Deprecated
     public ResultHelper<Page<TaskInfoDto>> queryLeaderTaskInfo(TaskInfoDto taskInfoDto) {
         User userModelInfo = authCenterInterface.getUserInfo();
         Map<String, Object> params = new HashMap<>();
@@ -542,6 +547,89 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .mapperTo(TaskInfoDto.class)
                 .execute(params);
         return CommonResult.getSuccessResultData(taskInfoDtoPage);
+    }
+
+    /**
+     * 查询用户任务信息
+     *
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-29
+     */
+    @Override
+    public ResultHelper<Page<TaskInfoDto>> queryTaskInfoPageByUemUser(TaskInfoDto taskInfoDto) {
+        User userModelInfo = authCenterInterface.getUserInfo();
+        Map<String, Object> params = new HashMap<>();
+        if (Objects.isNull(userModelInfo) || Objects.isNull(userModelInfo.getUemUserId())) {
+            return CommonResult.getFaildResultData("请先登录！");
+        }
+        Long uemUserId = userModelInfo.getUemUserId();
+        String taskTitle = StrUtil.isEmpty(taskInfoDto.getTaskTitle()) ? "%" : "%" + taskInfoDto.getTaskTitle() + "%";
+        List<Integer> status;
+        if (Objects.isNull(taskInfoDto.getStatus())) {
+            status = Arrays.asList(0, 1, 2, 3);
+        } else {
+            status = Collections.singletonList(taskInfoDto.getStatus());
+        }
+        params.put("taskTitle", taskTitle);
+        params.put("status", status);
+        params.put("uemUserId", uemUserId);
+        params.put("uemUserIdStr", "%" + uemUserId + "%");
+        Page<TaskInfoDto> taskInfoDtoPage = DSContext
+                .customization("WL-ERM_queryTaskInfoByUemUser")
+                .select()
+                .paging(taskInfoDto.getPageNo(), taskInfoDto.getPageSize())
+                .mapperTo(TaskInfoDto.class)
+                .execute(params);
+        return CommonResult.getSuccessResultData(taskInfoDtoPage);
+    }
+
+    /**
+     * 查询任务信息和任务细则列表
+     *
+     * @param queryTaskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-29
+     */
+    @Override
+    public ResultHelper<TaskInfoDto> queryTaskDetailInfo(TaskInfoDto queryTaskInfoDto) {
+        if (queryTaskInfoDto.getTaskInfoId() == null) {
+            return CommonResult.getFaildResultData("必填参数不能为空");
+        }
+        User userModelInfo = authCenterInterface.getUserInfo();
+        if (Objects.isNull(userModelInfo) || Objects.isNull(userModelInfo.getUemUserId())) {
+            return CommonResult.getFaildResultData("请先登录！");
+        }
+        Long uemUserId = userModelInfo.getUemUserId();
+        TaskInfoDto taskInfoDto = QTaskInfo.taskInfo.selectOne()
+                .mapperTo(TaskInfoDto.class)
+                .byId(queryTaskInfoDto.getTaskInfoId());
+        List<TaskDetailInfoDto> taskDetailInfoDtoList = DSContext
+                .customization("WL-ERM_queryTaskDetailInfoById")
+                .select()
+                .mapperTo(TaskDetailInfoDto.class)
+                .execute(queryTaskInfoDto);
+        for (TaskDetailInfoDto taskDetailInfoDto : taskDetailInfoDtoList) {
+            if (uemUserId.equals(taskDetailInfoDto.getExecutor())) {
+                taskInfoDto.setUserType("executor");
+                break;
+            } else if (uemUserId.equals(taskDetailInfoDto.getDispatchers())) {
+                taskInfoDto.setUserType("dispatcher");
+            } else if (uemUserId.equals(taskDetailInfoDto.getLeader())) {
+                taskInfoDto.setUserType("leader");
+                break;
+            } else if (uemUserId.equals(taskDetailInfoDto.getApprover())) {
+                taskInfoDto.setUserType("approver");
+            } else if (uemUserId.equals(taskDetailInfoDto.getAuditId())) {
+                taskInfoDto.setUserType("auditor");
+            } else if (taskDetailInfoDto.getOrdinator().contains(uemUserId.toString())) {
+                taskInfoDto.setUserType("ordinator");
+            }
+        }
+        taskInfoDto.setTaskDetailInfoDtoList(taskDetailInfoDtoList);
+        return CommonResult.getSuccessResultData(taskInfoDto);
     }
 
     /**
@@ -621,6 +709,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      * @date 2022-08-05
      */
     @Override
+    @Deprecated
     public ResultHelper<Page<TaskInfoDto>> queryOrdinatorTaskInfo(TaskInfoDto taskInfoDto) {
         User userModelInfo = authCenterInterface.getUserInfo();
         Map<String, Object> params = new HashMap<>();

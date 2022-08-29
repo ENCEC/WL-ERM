@@ -96,12 +96,17 @@ public class TaskInfoDto implements Serializable {
     @ApiModelProperty("任务标题")
     private String taskTitle;
 
-    /**任务类型*/
+    /**
+     * 任务类型
+     */
     @ApiModelProperty("任务类型")
     private String taskType;
 
     @ApiModelProperty("任务细则")
     private List<TaskDetailInfoDto> taskDetailInfoDtoList;
+
+    @ApiModelProperty("用户类型（员工、统筹人、负责人、审核人、审批人）")
+    private String userType;
 
     @ApiModelProperty("分页大小")
     private Integer pageSize;
@@ -109,7 +114,9 @@ public class TaskInfoDto implements Serializable {
     @ApiModelProperty("页码")
     private Integer pageNo;
 
-    /**创建时间*/
+    /**
+     * 创建时间
+     */
     @ApiModelProperty("创建时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
