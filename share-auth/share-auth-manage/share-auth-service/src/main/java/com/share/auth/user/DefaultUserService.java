@@ -112,14 +112,15 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
                 user = authCenterInterface.getUserInfo();
                 session.setAttribute(USER, user);
             }
-            if (user == null) {
-                return spUser;
+//            if (user == null) {
+//                return spUser;
+//            }
+            if (user != null) {
+                String jsonUser = JSON.toJSONString(user);
+                log.info("Get user info :" + jsonUser);
+                spUser = JSON.parseObject(jsonUser, UserInfoModel.class);
             }
-            String jsonUser = JSON.toJSONString(user);
-            log.info("Get user info :"+jsonUser);
-            spUser = JSON.parseObject(jsonUser, UserInfoModel.class);
 //            BeanUtils.copyProperties(user, authUserInfoModel);
-
             final ArrayList<IDataPermission> dataPermissions = new ArrayList<>();
             final ArrayList<ITable> permissionTables = new ArrayList<>(0);
             checkSelectDataPermissions(dataPermissions, user);
@@ -145,13 +146,20 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
     }
 
     private void checkSelectDataPermissions(ArrayList<IDataPermission> dataPermissions, User user) {
+        if (user == null || user.getRoleList() == null || user.getProjectList() == null) {
+            dataPermissions.add(new DataPermission("1=0", CrudType.SELECT));
+            dataPermissions.add(new DataPermission("1=0", CrudType.DELETE));
+            dataPermissions.add(new DataPermission("1=0", CrudType.UPDATE));
+            dataPermissions.add(new DataPermission("1=0", CrudType.INSERT));
+            return;
+        }
         List<Role> roleList = user.getRoleList();
         for (Role role : roleList) {
             if ("ADMIN".equals(role.getRoleName())) {
                 dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.SELECT));
                 dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.DELETE));
                 dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.UPDATE));
-                dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.INSERT));
+//                dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.INSERT));
                 return;
             }
         }
@@ -193,6 +201,11 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
             dataPermissions.add(new DataPermission("uem_user_id IN " + idListStr, CrudType.SELECT));
             dataPermissions.add(new DataPermission("uem_user_id IN " + idListStr, CrudType.DELETE));
             dataPermissions.add(new DataPermission("uem_user_id IN " + idListStr, CrudType.UPDATE));
+        } else {
+            dataPermissions.add(new DataPermission("1=0", CrudType.SELECT));
+            dataPermissions.add(new DataPermission("1=0", CrudType.DELETE));
+            dataPermissions.add(new DataPermission("1=0", CrudType.UPDATE));
+            dataPermissions.add(new DataPermission("1=0", CrudType.INSERT));
         }
     }
 
