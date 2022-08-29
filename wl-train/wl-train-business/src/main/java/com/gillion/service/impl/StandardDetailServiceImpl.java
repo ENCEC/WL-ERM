@@ -91,7 +91,7 @@ public class StandardDetailServiceImpl implements StandardDetailService {
 
         standardDetailVO.setStandardEntryId(execute.getStandardEntryId());
         if (Objects.isNull(standardDetailVO.getStatus())) {
-            standardDetailVO.setStatus(true);
+            standardDetailVO.setStatus(false);
         }
         standardDetailVO.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         Integer actionSerialNum = saveActionSerialNum(standardDetailVO.getActionSerialNum());

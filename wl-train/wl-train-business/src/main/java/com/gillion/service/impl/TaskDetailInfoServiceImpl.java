@@ -77,11 +77,6 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
         taskDetailInfo.setOfferType(taskDetailInfoDTO.getOfferType());
         taskDetailInfo.setApprover(taskDetailInfoDTO.getApprover());
-        UemUserDto uemUserDto = taskInfoInterface.queryUemUserById(taskDetailInfoDTO.getApprover());
-        taskDetailInfo.setApproverName(uemUserDto.getName());
-        StandardEntry standardEntry = QStandardEntry.standardEntry.selectOne().where(QStandardEntry.entryName.eq$("员工转正")).execute();
-        taskDetailInfo.setStandardEntryId(standardEntry.getStandardEntryId());
-        taskDetailInfo.setStandardEntryName(standardEntry.getEntryName());
         taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         return CommonResult.getSuccessResultData("提交转正申请成功");
@@ -119,11 +114,6 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
         taskDetailInfo.setApprover(taskDetailInfoDTO.getApprover());
-        UemUserDto uemUserDto = taskInfoInterface.queryUemUserById(taskDetailInfoDTO.getApprover());
-        taskDetailInfo.setApproverName(uemUserDto.getName());
-        StandardEntry standardEntry = QStandardEntry.standardEntry.selectOne().where(QStandardEntry.entryName.eq$("员工离职")).execute();
-        taskDetailInfo.setStandardEntryId(standardEntry.getStandardEntryId());
-        taskDetailInfo.setStandardEntryName(standardEntry.getEntryName());
         taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         return CommonResult.getSuccessResultData("提交离职申请成功");

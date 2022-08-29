@@ -120,7 +120,7 @@ public class StandardEntryServiceImpl implements StandardEntryService  {
             return  CommonResult.getFaildResultData("传入的执行序号要为正整数");
         }
         standardEntry.setActionSerialNum(saveActionSerialNum);
-        standardEntry.setStatus(Boolean.TRUE);
+        standardEntry.setStatus(Boolean.FALSE);
         int save = QStandardEntry.standardEntry.save(standardEntry);
         if (save >0) {
             return CommonResult.getSuccessResultData("新增成功");
