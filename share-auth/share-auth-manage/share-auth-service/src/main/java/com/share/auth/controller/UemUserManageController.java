@@ -13,6 +13,7 @@ import com.share.auth.model.entity.SysPost;
 import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.entity.UemDept;
 import com.share.auth.model.entity.UemProject;
+import com.share.auth.model.vo.QueryWorkUserVo;
 import com.share.auth.service.UemUserManageService;
 import com.share.file.domain.FileInfoVO;
 import com.share.support.result.CommonResult;
@@ -28,11 +29,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.*;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 用户管理接口
@@ -70,6 +70,23 @@ public class UemUserManageController {
     @PostMapping("/queryUemUser")
     public ResultHelper<Page<UemUserDto>> queryUemUser(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.queryUemUser(uemUserDto);
+    }
+
+    /**
+     * 根据用户名、姓名查询所有用户列表
+     *
+     * @param uemUserDto 用户信息封装类
+     * @return ResultHelper<List < QueryWorkUserVo>>
+     * @date 2022-07-25
+     */
+    @ApiOperation("根据用户名、姓名查询所有在职用户列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "account", value = "用户名", dataTypeClass = String.class, paramType = "body"),
+            @ApiImplicitParam(name = "name", value = "真实姓名", dataTypeClass = String.class, paramType = "body"),
+    })
+    @PostMapping("/queryAllWorkUserList")
+    public ResultHelper<List<QueryWorkUserVo>> queryAllWorkUserList(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.queryAllWorkUserList(uemUserDto);
     }
 
     /**
