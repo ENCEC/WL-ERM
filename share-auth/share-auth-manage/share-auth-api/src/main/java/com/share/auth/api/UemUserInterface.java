@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-
 /**
  * @author xuzt <xuzt@gillion.com.cn>
  * @date 2022/8/1
@@ -40,5 +38,5 @@ public interface UemUserInterface {
      * @date 2022-07-25
      */
     @PostMapping("/uemUserManage/queryAllWorkUserList")
-    ResultHelper<List<UemUserDto>> queryAllWorkUserList(@RequestBody UemUserDto uemUserDto);
+    ResultHelper<Page<UemUserDto>> queryAllWorkUserList(@RequestBody UemUserDto uemUserDto);
 }

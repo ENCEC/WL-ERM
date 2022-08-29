@@ -112,7 +112,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      * @date 2022-08-29
      */
     @Override
-    public ResultHelper<List<QueryWorkUserVo>> queryAllWorkUserList(UemUserDto uemUserDto) {
+    public ResultHelper<Page<QueryWorkUserVo>> queryAllWorkUserList(UemUserDto uemUserDto) {
 //        String account = uemUserDto.getAccount();
 //        String name = uemUserDto.getName();
 //        if (!StringUtils.isEmpty(account)) {
@@ -121,10 +121,22 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 //        if (!StringUtils.isEmpty(name)) {
 //            uemUserDto.setName("%" + name + "%");
 //        }
+        int pageNo = (uemUserDto.getPageNo() == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : uemUserDto.getPageNo();
+        int pageSize = (uemUserDto.getPageSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : uemUserDto.getPageSize();
+        int offset = pageNo * pageSize;
+        Page<QueryWorkUserVo> page = new Page<>();
+        int count = jdbcTemplate.queryForList(
+                "SELECT COUNT(`uem_user_id`) FROM uem_user WHERE is_deleted=0 AND job_status<>2;", Integer.class)
+                .get(0);
         List<QueryWorkUserVo> uemUserDtoList = jdbcTemplate.query(
-                "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` FROM uem_user WHERE is_deleted=0 AND job_status<>2;",
-                BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class));
-        return CommonResult.getSuccessResultData(uemUserDtoList);
+                "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` " +
+                        "FROM uem_user WHERE is_deleted=0 AND job_status<>2 LIMIT ?,?;",
+                BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class), offset, pageSize);
+        page.setRecords(uemUserDtoList);
+        page.setTotalRecord(count);
+        page.setPageSize(pageSize);
+        page.setCurrentPage(pageNo);
+        return CommonResult.getSuccessResultData(page);
     }
 
     /**

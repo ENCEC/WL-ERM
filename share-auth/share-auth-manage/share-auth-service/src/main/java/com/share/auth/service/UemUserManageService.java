@@ -42,7 +42,7 @@ public interface UemUserManageService {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-29
      */
-    ResultHelper<List<QueryWorkUserVo>> queryAllWorkUserList(UemUserDto uemUserDto);
+    ResultHelper<Page<QueryWorkUserVo>> queryAllWorkUserList(UemUserDto uemUserDto);
 
     /**
      * 用户管理详情

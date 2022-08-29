@@ -85,7 +85,7 @@ public class UemUserManageController {
             @ApiImplicitParam(name = "name", value = "真实姓名", dataTypeClass = String.class, paramType = "body"),
     })
     @PostMapping("/queryAllWorkUserList")
-    public ResultHelper<List<QueryWorkUserVo>> queryAllWorkUserList(@RequestBody UemUserDto uemUserDto) {
+    public ResultHelper<Page<QueryWorkUserVo>> queryAllWorkUserList(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.queryAllWorkUserList(uemUserDto);
     }
 
