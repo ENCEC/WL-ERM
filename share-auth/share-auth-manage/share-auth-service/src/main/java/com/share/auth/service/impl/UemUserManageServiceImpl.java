@@ -1033,5 +1033,15 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     }
 
+    @Override
+    public ResultHelper<?> queryPostOfDept() {
+        List result = DSContext.customization("WL-ERM_queryPostOfDept").select().execute();
+        if (CollectionUtils.isNotEmpty(result)) {
+            return CommonResult.getSuccessResultData(result);
+        } else {
+            return CommonResult.getFaildResultData("查询失败！");
+        }
+    }
+
 
 }

@@ -486,4 +486,9 @@ public class UemUserManageController {
     public ResultHelper<?> updateJobStatus(Long uemUserId) {
         return uemUserManageService.updateJobStatus(uemUserId);
     }
+
+    @PostMapping("/queryPostOfDept")
+    public ResultHelper<?> queryPostOfDept() {
+        return uemUserManageService.queryPostOfDept();
+    }
 }

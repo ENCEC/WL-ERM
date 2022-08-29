@@ -315,4 +315,11 @@ public interface UemUserManageService {
      */
     ResultHelper<?> deleteResume(Long uemUserId, String type);
 
+    /**
+     * Echarts图表查询部门岗位的情况
+     *
+     * @return
+     */
+    ResultHelper<?> queryPostOfDept();
+
 }
