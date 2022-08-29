@@ -13,6 +13,7 @@ import com.share.auth.domain.UemUserEditDTO;
 import com.share.auth.domain.UemUserRoleDto;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
+import com.share.auth.model.vo.QueryWorkUserVo;
 import com.share.auth.service.UemUserManageService;
 import com.share.auth.service.UemUserService;
 import com.share.auth.user.DefaultUserService;
@@ -30,6 +31,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -61,6 +64,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Autowired
     private ShareFileInterface shareFileInterface;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     /**
      * 查询用户信息
      *
@@ -70,17 +76,11 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     public ResultHelper<Page<UemUserDto>> queryUemUser(UemUserDto uemUserDto) {
-
-        // 用户名
         String account = uemUserDto.getAccount();
-
-        // 姓名
         String name = uemUserDto.getName();
-
         if (!StringUtils.isEmpty(account)) {
             uemUserDto.setAccount("%" + account + "%");
         }
-
         if (!StringUtils.isEmpty(name)) {
             uemUserDto.setName("%" + name + "%");
         }
@@ -95,12 +95,48 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                                 .and(QUemUser.name.like(":name"))
                                 .and(QUemUser.isValid.eq(":isValid"))
                                 .and(QUemUser.isDeleted.eq$(false))
-                ).paging(pageNo, pageSize)
+        ).paging(pageNo, pageSize)
                 .sorting(QUemUser.createTime.desc())
                 .mapperTo(UemUserDto.class)
                 .execute(uemUserDto);
 
         return CommonResult.getSuccessResultData(uemUserDtoPage);
+    }
+
+    /**
+     * 根据用户名、姓名查询所有在职用户列表
+     *
+     * @param uemUserDto 查询入参
+     * @return com.share.support.result.ResultHelper<java.util.List < com.share.auth.model.vo.QueryWorkUserVo>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-29
+     */
+    @Override
+    public ResultHelper<Page<QueryWorkUserVo>> queryAllWorkUserList(UemUserDto uemUserDto) {
+//        String account = uemUserDto.getAccount();
+//        String name = uemUserDto.getName();
+//        if (!StringUtils.isEmpty(account)) {
+//            uemUserDto.setAccount("%" + account + "%");
+//        }
+//        if (!StringUtils.isEmpty(name)) {
+//            uemUserDto.setName("%" + name + "%");
+//        }
+        int pageNo = (uemUserDto.getPageNo() == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : uemUserDto.getPageNo();
+        int pageSize = (uemUserDto.getPageSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : uemUserDto.getPageSize();
+        int offset = pageNo * pageSize;
+        Page<QueryWorkUserVo> page = new Page<>();
+        int count = jdbcTemplate.queryForList(
+                "SELECT COUNT(`uem_user_id`) FROM uem_user WHERE is_deleted=0 AND job_status<>2;", Integer.class)
+                .get(0);
+        List<QueryWorkUserVo> uemUserDtoList = jdbcTemplate.query(
+                "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` " +
+                        "FROM uem_user WHERE is_deleted=0 AND job_status<>2 LIMIT ?,?;",
+                BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class), offset, pageSize);
+        page.setRecords(uemUserDtoList);
+        page.setTotalRecord(count);
+        page.setPageSize(pageSize);
+        page.setCurrentPage(pageNo);
+        return CommonResult.getSuccessResultData(page);
     }
 
     /**

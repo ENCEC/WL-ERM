@@ -9,6 +9,7 @@ import com.share.auth.model.entity.SysPost;
 import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.entity.UemDept;
 import com.share.auth.model.entity.UemProject;
+import com.share.auth.model.vo.QueryWorkUserVo;
 import com.share.file.domain.FileInfoVO;
 import com.share.support.result.ResultHelper;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,16 @@ public interface UemUserManageService {
      * @date 2022-07-25
      */
     ResultHelper<Page<UemUserDto>> queryUemUser(UemUserDto uemUserDto);
+
+    /**
+     * 根据用户名、姓名查询所有在职用户列表
+     *
+     * @param uemUserDto 查询入参
+     * @return com.share.support.result.ResultHelper<java.util.List < com.share.auth.model.vo.UemUserDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-29
+     */
+    ResultHelper<Page<QueryWorkUserVo>> queryAllWorkUserList(UemUserDto uemUserDto);
 
     /**
      * 用户管理详情

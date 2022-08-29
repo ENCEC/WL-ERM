@@ -17,8 +17,8 @@ import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -97,6 +97,7 @@ public class TaskInfoController {
         return taskInfoService.queryNotNeedStandardFullDetailByTaskType(taskInfoDto);
     }
 
+    @Deprecated
     @PostMapping("/queryStaffTaskInfo")
     @ApiOperation("查询员工任务信息")
     @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
@@ -110,7 +111,8 @@ public class TaskInfoController {
         return taskInfoService.queryStaffTaskInfo(taskInfoDto);
     }
 
-    @PostMapping("/queryTaskDetailInfo")
+    @Deprecated
+    @PostMapping("/queryStaffTaskDetail")
     @ApiOperation("查询员工任务详情信息")
     @ApiImplicitParam(name = "taskInfoDto", value = "任务信息ID", dataType = "TaskInfoDto", paramType = "body")
     public ResultHelper<Page<TaskDetailInfoDto>> queryTaskDetail(@RequestBody TaskInfoDto taskInfoDto) {
@@ -130,6 +132,7 @@ public class TaskInfoController {
         return taskInfoService.updateTaskDetailProgress(taskDetailInfoDtoList);
     }
 
+    @Deprecated
     @PostMapping("/queryLeaderTaskInfo")
     @ApiOperation("查询负责人任务信息")
     @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
@@ -150,6 +153,7 @@ public class TaskInfoController {
         return taskInfoService.updateTaskDetailStatus(taskDetailInfoDtoList);
     }
 
+    @Deprecated
     @PostMapping("/queryOrdinatorTaskInfo")
     @ApiOperation("查询统筹人任务信息")
     @ApiImplicitParam(name = "taskType", value = "任务类型", dataType = "String", paramType = "body")
@@ -161,6 +165,29 @@ public class TaskInfoController {
             taskInfoDto.setPageSize(10);
         }
         return taskInfoService.queryOrdinatorTaskInfo(taskInfoDto);
+    }
+
+    @PostMapping("/queryTaskInfoPageByUemUser")
+    @ApiOperation(value = "查询用户任务信息", notes = "查询用户任务信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "taskTitle", value = "任务标题", dataType = "String", paramType = "body"),
+            @ApiImplicitParam(name = "status", value = "任务状态（0：待完成 1：执行中 2：已完成  3：审批中）", dataType = "Integer", paramType = "body")
+    })
+    public ResultHelper<Page<TaskInfoDto>> queryTaskInfoPageByUemUser(@RequestBody TaskInfoDto taskInfoDto) {
+        if (Objects.isNull(taskInfoDto.getPageNo())) {
+            taskInfoDto.setPageNo(1);
+        }
+        if (Objects.isNull(taskInfoDto.getPageSize())) {
+            taskInfoDto.setPageSize(10);
+        }
+        return taskInfoService.queryTaskInfoPageByUemUser(taskInfoDto);
+    }
+
+    @PostMapping("/queryTaskDetailInfo")
+    @ApiOperation(value = "查询任务信息和任务细则列表", notes = "查询任务信息和任务细则列表")
+    @ApiImplicitParam(name = "taskInfoId", value = "任务ID", dataType = "Long", paramType = "body")
+    public ResultHelper<TaskInfoDto> queryTaskDetailInfo(@RequestBody TaskInfoDto taskInfoDto) {
+        return taskInfoService.queryTaskDetailInfo(taskInfoDto);
     }
 
     @GetMapping("/queryPositiveApply")
