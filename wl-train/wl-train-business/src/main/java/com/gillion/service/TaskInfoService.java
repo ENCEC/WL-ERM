@@ -105,6 +105,7 @@ public interface TaskInfoService {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
+    @Deprecated
     ResultHelper<Page<TaskInfoDto>> queryStaffTaskInfo(TaskInfoDto taskInfoDto);
 
     /**
@@ -115,6 +116,7 @@ public interface TaskInfoService {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-08
      */
+    @Deprecated
     ResultHelper<Page<TaskDetailInfoDto>> queryStaffTaskDetail(TaskInfoDto taskInfoDto);
 
     /**
@@ -135,7 +137,28 @@ public interface TaskInfoService {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
+    @Deprecated
     ResultHelper<Page<TaskInfoDto>> queryLeaderTaskInfo(TaskInfoDto taskInfoDto);
+
+    /**
+     * 查询用户任务信息
+     *
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-29
+     */
+    ResultHelper<Page<TaskInfoDto>> queryTaskInfoPageByUemUser(TaskInfoDto taskInfoDto);
+
+    /**
+     * 查询任务信息和任务细则列表
+     *
+     * @param taskInfoDto 查询入参
+     * @return com.share.support.result.ResultHelper<com.gillion.ds.client.api.queryobject.model.Page < com.gillion.model.domain.TaskInfoDto>>
+     * @author xuzt <xuzt@gillion.com.cn>
+     * @date 2022-08-29
+     */
+    ResultHelper<TaskInfoDto> queryTaskDetailInfo(TaskInfoDto taskInfoDto);
 
     /**
      * 更新任务完成状态
@@ -155,6 +178,7 @@ public interface TaskInfoService {
      * @author xuzt <xuzt@gillion.com.cn>
      * @date 2022-08-05
      */
+    @Deprecated
     ResultHelper<Page<TaskInfoDto>> queryOrdinatorTaskInfo(TaskInfoDto taskInfoDto);
 
 
