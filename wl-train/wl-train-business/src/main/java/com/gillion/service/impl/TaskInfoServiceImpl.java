@@ -939,10 +939,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     public TaskDetailInfoDTO queryPositiveInfoByTaskId(Long taskInfoId) {
         HashMap<String, Long> params = new HashMap<>();
         params.put("taskInfoId", taskInfoId);
-        TaskDetailInfoDTO execute = DSContext.customization("WL-ERM_queryPositiveInfo").selectOne()
+        TaskDetailInfoDTO result = DSContext.customization("WL-ERM_queryPositiveInfo").selectOne()
                 .mapperTo(TaskDetailInfoDTO.class).execute(params);
-        if (execute != null) {
-            return execute;
+        if (result != null) {
+            return result;
         } else {
             return null;
         }

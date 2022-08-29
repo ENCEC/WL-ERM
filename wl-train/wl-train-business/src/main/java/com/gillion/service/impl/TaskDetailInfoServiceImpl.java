@@ -47,6 +47,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
 
     /**
      * 转正申请
+     *
      * @param taskDetailInfoDTO
      * @return
      */
@@ -55,7 +56,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
     public ResultHelper<?> saveOffer(TaskDetailInfoDTO taskDetailInfoDTO) {
         if (Objects.isNull(taskDetailInfoDTO.getApplyDate())
                 || StrUtil.isEmpty(taskDetailInfoDTO.getOfferType())
-                || Objects.isNull(taskDetailInfoDTO.getApprover()) ) {
+                || Objects.isNull(taskDetailInfoDTO.getApprover())) {
             return CommonResult.getFaildResultData("必填项不能为空");
         }
         List<TaskInfo> taskInfos = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskDetailInfoDTO.getUemUserName() + "转正申请")).execute();
@@ -67,8 +68,9 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskInfo.setDispatchers(taskDetailInfoDTO.getUemUserId());
         taskInfo.setDispatchersName(taskDetailInfoDTO.getUemUserName());
         taskInfo.setTaskType("员工转正");
-        taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"转正申请");
-        taskInfo.setStatus(1);
+        taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName() + "转正申请");
+        //员工提交申请之后状态变为审批中
+        taskInfo.setStatus(3);
         QTaskInfo.taskInfo.save(taskInfo);
         TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
@@ -87,6 +89,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
 
     /**
      * 离职申请
+     *
      * @param taskDetailInfoDTO
      * @return
      */
@@ -95,7 +98,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
     public ResultHelper<?> saveLeave(TaskDetailInfoDTO taskDetailInfoDTO) {
         if (Objects.isNull(taskDetailInfoDTO.getApplyDate())
                 || Objects.isNull(taskDetailInfoDTO.getApprover())
-        ||StrUtil.isEmpty(taskDetailInfoDTO.getLeaveReason())) {
+                || StrUtil.isEmpty(taskDetailInfoDTO.getLeaveReason())) {
             return CommonResult.getFaildResultData("必填项不能为空");
         }
         List<TaskInfo> taskInfos = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskDetailInfoDTO.getUemUserName() + "离职申请")).execute();
@@ -107,10 +110,11 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskInfo.setDispatchers(taskDetailInfoDTO.getUemUserId());
         taskInfo.setDispatchersName(taskDetailInfoDTO.getUemUserName());
         taskInfo.setTaskType("员工离职");
-        taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName()+"离职申请");
-        taskInfo.setStatus(1);
+        taskInfo.setTaskTitle(taskDetailInfoDTO.getUemUserName() + "离职申请");
+        //员工提交申请后状态变为审批中
+        taskInfo.setStatus(3);
         QTaskInfo.taskInfo.save(taskInfo);
-        taskDetailInfoInterface.updateLeaveReason(taskDetailInfoDTO.getUemUserId(),taskDetailInfoDTO.getLeaveReason());
+        taskDetailInfoInterface.updateLeaveReason(taskDetailInfoDTO.getUemUserId(), taskDetailInfoDTO.getLeaveReason());
         TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
@@ -127,13 +131,14 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
 
     /**
      * 查看转正评语
+     *
      * @param dispatchers
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResultHelper<List> queryOffer(Long dispatchers,String name) {
-        String taskTitle = name+"转正申请";
+    public ResultHelper<List> queryOffer(Long dispatchers, String name) {
+        String taskTitle = name + "转正申请";
         List<TaskInfo> taskInfos = QTaskInfo.taskInfo.select().where(QTaskInfo.taskInfoId.goe$(1L)).execute();
         List lists = new LinkedList();
         for (TaskInfo taskInfo : taskInfos) {
@@ -144,7 +149,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         if (lists.size() == 1) {
             UemUserDto uemUserDto = taskDetailInfoInterface.queryOfferInfo(dispatchers);
             TaskInfoDto taskInfoDto = QTaskInfo.taskInfo.selectOne(
-                    QTaskInfo.taskInfoId)
+                            QTaskInfo.taskInfoId)
                     .where(QTaskInfo.dispatchers.eq$(dispatchers).and(QTaskInfo.taskTitle.eq$(taskTitle)))
                     .mapperTo(TaskInfoDto.class)
                     .execute();

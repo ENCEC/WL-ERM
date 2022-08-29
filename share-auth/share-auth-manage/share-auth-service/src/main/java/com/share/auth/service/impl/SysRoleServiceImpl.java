@@ -363,12 +363,15 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public ResultHelper<Object> saveSysRole(SysRoleDTO sysRoleDTO) {
+        SysApplication sysApplication = QSysApplication.sysApplication.selectOne()
+                .where(QSysApplication.sysApplicationId.eq$(6726670753768472580L)).execute();
+        Long sysApplicationId = sysApplication.getSysApplicationId();
         SysRole sysRole = new SysRole();
         String roleName = sysRoleDTO.getRoleName();
         String remark = sysRoleDTO.getRemark();
         sysRole.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         sysRole.setRoleName(roleName);
-        sysRole.setSysApplicationId(1L);
+        sysRole.setSysApplicationId(sysApplicationId);
         sysRole.setRemark(remark);
         sysRole.setIsValid(true);
         QSysRole.sysRole.save(sysRole);

@@ -264,6 +264,7 @@ public class TaskInfoController {
         taskInfo.setDispatchersName(name);
         taskInfo.setTaskType("员工离职");
         taskInfo.setTaskTitle(name + "离职申请");
+        //员工管理提交申请之后状态为已完成，用于领导快速审批
         taskInfo.setStatus(2);
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         List<TaskInfo> execute = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskInfo.getTaskTitle())).execute();
@@ -302,6 +303,7 @@ public class TaskInfoController {
         taskInfo.setDispatchersName(name);
         taskInfo.setTaskType("员工辞退");
         taskInfo.setTaskTitle(name + "辞退申请");
+        //员工管理提交申请之后状态为已完成，用于领导快速审批
         taskInfo.setStatus(2);
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         //关联查出用户id，name 插入任务表，生成新任务
@@ -351,9 +353,14 @@ public class TaskInfoController {
         List list = new ArrayList<>();
         ResultHelper<TaskDetailInfoDto> taskDetailInfoDtoResultHelper = taskInfoService.queryPositiveApply(taskInfoId);
         UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(dispatchers));
-        //String resume = uemUserDto.getResume();
-        list.add(taskDetailInfoDtoResultHelper);
-        list.add(uemUserDto);
-        return list;
+        try {
+            list.add(taskDetailInfoDtoResultHelper);
+            list.add(uemUserDto);
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 }
