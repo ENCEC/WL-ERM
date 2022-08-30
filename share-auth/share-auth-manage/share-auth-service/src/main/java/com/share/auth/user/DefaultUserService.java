@@ -177,12 +177,18 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
                         break;
                     case "MD":
                     case "PD":
+                        uemUserIdSet.addAll(parseIdList(project.getGenDevUsers()));
+                        uemUserIdSet.addAll(parseIdList(project.getGenDemandUsers()));
+                        uemUserIdSet.add(project.getChiefId());
+                        uemUserIdSet.add(project.getDutyId());
+                        uemUserIdSet.add(project.getDevDirectorId());
+                        uemUserIdSet.add(project.getDemandId());
+                        break;
                     case "PM":
                     case "GM":
                     case "VGM":
+                        uemUserIdSet.addAll(parseIdList(project.getGenDevUsers()));
                         uemUserIdSet.addAll(parseIdList(project.getGenDemandUsers()));
-                        uemUserIdSet.addAll(parseIdList(project.getGenDemandUsers()));
-                        uemUserIdSet.add(project.getChiefId());
                         uemUserIdSet.add(project.getDutyId());
                         uemUserIdSet.add(project.getDevDirectorId());
                         uemUserIdSet.add(project.getDemandId());

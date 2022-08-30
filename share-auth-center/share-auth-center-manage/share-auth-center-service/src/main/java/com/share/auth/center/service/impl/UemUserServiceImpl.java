@@ -284,6 +284,7 @@ public class UemUserServiceImpl implements UemUserService {
                     .execute(params);
             userInfoModel.setProjectList(uemProjectList);
             userInfoModel.setRoleList(sysRoleDTOList);
+            userInfoModel.setPassword(null);
             String credential = credentialProcessor.createCredential(userInfoModel);
             credentialProcessor.deliveryCredential(response, credential, user.getUemUserId().toString());
             // 保存登录日志
