@@ -612,18 +612,20 @@ public class TaskInfoServiceImpl implements TaskInfoService {
                 .mapperTo(TaskDetailInfoDto.class)
                 .execute(queryTaskInfoDto);
         for (TaskDetailInfoDto taskDetailInfoDto : taskDetailInfoDtoList) {
-            if (uemUserId.equals(taskDetailInfoDto.getExecutor())) {
+            if (uemUserId.equals(taskDetailInfoDto.getApprover())) {
+                taskInfoDto.setUserType("approver");
+                break;
+            } else if (uemUserId.equals(taskDetailInfoDto.getAuditId())) {
+                taskInfoDto.setUserType("auditor");
+                break;
+            } else if (uemUserId.equals(taskDetailInfoDto.getExecutor())) {
                 taskInfoDto.setUserType("executor");
                 break;
-            } else if (uemUserId.equals(taskDetailInfoDto.getDispatchers())) {
-                taskInfoDto.setUserType("dispatcher");
             } else if (uemUserId.equals(taskDetailInfoDto.getLeader())) {
                 taskInfoDto.setUserType("leader");
                 break;
-            } else if (uemUserId.equals(taskDetailInfoDto.getApprover())) {
-                taskInfoDto.setUserType("approver");
-            } else if (uemUserId.equals(taskDetailInfoDto.getAuditId())) {
-                taskInfoDto.setUserType("auditor");
+            } else if (uemUserId.equals(taskDetailInfoDto.getDispatchers())) {
+                taskInfoDto.setUserType("dispatcher");
             } else if (taskDetailInfoDto.getOrdinator().contains(uemUserId.toString())) {
                 taskInfoDto.setUserType("ordinator");
             }
