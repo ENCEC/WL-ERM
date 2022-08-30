@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -111,4 +112,16 @@ public class FileInfoController {
 	public Map<String,Object> saveCurrentSystem(@RequestParam("systemCode") String systemCode) {
         return fileInfoService.saveCurrentSystem(systemCode);
     }
+
+	@RequestMapping(value = "/batchUploadFile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.POST)
+	@ApiOperation(value = "文件上传接口",notes = "文件上传接口")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "file", value = "文件数组", required = true, dataType = "__file", allowMultiple = true, paramType = "uploadFile"),
+			@ApiImplicitParam(name = "fileType", value = "文件类型数组", required = true, dataType = "string", allowMultiple = true, paramType = "uploadFile"),
+			@ApiImplicitParam(name = "systemId", value = "系统id", required = true, dataType = "string", paramType = "uploadFile")
+	})
+	public Map<String, Object> batchUploadFile(@RequestPart("file") MultipartFile[] file,@RequestParam("fileType") String[] fileType,@RequestParam("systemId") String systemId) {
+		return fileInfoService.batchUploadFile(file, fileType, systemId);
+
+	}
 }

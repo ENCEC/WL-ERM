@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSON;
+import com.gillion.ec.upload.entity.CloudFile;
+import com.gillion.ec.upload.support.CloudBucketProvider;
 import com.share.file.constants.GlobalConstant;
 import com.share.file.enums.GlobalEnum;
 import com.share.file.model.vo.FileInfo;
@@ -21,6 +23,7 @@ import com.share.file.model.vo.FileInfoReturnVo;
 import org.apache.commons.lang.StringUtils;
 import org.csource.fastdfs.StorageServer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +58,13 @@ public class FileInfoServiceImpl implements FileInfoService {
     StorageConfig storageConfig;
 
     @Autowired
+    private CloudBucketProvider cloudBucketProvider;
+
+    @Autowired
     SassRedisInterface sassRedisInterface;
+
+    @Value("${upFileURL.subdirectory}")
+    private String subdirectory;
 
     /**
      * 上传文件
@@ -398,5 +407,82 @@ public class FileInfoServiceImpl implements FileInfoService {
         sassRedisInterface.set(GlobalConstant.SESSION_KEY_APP_CODE, systemCode);
         return ResultUtils.getSuccessResultData("保存systemCode成功");
     }
+
+    /**
+     * 批量上传文件
+     * @param files
+     * @param fileType
+     * @param systemId
+     * @return
+     */
+    @Override
+    public Map<String, Object> batchUploadFile(MultipartFile[] files, String[] fileType, String systemId) {
+        if (StringUtils.isEmpty(systemId)) {
+            return ResultUtils.getFailedResultData("systemId为空");
+        }
+        if (files.length == 0) {
+            return ResultUtils.getFailedResultData("没有上传的文件");
+        }
+        List<FsUploaderConfig> fsUploaderConfig;
+        // 获取文件配置类
+        fsUploaderConfig = QFsUploaderConfig.fsUploaderConfig
+                .select(QFsUploaderConfig.fsUploaderConfig.fieldContainer())
+                .where(QFsUploaderConfig.businessSystemId.eq(":businessSystemId"))
+                .execute(ImmutableMap.of("businessSystemId", systemId));
+        // 文件上传限制
+        if (!CollectionUtils.isEmpty(fsUploaderConfig) && fsUploaderConfig.get(0).getCountLimit() != null && files.length > fsUploaderConfig.get(0).getCountLimit()) {
+            return ResultUtils.getFailedResultData("文件数量超过限制，可在文件上传配置页配置");
+        }
+        List<FsFileInfo> fileList = new ArrayList<>();
+        try {
+            for (int i = 0; i < files.length; i++) {
+                FsFileInfo fileInfo = new FsFileInfo();
+                fileInfo.setFileName(files[i].getOriginalFilename());
+                fileInfo.setFileType(fileType[i]);
+                fileInfo.setBusinessSystemId(systemId);
+                BigDecimal fileSize = new BigDecimal(files[i].getSize());
+                // 比较文件大小是否超过限制
+                if (!CollectionUtils.isEmpty(fsUploaderConfig)
+                        && (fileSize.compareTo(fsUploaderConfig.get(0).getSizeLimit())) > 0) {
+                    return ResultUtils.getFailedResultData("文件" + fileInfo.getFileName() + "大小超过限制，可在文件上传配置页配置");
+                }
+                // 限制文件类型
+                Map<String, Object> resultMap = this.restrictFileTypes(files, fsUploaderConfig, i);
+                if (!CollectionUtils.isEmpty(resultMap)) {
+                    return resultMap;
+                }
+                fileInfo.setFileSize(fileSize);
+
+                InputStream inputStream = null;
+                inputStream = files[i].getInputStream();
+
+//                StorageServer storageServer = storageConfig.getStorageServer();
+//                String fileKey = fastDfsClient.upload(inputStream, fileInfo.getFileName(), null, storageServer);
+                String str1=fileInfo.getFileName().substring(0, fileInfo.getFileName().contains(".") ? fileInfo.getFileName().indexOf(".") : fileInfo.getFileName().length());
+                String str2=fileInfo.getFileName().substring(str1.length(), fileInfo.getFileName().length());
+                String fileKey = UUID.randomUUID().toString()+str2;
+                cloudBucketProvider.getCloudBucket(subdirectory).put(fileKey, CloudFile.of(inputStream,fileInfo.getFileName(),fileSize.longValue()));
+                if (StringUtils.isNotEmpty(fileKey)) {
+                    fileInfo.setFileKey(fileKey);
+                    fileList.add(fileInfo);
+                }
+            }
+
+            if (CollectionUtils.isEmpty(fileList)) {
+                return ResultUtils.getFailedResultData("没有上传成功的文件");
+            }
+            fileList.forEach(x -> x.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED));
+            int savedCount = QFsFileInfo.fsFileInfo.save(fileList);
+            if (savedCount > 0) {
+                return ResultUtils.getSuccessResultData(fileList);
+            }
+            return ResultUtils.getFailedResultData("文件对象保存数据库失败");
+
+        } catch (IOException e) {
+            log.error("上传文件失败：" + e);
+        }
+        return ResultUtils.getFailedResultData("上传失败");
+    }
+
 
 }
