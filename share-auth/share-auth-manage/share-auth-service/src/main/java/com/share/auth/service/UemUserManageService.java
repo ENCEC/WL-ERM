@@ -1,5 +1,6 @@
 package com.share.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.share.auth.domain.SysRoleDTO;
 import com.share.auth.domain.UemUserDto;
@@ -332,5 +333,16 @@ public interface UemUserManageService {
      * @return
      */
     ResultHelper<?> queryPostOfDept();
+
+    /**
+     * 批量上传文件
+     * @param uemUserId
+     * @param file
+     * @param fileType
+     * @param systemId
+     * @return
+     * @throws JsonProcessingException
+     */
+    ResultHelper<?> batchUploadFile (Long uemUserId,MultipartFile[] file,String[] fileType,String systemId) throws JsonProcessingException;
 
 }

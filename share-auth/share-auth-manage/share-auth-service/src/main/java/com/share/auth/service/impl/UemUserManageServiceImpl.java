@@ -3,6 +3,9 @@ package com.share.auth.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
@@ -1076,6 +1079,40 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             return CommonResult.getSuccessResultData(result);
         } else {
             return CommonResult.getFaildResultData("查询失败！");
+        }
+    }
+
+    /**
+     * 批量上传文件
+     * @param uemUserId
+     * @param file
+     * @param fileType
+     * @param systemId
+     * @return
+     * @throws JsonProcessingException
+     */
+    @Override
+    public ResultHelper<?> batchUploadFile(Long uemUserId,MultipartFile[] file, String[] fileType, String systemId) throws JsonProcessingException {
+        Map<String, Object> map = shareFileInterface.batchUploadFile(file, fileType, systemId);
+        ObjectMapper mapper = new ObjectMapper();
+        String result = mapper.writeValueAsString(map);
+        JsonNode jsonNode = mapper.readTree(result);
+        String files="";
+        List<String> fileKeys = new ArrayList<>();
+        int size = map.size();
+        for (int i = 0; i < size; i++) {
+            String fileKey = jsonNode.path("data").get(i).path("fileKey").asText();
+            files=files+fileKey+",";
+            fileKeys.add(fileKey);
+        }
+        UemUser uemUser = QUemUser.uemUser.selectOne().byId(uemUserId);
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        uemUser.setStaffApplication(files);
+        int count = QUemUser.uemUser.save(uemUser);
+        if (count > 0) {
+            return CommonResult.getSuccessResultData(fileKeys);
+        } else {
+            return CommonResult.getFaildResultData("上传失败");
         }
     }
 

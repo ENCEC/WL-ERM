@@ -1,5 +1,6 @@
 package com.share.auth.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.train.api.AuthInfoInterface;
 import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
@@ -15,6 +16,7 @@ import com.share.auth.model.entity.UemDept;
 import com.share.auth.model.entity.UemProject;
 import com.share.auth.model.vo.QueryWorkUserVo;
 import com.share.auth.service.UemUserManageService;
+import com.share.file.api.ShareFileInterface;
 import com.share.file.domain.FileInfoVO;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -29,9 +31,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -53,6 +57,9 @@ public class UemUserManageController {
 
     @Autowired
     private AuthInfoInterface authInfoInterface;
+
+    @Autowired
+    private ShareFileInterface shareFileInterface;
 
     /**
      * 根据用户名、姓名或启禁用状态查询用户信息
@@ -508,4 +515,19 @@ public class UemUserManageController {
     public ResultHelper<?> queryPostOfDept() {
         return uemUserManageService.queryPostOfDept();
     }
+
+    /**
+     * 批量上传文件
+     * @param uemUserId
+     * @param file
+     * @param fileType
+     * @param systemId
+     * @return
+     * @throws JsonProcessingException
+     */
+    @RequestMapping(value = "/batchUploadFile")
+    public ResultHelper<?> batchUploadFile(@RequestParam("uemUserId")Long uemUserId,@RequestPart("file") MultipartFile[] file,@RequestParam("fileType") String[] fileType,@RequestParam("systemId") String systemId) throws JsonProcessingException {
+        return uemUserManageService.batchUploadFile(uemUserId,file,fileType,systemId);
+    }
+
 }

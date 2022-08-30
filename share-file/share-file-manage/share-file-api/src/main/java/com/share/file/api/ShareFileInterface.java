@@ -7,6 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -92,4 +93,15 @@ public interface ShareFileInterface {
 	 */
 	@RequestMapping(value = "/externalFile/getFullUrlMap")
 	Map<String, FastDfsTokenResult> getFullUrlMap(List<FileInfoVO> fileInfoList);
+
+	/**
+	 * 批量上传文件
+	 * @param file
+	 * @param fileType
+	 * @param systemId
+	 * @return
+	 */
+	@RequestMapping(value = "/fileInfo/batchUploadFile",consumes = "multipart/form-data")
+	Map<String, Object> batchUploadFile(@RequestPart("file") MultipartFile[] file,@RequestParam("fileType") String[] fileType,@RequestParam("systemId") String systemId);
+
 }

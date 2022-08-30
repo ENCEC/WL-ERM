@@ -65,4 +65,13 @@ public interface FileInfoService {
 	 */
 	Map<String, Object> saveCurrentSystem(String systemCode);
 
+	/**
+	 * 批量上传文件
+	 * @param files
+	 * @param fileType
+	 * @param systemId
+	 * @return
+	 */
+	Map<String, Object> batchUploadFile(MultipartFile[] files, String[] fileType, String systemId);
+
 }
