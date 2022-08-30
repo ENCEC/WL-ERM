@@ -593,6 +593,9 @@ public class SysResourceServiceImpl implements SysResourceService {
     @Override
     public ResultHelper<Object> updateResource(SysResourceDTO sysResourceDTO) {
         Long resourceId = sysResourceDTO.getSysResourceId();
+        if (Objects.isNull(resourceId)) {
+            return CommonResult.getFaildResultData("资源id不能为空");
+        }
         String resourceTitle = sysResourceDTO.getResourceTitle();
         Long resourcePid = sysResourceDTO.getResourcePid();
         String resourceUrl = sysResourceDTO.getResourceUrl();
@@ -601,7 +604,11 @@ public class SysResourceServiceImpl implements SysResourceService {
         String component = sysResourceDTO.getComponent();
         String resourceLogo = sysResourceDTO.getResourceLogo();
         Long sysApplicationId = sysResourceDTO.getSysApplicationId();
-        SysResource sysResource = QSysResource.sysResource.selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
+        SysResource sysResource = QSysResource.sysResource
+                .selectOne(QSysResource.sysResource.fieldContainer()).byId(resourceId);
+        if (sysResource == null) {
+            return CommonResult.getFaildResultData("查询结果为空!");
+        }
         sysResource.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         sysResource.setResourcePid(resourcePid);
         sysResource.setSysApplicationId(sysApplicationId);
@@ -624,6 +631,9 @@ public class SysResourceServiceImpl implements SysResourceService {
     @Override
     public ResultHelper<Object> updateResourceStatus(SysResourceDTO sysResourceDTO) {
         Long resourceId = sysResourceDTO.getSysResourceId();
+        if (Objects.isNull(resourceId)) {
+            return CommonResult.getFaildResultData("资源id不能为空");
+        }
         //是否禁用（0禁用，1启用）
         Boolean isValid = sysResourceDTO.getIsValid();
 

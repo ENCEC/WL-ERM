@@ -418,9 +418,29 @@ public class UemUserManageController {
         return uemUserManageService.uploadExternalFile(uemUserId, systemId, fileType, fileName, type, file);
     }
 
+    /**
+     * 上传文件
+     *
+     * @param fileInfoVO
+     * @return
+     */
+
     @PostMapping("/downloadExternalFile")
     public ResultHelper<?> downloadExternalFile(@RequestBody FileInfoVO fileInfoVO) {
         return uemUserManageService.downloadExternalFile(fileInfoVO);
+
+    }
+
+    /**
+     * 批量下载文件
+     *
+     * @param fileInfoVO
+     * @return
+     */
+
+    @PostMapping("/batchDownloadFile")
+    public ResultHelper<?> batchDownloadFile(@RequestBody FileInfoVO fileInfoVO) {
+        return uemUserManageService.batchDownloadFile(fileInfoVO);
 
     }
 

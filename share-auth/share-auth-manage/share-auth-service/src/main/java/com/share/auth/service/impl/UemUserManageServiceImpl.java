@@ -95,7 +95,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                                 .and(QUemUser.name.like(":name"))
                                 .and(QUemUser.isValid.eq(":isValid"))
                                 .and(QUemUser.isDeleted.eq$(false))
-        ).paging(pageNo, pageSize)
+                ).paging(pageNo, pageSize)
                 .sorting(QUemUser.createTime.desc())
                 .mapperTo(UemUserDto.class)
                 .execute(uemUserDto);
@@ -126,7 +126,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         int offset = pageNo * pageSize;
         Page<QueryWorkUserVo> page = new Page<>();
         int count = jdbcTemplate.queryForList(
-                "SELECT COUNT(`uem_user_id`) FROM uem_user WHERE is_deleted=0 AND job_status<>2;", Integer.class)
+                        "SELECT COUNT(`uem_user_id`) FROM uem_user WHERE is_deleted=0 AND job_status<>2;", Integer.class)
                 .get(0);
         List<QueryWorkUserVo> uemUserDtoList = jdbcTemplate.query(
                 "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` " +
@@ -571,7 +571,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Override
     public ResultHelper<Object> updateStaff(UemUserDto uemUserDto) {
         Long uemUserId = uemUserDto.getUemUserId();
-        // String account = uemUserDto.getAccount();
+        if (Objects.isNull(uemUserId)) {
+            return CommonResult.getFaildResultData("用户id不能为空");
+        }
         String name = uemUserDto.getName();
         Boolean sex = uemUserDto.getSex();
         String birthday = uemUserDto.getBirthday();
@@ -589,7 +591,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         String speciality = uemUserDto.getSpeciality();
         Date entryDate = uemUserDto.getEntryDate();
         Long uemDeptId = uemUserDto.getUemDeptId();
-        String staffDutyCode = uemUserDto.getStaffDutyCode();
         Long technicalTitleId = uemUserDto.getTechnicalTitleId();
         String email = uemUserDto.getEmail();
         BigDecimal seniority = uemUserDto.getSeniority();
@@ -597,10 +598,12 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         Long staffDutyId = uemUserDto.getStaffDutyId();
         //根据id查询出对应的员工信息，避免空字段
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
+        if (uemUser == null) {
+            return CommonResult.getFaildResultData("查询结果为空!");
+        }
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         uemUser.setUemUserId(uemUserId);
         uemUser.setPoliticalStatus(politicalStatus);
-        //  uemUser.setAccount(account);
         uemUser.setSex(sex);
         uemUser.setBirthday(birthday);
         uemUser.setJobStatus(jobStatus);
@@ -678,6 +681,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Override
     public ResultHelper<Object> saveResignInfo(UemUserDto uemUserDto) {
         Long uemUserId = uemUserDto.getUemUserId();
+        if (Objects.isNull(uemUserId)) {
+            return CommonResult.getFaildResultData("用户id不能为空!");
+        }
         Date leaveDate = uemUserDto.getLeaveDate();
         String leaveReason = uemUserDto.getLeaveReason();
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
@@ -703,6 +709,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Override
     public ResultHelper<Object> saveDismissInfo(UemUserDto uemUserDto) {
         Long uemUserId = uemUserDto.getUemUserId();
+        if (Objects.isNull(uemUserId)) {
+            return CommonResult.getFaildResultData("用户id不能为空!");
+        }
         Date dismissDate = uemUserDto.getDismissDate();
         String dismissReason = uemUserDto.getDismissReason();
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
@@ -954,6 +963,30 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             return CommonResult.getFaildResultData("file为空，下载失败！");
         } else {
             return CommonResult.getSuccessResultData(file);
+        }
+    }
+
+    /**
+     * 批量下载文件
+     *
+     * @param fileInfoVO
+     * @return
+     */
+    @Override
+    public ResultHelper<?> batchDownloadFile(FileInfoVO fileInfoVO) {
+        String[] fileKeys = fileInfoVO.getFileKeys();
+        List<String> files = new ArrayList<>();
+        for (String f : fileKeys) {
+            fileInfoVO.setFileKey(f);
+            FastDfsDownloadResult fastDfsDownloadResult = shareFileInterface.downloadExternalFile(fileInfoVO);
+            String file = fastDfsDownloadResult.getFile();
+            files.add(file);
+        }
+        int size = files.size();
+        if (size == 0) {
+            return CommonResult.getFaildResultData("file为空，下载失败！");
+        } else {
+            return CommonResult.getSuccessResultData(files);
         }
     }
 

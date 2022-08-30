@@ -4,6 +4,7 @@ import lombok.Data;
 
 /**
  * 文件信息V0
+ *
  * @author wangcl
  * @date 20201103
  */
@@ -17,4 +18,9 @@ public class FileInfoVO {
      * 文件Id
      */
     private String fileKey;
+
+    /**
+     * 文件Id数组
+     */
+    private String[] fileKeys;
 }

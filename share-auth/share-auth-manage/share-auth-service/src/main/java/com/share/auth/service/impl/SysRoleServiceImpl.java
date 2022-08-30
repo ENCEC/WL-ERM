@@ -375,7 +375,6 @@ public class SysRoleServiceImpl implements SysRoleService {
         sysRole.setRemark(remark);
         sysRole.setIsValid(true);
         QSysRole.sysRole.save(sysRole);
-        System.out.println(sysRole);
         //查询角色的id插入中间表
         Long sysRoleId = sysRole.getSysRoleId();
         // 判断是角色id否存在

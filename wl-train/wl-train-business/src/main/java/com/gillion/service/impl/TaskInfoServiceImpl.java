@@ -744,10 +744,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      * @date 2022-08-09
      */
     @Override
-    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId/*, Long taskDetailId*/) {
+    public ResultHelper<TaskDetailInfoDto> queryPositiveApply(Long taskInfoId) {
         Map<String, Long> parms = new HashMap<>(2);
         parms.put("taskInfoId", taskInfoId);
-        // parms.put("taskDetailId", taskDetailId);
         TaskDetailInfoDto result = DSContext.customization("WL-ERM_queryPositiveApply")
                 .selectOne().mapperTo(TaskDetailInfoDto.class)
                 .execute(parms);
@@ -776,6 +775,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Override
     public ResultHelper<Object> savePositiveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
+        if (uemUserId == null) {
+            return CommonResult.getFaildResultData("用户id不能为空!");
+        }
         UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
         String name = uemUserDto.getName();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
@@ -784,6 +786,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         String faceScore = taskDetailInfoDto.getFaceScore();
         String faceRemark = taskDetailInfoDto.getFaceRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne(QTaskDetailInfo.taskDetailInfo.fieldContainer()).byId(taskDetailId);
+        if (Objects.isNull(taskDetailInfo)) {
+            return CommonResult.getFaildResultData("查询结果为空!");
+        }
         taskDetailInfo.setApprover(uemUserId);
         taskDetailInfo.setApproverName(name);
         taskDetailInfo.setFaceTime(faceTime);
@@ -808,15 +813,20 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Override
     public ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
+        if (uemUserId == null) {
+            return CommonResult.getFaildResultData("用户id不能为空!");
+        }
         UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
         String name = uemUserDto.getName();
-        Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
         Date auditDate = taskDetailInfoDto.getAuditDate();
         String auditResult = taskDetailInfoDto.getAuditResult();
         String auditRemark = taskDetailInfoDto.getAuditRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
+        if (Objects.isNull(taskDetailInfo)) {
+            return CommonResult.getFaildResultData("查询结果为空!");
+        }
         taskDetailInfo.setAuditId(uemUserId);
         taskDetailInfo.setAuditName(name);
         taskDetailInfo.setAuditDate(auditDate);
@@ -841,14 +851,19 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     @Override
     public ResultHelper<Object> savePositiveInfoByLeader(TaskDetailInfoDto taskDetailInfoDto) {
-        Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
+        if (taskInfoId == null) {
+            return CommonResult.getFaildResultData("任务id不能为空!");
+        }
         Date approvalDate = taskDetailInfoDto.getApprovalDate();
         String resultAccess = taskDetailInfoDto.getResultAccess();
         String offerRemark = taskDetailInfoDto.getOfferRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
         TaskInfo taskInfo = QTaskInfo.taskInfo.selectOne().where(QTaskInfo.taskInfoId.eq$(taskInfoId)).execute();
+        if (Objects.isNull(taskInfo)) {
+            return CommonResult.getFaildResultData("查询结果为空!");
+        }
         taskInfo.setStatus(2);
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         QTaskInfo.taskInfo.save(taskInfo);
@@ -875,12 +890,18 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     public ResultHelper<Object> saveLeaveInfoByLeader(TaskDetailInfoDto taskDetailInfoDto) {
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
+        if ((taskDetailId == null) || (taskInfoId == null)) {
+            return CommonResult.getFaildResultData("任务id与任务详情id都不能为空!");
+        }
         Date approvalDate = taskDetailInfoDto.getApprovalDate();
         String resultAccess = taskDetailInfoDto.getResultAccess();
         String approvalRemark = taskDetailInfoDto.getApprovalRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)
                         .and(QTaskDetailInfo.taskDetailId.eq$(taskDetailId))).execute();
+        if (Objects.isNull(taskDetailInfo)) {
+            return CommonResult.getFaildResultData("查询结果为空!");
+        }
         taskDetailInfo.setApprovalDate(approvalDate);
         taskDetailInfo.setResultAccess(resultAccess);
         taskDetailInfo.setApprovalRemark(approvalRemark);
@@ -908,6 +929,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     public ResultHelper<Object> savePositiveInfoByStaff(TaskDetailInfoDTO taskDetailInfoDTO) {
         Long uemUserId = taskDetailInfoDTO.getUemUserId();
         Long taskInfoId = taskDetailInfoDTO.getTaskInfoId();
+        if ((uemUserId == null) || (taskInfoId == null)) {
+            return CommonResult.getFaildResultData("用户id与任务详情id都不能为空!");
+        }
         Date offerDate = taskDetailInfoDTO.getOfferDate();
         String offerType = taskDetailInfoDTO.getOfferType();
         String faceScore = taskDetailInfoDTO.getFaceScore();

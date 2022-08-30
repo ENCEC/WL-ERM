@@ -272,6 +272,15 @@ public interface UemUserManageService {
     ResultHelper<?> downloadExternalFile(FileInfoVO fileInfoVO);
 
     /**
+     * 批量下载文件
+     *
+     * @param fileInfoVO
+     * @return
+     */
+    ResultHelper<?> batchDownloadFile(FileInfoVO fileInfoVO);
+
+
+    /**
      * 下拉框查询所有岗位的信息
      *
      * @return
