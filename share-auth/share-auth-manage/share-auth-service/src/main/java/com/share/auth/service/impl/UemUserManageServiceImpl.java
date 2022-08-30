@@ -331,7 +331,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         uemUser.setJobStatus(0L);
         uemUser.setIsDeleted(false);
         // 设置密码
-        String passwordText = RandomUtil.randomString(12);
+        String passwordText = RandomUtil.randomString(6);
         String password = MD5EnCodeUtils.encryptionPassword(passwordText);
         uemUser.setPassword(password);
         // 新增用户
@@ -366,7 +366,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             return CommonResult.getFaildResultData("用户不存在");
         }
         // 生成新密码
-        String passwordText = RandomUtil.randomString(12);
+        String passwordText = RandomUtil.randomString(6);
         String password = MD5EnCodeUtils.encryptionPassword(passwordText);
         // 更新用户
         uemUser.setPassword(password);
