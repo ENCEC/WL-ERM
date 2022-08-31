@@ -538,6 +538,7 @@ public class UemUserManageController {
 
     /**
      * 批量上传文件
+     *
      * @param uemUserId
      * @param file
      * @param fileType
@@ -546,8 +547,8 @@ public class UemUserManageController {
      * @throws JsonProcessingException
      */
     @RequestMapping(value = "/batchUploadFile")
-    public ResultHelper<?> batchUploadFile(@RequestParam("uemUserId")Long uemUserId,@RequestPart("file") MultipartFile[] file,@RequestParam("fileType") String[] fileType,@RequestParam("systemId") String systemId) throws JsonProcessingException {
-        return uemUserManageService.batchUploadFile(uemUserId,file,fileType,systemId);
+    public ResultHelper<?> batchUploadFile(@RequestParam("uemUserId") Long uemUserId, @RequestPart("file") MultipartFile[] file, @RequestParam("fileType") String[] fileType, @RequestParam("systemId") String systemId) throws JsonProcessingException {
+        return uemUserManageService.batchUploadFile(uemUserId, file, fileType, systemId);
     }
 
 }
