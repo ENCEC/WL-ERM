@@ -155,11 +155,13 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
         }
         List<Role> roleList = user.getRoleList();
         for (Role role : roleList) {
-            if ("ADMIN".equals(role.getRoleName())) {
+            if ("ADMIN".equals(role.getRoleName()) ||
+                    "GM".equals(role.getRoleName()) ||
+                    "VGM".equals(role.getRoleName())) {
                 dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.SELECT));
                 dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.DELETE));
                 dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.UPDATE));
-//                dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.INSERT));
+                dataPermissions.add(new DataPermission("uem_user_id IS NOT NULL", CrudType.INSERT));
                 return;
             }
         }
@@ -185,8 +187,6 @@ public class DefaultUserService implements UserService, UserInfoCollector, IThre
                         uemUserIdSet.add(project.getDemandId());
                         break;
                     case "PM":
-                    case "GM":
-                    case "VGM":
                         uemUserIdSet.addAll(parseIdList(project.getGenDevUsers()));
                         uemUserIdSet.addAll(parseIdList(project.getGenDemandUsers()));
                         uemUserIdSet.add(project.getDutyId());

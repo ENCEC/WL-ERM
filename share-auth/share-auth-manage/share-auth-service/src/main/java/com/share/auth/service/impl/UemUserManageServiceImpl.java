@@ -98,12 +98,44 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                                 .and(QUemUser.name.like(":name"))
                                 .and(QUemUser.isValid.eq(":isValid"))
                                 .and(QUemUser.isDeleted.eq$(false))
-                ).paging(pageNo, pageSize)
+        ).paging(pageNo, pageSize)
                 .sorting(QUemUser.createTime.desc())
                 .mapperTo(UemUserDto.class)
                 .execute(uemUserDto);
 
         return CommonResult.getSuccessResultData(uemUserDtoPage);
+    }
+
+    /**
+     * 根据用户ID列表查询用户信息
+     *
+     * @param uemUserDto 用户信息封装类
+     * @return ResultHelper<List < UemUserDto>>
+     * @date 2022-08-31
+     */
+    @Override
+    public ResultHelper<List<UemUserDto>> queryUemUserListById(UemUserDto uemUserDto) {
+        List<Long> uemUserIdList = uemUserDto.getUemUserIdList();
+        if (uemUserIdList.isEmpty()) {
+            return CommonResult.getSuccessResultData(new ArrayList<>());
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append('(');
+        for (Long uemUserId : uemUserIdList) {
+            stringBuilder.append(uemUserId);
+            stringBuilder.append(',');
+        }
+        stringBuilder.setCharAt(stringBuilder.length() - 1, ')');
+        List<UemUserDto> uemUserDtoList = jdbcTemplate.query(
+                "SELECT * FROM uem_user WHERE `uem_user_id` IN ? AND `is_deleted=0`",
+                BeanPropertyRowMapper.newInstance(UemUserDto.class), stringBuilder.toString());
+//        List<UemUserDto> uemUserDtoList = QUemUser.uemUser
+//                .select(QUemUser.uemUser.fieldContainer())
+//                .where(QUemUser.uemUserId.in$(uemUserIdList).and(QUemUser.isDeleted.eq$(false)))
+//                .sorting(QUemUser.createTime.desc())
+//                .mapperTo(UemUserDto.class)
+//                .execute(uemUserDto);
+        return CommonResult.getSuccessResultData(uemUserDtoList);
     }
 
     /**
@@ -116,25 +148,20 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     public ResultHelper<Page<QueryWorkUserVo>> queryAllWorkUserList(UemUserDto uemUserDto) {
-//        String account = uemUserDto.getAccount();
-//        String name = uemUserDto.getName();
-//        if (!StringUtils.isEmpty(account)) {
-//            uemUserDto.setAccount("%" + account + "%");
-//        }
-//        if (!StringUtils.isEmpty(name)) {
-//            uemUserDto.setName("%" + name + "%");
-//        }
+        String name = uemUserDto.getName();
+        name = StrUtil.isEmpty(name) ? "%" : "%" + name + "%";
         int pageNo = (uemUserDto.getPageNo() == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : uemUserDto.getPageNo();
         int pageSize = (uemUserDto.getPageSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : uemUserDto.getPageSize();
-        int offset = pageNo * pageSize;
+        int offset = (pageNo - 1) * pageSize;
         Page<QueryWorkUserVo> page = new Page<>();
         int count = jdbcTemplate.queryForList(
-                        "SELECT COUNT(`uem_user_id`) FROM uem_user WHERE is_deleted=0 AND job_status<>2;", Integer.class)
+                "SELECT COUNT(`uem_user_id`) FROM uem_user " +
+                        "WHERE `name` LIKE ? AND `is_deleted`=0 AND `job_status`<>2;", Integer.class, name)
                 .get(0);
         List<QueryWorkUserVo> uemUserDtoList = jdbcTemplate.query(
-                "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` " +
-                        "FROM uem_user WHERE is_deleted=0 AND job_status<>2 LIMIT ?,?;",
-                BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class), offset, pageSize);
+                "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` FROM uem_user " +
+                        "WHERE `name` LIKE ? AND `is_deleted`=0 AND `job_status`<>2 LIMIT ?,?;",
+                BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class), name, offset, pageSize);
         page.setRecords(uemUserDtoList);
         page.setTotalRecord(count);
         page.setPageSize(pageSize);

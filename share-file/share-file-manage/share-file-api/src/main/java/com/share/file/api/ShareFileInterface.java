@@ -1,13 +1,10 @@
 package com.share.file.api;
 
 import com.share.file.domain.*;
-import com.share.file.domain.FastDfsDeleteResult;
-import com.share.file.domain.FileInfoVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 

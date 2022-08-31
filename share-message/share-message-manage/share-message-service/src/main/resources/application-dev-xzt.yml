@@ -299,6 +299,9 @@ hystrix:
           thread:
             timeoutInMilliseconds: 50000
 
+#网站域名
+web_domain: null
+
 # spring boot安全检查
 management:
   endpoints:

@@ -35,6 +35,15 @@ public class UemUserDto extends BaseModel implements Serializable {
     private Long uemUserId;
 
     /**
+     * 主键id数组
+     */
+    @ApiModelProperty("主键数组")
+    private List<String> uemUserIds;
+
+    @ApiModelProperty("用户ID列表")
+    private List<Long> uemUserIdList;
+
+    /**
      * 用户名
      */
     @ApiModelProperty("用户名")
@@ -231,20 +240,6 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String leaveReason;
 
     /**
-     * 辞退时间
-     */
-    @ApiModelProperty("辞退时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
-    private Date dismissDate;
-
-    /**
-     * 辞退原因
-     */
-    @ApiModelProperty("辞退原因")
-    private String dismissReason;
-
-    /**
      * 婚姻状况（0：未婚 1：已婚 2：离婚）
      */
     @ApiModelProperty("婚姻状况（0：未婚 1：已婚 2：离婚）")
@@ -301,6 +296,20 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String offerReason;
 
     /**
+     * 辞退时间
+     */
+    @ApiModelProperty("辞退时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date dismissDate;
+
+    /**
+     * 辞退原因
+     */
+    @ApiModelProperty("辞退原因")
+    private String dismissReason;
+
+    /**
      * 来源应用
      */
     @ApiModelProperty("来源应用")
@@ -345,6 +354,18 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String resume;
 
     /**
+     * 员工转正申请表
+     */
+    @ApiModelProperty("员工转正申请表")
+    private String staffApplication;
+
+    /**
+     * 员工辞退申请表
+     */
+    @ApiModelProperty(name = "员工辞退申请表")
+    private String dismissApplication;
+
+    /**
      * 用户评分
      */
     @ApiModelProperty("用户评分")
@@ -381,6 +402,29 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String sourceAddress;
 
     /**
+     * 转正类型
+     */
+    @ApiModelProperty("转正类型")
+    private Long positiveType;
+    /**
+     * 答辩成绩
+     */
+    @ApiModelProperty("答辩成绩")
+    private Long defenseScore;
+
+    /**
+     * 面谈评语
+     */
+    @ApiModelProperty("面谈评语")
+    private String interviewComments;
+
+    /**
+     * 转正评语
+     */
+    @ApiModelProperty("转正评语")
+    private String positiveComments;
+
+    /**
      * 在校专业
      */
     @ApiModelProperty("在校专业")
@@ -393,16 +437,18 @@ public class UemUserDto extends BaseModel implements Serializable {
     private String staffDuty;
 
     /**
+     * 人员岗位ID
+     */
+    @ApiModelProperty("人员岗位ID")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long staffDutyId;
+
+    /**
      * 人员岗位code
      */
     @ApiModelProperty("人员岗位code")
     private String staffDutyCode;
-
-    /**人员岗位ID*/
-    @ApiModelProperty("人员岗位id")
-    @JsonSerialize(using = Long2String.class)
-    @JsonDeserialize(using = String2Long.class)
-    private Long staffDutyId;
 
     /**
      * 岗位级别
@@ -494,4 +540,5 @@ public class UemUserDto extends BaseModel implements Serializable {
 
     @ApiModelProperty("政治面貌")
     private String politicalStatus;
+
 }

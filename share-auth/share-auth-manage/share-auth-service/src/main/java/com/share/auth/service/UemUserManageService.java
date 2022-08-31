@@ -36,6 +36,15 @@ public interface UemUserManageService {
     ResultHelper<Page<UemUserDto>> queryUemUser(UemUserDto uemUserDto);
 
     /**
+     * 根据用户ID列表查询用户信息
+     *
+     * @param uemUserDto 用户信息封装类
+     * @return ResultHelper<List < UemUserDto>>
+     * @date 2022-08-31
+     */
+    ResultHelper<List<UemUserDto>> queryUemUserListById(UemUserDto uemUserDto);
+
+    /**
      * 根据用户名、姓名查询所有在职用户列表
      *
      * @param uemUserDto 查询入参

@@ -31,11 +31,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -77,6 +75,20 @@ public class UemUserManageController {
     @PostMapping("/queryUemUser")
     public ResultHelper<Page<UemUserDto>> queryUemUser(@RequestBody UemUserDto uemUserDto) {
         return uemUserManageService.queryUemUser(uemUserDto);
+    }
+
+    /**
+     * 根据用户ID列表查询用户信息
+     *
+     * @param uemUserDto 用户信息封装类
+     * @return ResultHelper<Page < UemUserDto>>
+     * @date 2022-08-31
+     */
+    @ApiOperation("根据用户ID列表查询用户信息")
+    @ApiImplicitParam(name = "uemUserIdList", value = "用户ID列表", dataTypeClass = List.class, paramType = "body")
+    @PostMapping("/queryUemUserListById")
+    public ResultHelper<List<UemUserDto>> queryUemUserListById(@RequestBody UemUserDto uemUserDto) {
+        return uemUserManageService.queryUemUserListById(uemUserDto);
     }
 
     /**
