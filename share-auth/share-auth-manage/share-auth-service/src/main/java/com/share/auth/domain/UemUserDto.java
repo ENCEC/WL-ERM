@@ -39,6 +39,10 @@ public class UemUserDto extends BaseModel implements Serializable {
      */
     @ApiModelProperty("主键数组")
     private List<String> uemUserIds;
+
+    @ApiModelProperty("用户ID列表")
+    private List<Long> uemUserIdList;
+
     /**
      * 用户名
      */

@@ -98,12 +98,31 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                                 .and(QUemUser.name.like(":name"))
                                 .and(QUemUser.isValid.eq(":isValid"))
                                 .and(QUemUser.isDeleted.eq$(false))
-                ).paging(pageNo, pageSize)
+        ).paging(pageNo, pageSize)
                 .sorting(QUemUser.createTime.desc())
                 .mapperTo(UemUserDto.class)
                 .execute(uemUserDto);
 
         return CommonResult.getSuccessResultData(uemUserDtoPage);
+    }
+
+    /**
+     * 根据用户ID列表查询用户信息
+     *
+     * @param uemUserDto 用户信息封装类
+     * @return ResultHelper<List < UemUserDto>>
+     * @date 2022-08-31
+     */
+    @Override
+    public ResultHelper<List<UemUserDto>> queryUemUserListById(UemUserDto uemUserDto) {
+        List<Long> uemUserIdList = uemUserDto.getUemUserIdList();
+        List<UemUserDto> uemUserDtoList = QUemUser.uemUser
+                .select(QUemUser.uemUser.fieldContainer())
+                .where(QUemUser.uemUserId.in$(uemUserIdList).and(QUemUser.isDeleted.eq$(false)))
+                .sorting(QUemUser.createTime.desc())
+                .mapperTo(UemUserDto.class)
+                .execute(uemUserDto);
+        return CommonResult.getSuccessResultData(uemUserDtoList);
     }
 
     /**
