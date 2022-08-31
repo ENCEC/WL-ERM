@@ -234,7 +234,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         retTaskInfo.setPublishDate(new Date());
         retTaskInfo.setStartDate(planStartDate);
         retTaskInfo.setStatus(0);
-        taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        retTaskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         return null;
     }
 
