@@ -143,7 +143,7 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         // 获取入职时间
         Date entryDate = executorUemUserDto.getEntryDate();
         // 遍历选中标准条目细则并生成任务细节
-        int seriesNum = 0;
+        int seriesNum = 1;
         Date planStartDate = null;
         Date planEndDate = null;
         for (TaskDetailInfoDto taskDetailInfoDto : taskInfoDto.getTaskDetailInfoDtoList()) {
