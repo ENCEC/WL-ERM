@@ -183,6 +183,7 @@ ec:
     interceptor:
       dataPermission:
         enabled: true
+        showSql: true
         allowFullTableQuery: "uem_user,sys_application,sys_dict_type,uem_id_card,md_country"
 # redis配置
 redis:
