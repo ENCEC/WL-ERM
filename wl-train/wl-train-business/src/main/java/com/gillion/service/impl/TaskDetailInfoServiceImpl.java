@@ -15,6 +15,7 @@ import com.gillion.train.api.model.vo.TaskDetailInfoDTO;
 import com.share.auth.api.StandardEntryInterface;
 import com.share.auth.api.TaskDetailInfoInterface;
 import com.share.auth.api.TaskInfoInterface;
+import com.share.auth.api.UemUserInterface;
 import com.share.auth.domain.UemUserDto;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +47,8 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
     @Autowired
     private TaskDetailInfoInterface taskDetailInfoInterface;
 
+    @Autowired
+    private UemUserInterface uemUserInterface;
     /**
      * 转正申请
      *
@@ -77,6 +81,13 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
         taskDetailInfo.setOfferType(taskDetailInfoDTO.getOfferType());
         taskDetailInfo.setApprover(taskDetailInfoDTO.getApprover());
+        List<Long> list = new ArrayList<>();
+        list.add(taskDetailInfoDTO.getApprover());
+        UemUserDto uemUserDto = new UemUserDto();
+        uemUserDto.setUemUserIdList(list);
+        ResultHelper<List<UemUserDto>> listResultHelper = uemUserInterface.queryUemUserListById(uemUserDto);
+        String name = listResultHelper.getData().get(0).getName();
+        taskDetailInfo.setApproverName(name);
         taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         return CommonResult.getSuccessResultData("提交转正申请成功");
@@ -114,6 +125,13 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
         taskDetailInfo.setApprover(taskDetailInfoDTO.getApprover());
+        List<Long> list = new ArrayList<>();
+        list.add(taskDetailInfoDTO.getApprover());
+        UemUserDto uemUserDto = new UemUserDto();
+        uemUserDto.setUemUserIdList(list);
+        ResultHelper<List<UemUserDto>> listResultHelper = uemUserInterface.queryUemUserListById(uemUserDto);
+        String name = listResultHelper.getData().get(0).getName();
+        taskDetailInfo.setApproverName(name);
         taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         return CommonResult.getSuccessResultData("提交离职申请成功");
