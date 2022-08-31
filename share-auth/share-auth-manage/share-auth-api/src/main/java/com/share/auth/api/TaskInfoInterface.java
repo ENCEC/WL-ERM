@@ -2,8 +2,12 @@ package com.share.auth.api;
 
 import com.share.auth.domain.UemUserDto;
 import com.share.support.result.ResultHelper;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @ClassName TaskInfoInterface
@@ -33,6 +37,7 @@ public interface TaskInfoInterface {
      */
     @RequestMapping("/uemUserManage/queryUemUserById")
     UemUserDto queryUemUserById(@RequestParam(value = "uemUserId") Long uemUserId);
+
     /**
      * 服务调用---转正，离职，辞退---查看信息
      *
@@ -70,4 +75,14 @@ public interface TaskInfoInterface {
 
     @GetMapping("/uemUserManage/updateJobStatus")
     ResultHelper<Object> updateJobStatus(@RequestParam(value = "uemUserId") Long uemUserId);
+
+    /**
+     * 不受数据权限控制---查询user表信息
+     *
+     * @param uemUserDto
+     * @date 2022-08-31
+     */
+
+    @PostMapping("/uemUserManage/queryUemUserListById")
+    ResultHelper<List<UemUserDto>> queryUemUserListById(@RequestBody UemUserDto uemUserDto);
 }

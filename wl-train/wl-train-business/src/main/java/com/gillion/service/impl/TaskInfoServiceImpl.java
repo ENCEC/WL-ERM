@@ -782,11 +782,15 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Override
     public ResultHelper<Object> savePositiveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
+        List<Long> list = new ArrayList<>();
+        list.add(taskDetailInfoDto.getUemUserId());
         if (uemUserId == null) {
             return CommonResult.getFaildResultData("用户id不能为空!");
         }
-        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
-        String name = uemUserDto.getName();
+        UemUserDto uemUserDto = new UemUserDto();
+        uemUserDto.setUemUserIdList(list);
+        ResultHelper<List<UemUserDto>> listResultHelper = uemUserInterface.queryUemUserListById(uemUserDto);
+        String name = listResultHelper.getData().get(0).getName();
         Long taskDetailId = taskDetailInfoDto.getTaskDetailId();
         Date faceTime = taskDetailInfoDto.getFaceTime();
         String faceResult = taskDetailInfoDto.getFaceResult();
@@ -820,14 +824,22 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     @Override
     public ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto) {
         Long uemUserId = taskDetailInfoDto.getUemUserId();
+        List<Long> list = new ArrayList<>();
+        list.add(taskDetailInfoDto.getUemUserId());
+        list.add(taskDetailInfoDto.getApprover());
         if (uemUserId == null) {
             return CommonResult.getFaildResultData("用户id不能为空!");
         }
-        UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
-        String name = uemUserDto.getName();
+        UemUserDto uemUserDto = new UemUserDto();
+        uemUserDto.setUemUserIdList(list);
+        ResultHelper<List<UemUserDto>> listResultHelper = uemUserInterface.queryUemUserListById(uemUserDto);
+        String name = listResultHelper.getData().get(0).getName();
+        String approverName = listResultHelper.getData().get(1).getName();
+        // UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
         Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
         Date auditDate = taskDetailInfoDto.getAuditDate();
         String auditResult = taskDetailInfoDto.getAuditResult();
+        Long approver = taskDetailInfoDto.getApprover();
         String auditRemark = taskDetailInfoDto.getAuditRemark();
         TaskDetailInfo taskDetailInfo = QTaskDetailInfo.taskDetailInfo.selectOne()
                 .where(QTaskDetailInfo.taskInfoId.eq$(taskInfoId)).execute();
@@ -835,6 +847,8 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             return CommonResult.getFaildResultData("查询结果为空!");
         }
         taskDetailInfo.setAuditId(uemUserId);
+        taskDetailInfo.setApprover(approver);
+        taskDetailInfo.setApproverName(approverName);
         taskDetailInfo.setAuditName(name);
         taskDetailInfo.setAuditDate(auditDate);
         taskDetailInfo.setAuditRemark(auditRemark);
