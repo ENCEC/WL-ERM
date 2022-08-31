@@ -116,25 +116,20 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     public ResultHelper<Page<QueryWorkUserVo>> queryAllWorkUserList(UemUserDto uemUserDto) {
-//        String account = uemUserDto.getAccount();
-//        String name = uemUserDto.getName();
-//        if (!StringUtils.isEmpty(account)) {
-//            uemUserDto.setAccount("%" + account + "%");
-//        }
-//        if (!StringUtils.isEmpty(name)) {
-//            uemUserDto.setName("%" + name + "%");
-//        }
+        String name = uemUserDto.getName();
+        name = StrUtil.isEmpty(name) ? "%" : "%" + name + "%";
         int pageNo = (uemUserDto.getPageNo() == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : uemUserDto.getPageNo();
         int pageSize = (uemUserDto.getPageSize() == null) ? CodeFinal.PAGE_SIZE_DEFAULT : uemUserDto.getPageSize();
-        int offset = pageNo * pageSize;
+        int offset = (pageNo - 1) * pageSize;
         Page<QueryWorkUserVo> page = new Page<>();
         int count = jdbcTemplate.queryForList(
-                        "SELECT COUNT(`uem_user_id`) FROM uem_user WHERE is_deleted=0 AND job_status<>2;", Integer.class)
+                "SELECT COUNT(`uem_user_id`) FROM uem_user " +
+                        "WHERE `name` LIKE ? AND `is_deleted`=0 AND `job_status`<>2;", Integer.class, name)
                 .get(0);
         List<QueryWorkUserVo> uemUserDtoList = jdbcTemplate.query(
-                "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` " +
-                        "FROM uem_user WHERE is_deleted=0 AND job_status<>2 LIMIT ?,?;",
-                BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class), offset, pageSize);
+                "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` FROM uem_user " +
+                        "WHERE `name` LIKE ? AND `is_deleted`=0 AND `job_status`<>2 LIMIT ?,?;",
+                BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class), name, offset, pageSize);
         page.setRecords(uemUserDtoList);
         page.setTotalRecord(count);
         page.setPageSize(pageSize);
