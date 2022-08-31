@@ -127,8 +127,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
         stringBuilder.setCharAt(stringBuilder.length() - 1, ')');
         List<UemUserDto> uemUserDtoList = jdbcTemplate.query(
-                "SELECT * FROM uem_user WHERE `uem_user_id` IN ? AND `is_deleted=0`",
-                BeanPropertyRowMapper.newInstance(UemUserDto.class), stringBuilder.toString());
+                "SELECT * FROM uem_user WHERE `uem_user_id` IN " + stringBuilder.toString() + " AND `is_deleted`=0",
+                BeanPropertyRowMapper.newInstance(UemUserDto.class));
 //        List<UemUserDto> uemUserDtoList = QUemUser.uemUser
 //                .select(QUemUser.uemUser.fieldContainer())
 //                .where(QUemUser.uemUserId.in$(uemUserIdList).and(QUemUser.isDeleted.eq$(false)))
