@@ -60,7 +60,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
     public ResultHelper<?> saveOffer(TaskDetailInfoDTO taskDetailInfoDTO) {
         if (Objects.isNull(taskDetailInfoDTO.getApplyDate())
                 || StrUtil.isEmpty(taskDetailInfoDTO.getOfferType())
-                || Objects.isNull(taskDetailInfoDTO.getApprover())) {
+                || Objects.isNull(taskDetailInfoDTO.getAuditId())) {
             return CommonResult.getFaildResultData("必填项不能为空");
         }
         List<TaskInfo> taskInfos = QTaskInfo.taskInfo.select().where(QTaskInfo.taskTitle.eq$(taskDetailInfoDTO.getUemUserName() + "转正申请")).execute();
@@ -80,14 +80,14 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
         taskDetailInfo.setOfferType(taskDetailInfoDTO.getOfferType());
-        taskDetailInfo.setApprover(taskDetailInfoDTO.getApprover());
+        taskDetailInfo.setAuditId(taskDetailInfoDTO.getAuditId());
         List<Long> list = new ArrayList<>();
-        list.add(taskDetailInfoDTO.getApprover());
+        list.add(taskDetailInfoDTO.getAuditId());
         UemUserDto uemUserDto = new UemUserDto();
         uemUserDto.setUemUserIdList(list);
         ResultHelper<List<UemUserDto>> listResultHelper = uemUserInterface.queryUemUserListById(uemUserDto);
         String name = listResultHelper.getData().get(0).getName();
-        taskDetailInfo.setApproverName(name);
+        taskDetailInfo.setAuditName(name);
         taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         return CommonResult.getSuccessResultData("提交转正申请成功");
@@ -103,7 +103,7 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
     @Transactional(rollbackFor = Exception.class)
     public ResultHelper<?> saveLeave(TaskDetailInfoDTO taskDetailInfoDTO) {
         if (Objects.isNull(taskDetailInfoDTO.getApplyDate())
-                || Objects.isNull(taskDetailInfoDTO.getApprover())
+                || Objects.isNull(taskDetailInfoDTO.getAuditId())
                 || StrUtil.isEmpty(taskDetailInfoDTO.getLeaveReason())) {
             return CommonResult.getFaildResultData("必填项不能为空");
         }
@@ -124,14 +124,14 @@ public class TaskDetailInfoServiceImpl implements TaskDetailInfoService {
         TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
         taskDetailInfo.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         taskDetailInfo.setApplyDate(taskDetailInfoDTO.getApplyDate());
-        taskDetailInfo.setApprover(taskDetailInfoDTO.getApprover());
+        taskDetailInfo.setAuditId(taskDetailInfoDTO.getAuditId());
         List<Long> list = new ArrayList<>();
-        list.add(taskDetailInfoDTO.getApprover());
+        list.add(taskDetailInfoDTO.getAuditId());
         UemUserDto uemUserDto = new UemUserDto();
         uemUserDto.setUemUserIdList(list);
         ResultHelper<List<UemUserDto>> listResultHelper = uemUserInterface.queryUemUserListById(uemUserDto);
         String name = listResultHelper.getData().get(0).getName();
-        taskDetailInfo.setApproverName(name);
+        taskDetailInfo.setAuditName(name);
         taskDetailInfo.setTaskInfoId(taskInfo.getTaskInfoId());
         QTaskDetailInfo.taskDetailInfo.save(taskDetailInfo);
         return CommonResult.getSuccessResultData("提交离职申请成功");

@@ -84,6 +84,40 @@ public class TaskDetailInfoDTO extends BaseModel implements Serializable {
     private Long approver;
 
     /**
+     * 审核人id
+     */
+    @Column(name = "audit_id")
+    @JsonSerialize(using = Long2String.class)
+    @JsonDeserialize(using = String2Long.class)
+    private Long auditId;
+
+    /**
+     * 审核人姓名
+     */
+    @Column(name = "audit_name")
+    private String auditName;
+
+    /**
+     * 审核日期
+     */
+    @Column(name = "audit_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date auditDate;
+
+    /**
+     * 审核结果
+     */
+    @Column(name = "audit_result")
+    private String auditResult;
+
+    /**
+     * 审核意见
+     */
+    @Column(name = "audit_remark")
+    private String auditRemark;
+
+    /**
      * 创建时间
      */
     @Column(name = "create_time")
