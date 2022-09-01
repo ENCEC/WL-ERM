@@ -80,8 +80,12 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
         sysTechnicalTitle.setSeniority(sysTechnicalTitleAndPostVO.getSeniority());
         sysTechnicalTitle.setPostId(sysTechnicalTitleAndPostVO.getPostId());
         sysTechnicalTitle.setStatus("0");
-        QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
-        return CommonResult.getSuccessResultData("新增成功");
+        int save = QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
+        if (save > 0) {
+            return CommonResult.getSuccessResultData("新增成功");
+        } else {
+            return CommonResult.getFaildResultData("新增失败");
+        }
     }
 
     /**
@@ -120,8 +124,12 @@ public class SysTechnicalTitleServiceImpl implements SysTechnicalTitleService {
         sysTechnicalTitle.setTechnicalName(sysTechnicalTitleAndPostVO.getTechnicalName());
         sysTechnicalTitle.setSeniority(sysTechnicalTitleAndPostVO.getSeniority());
         sysTechnicalTitle.setPostId(sysTechnicalTitleAndPostVO.getPostId());
-        QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
-        return CommonResult.getSuccessResultData("更新成功");
+        int save = QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
+        if (save > 0) {
+            return CommonResult.getSuccessResultData("更新成功");
+        } else {
+            return CommonResult.getFaildResultData("更新失败");
+        }
     }
 
     /**
