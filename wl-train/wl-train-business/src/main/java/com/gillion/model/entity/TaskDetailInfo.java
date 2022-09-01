@@ -62,16 +62,16 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 申请日期
      */
     @Column(name = "apply_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date applyDate;
 
     /**
      * 审批日期
      */
     @Column(name = "approval_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date approvalDate;
 
     /**
@@ -112,8 +112,8 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 审核日期
      */
     @Column(name = "audit_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date auditDate;
 
     /**
@@ -132,8 +132,8 @@ public class TaskDetailInfo extends BaseModel implements Serializable {
      * 创建时间
      */
     @Column(name = "create_time")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**

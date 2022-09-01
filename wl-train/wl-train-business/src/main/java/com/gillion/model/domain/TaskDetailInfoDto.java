@@ -65,16 +65,16 @@ public class TaskDetailInfoDto implements Serializable {
      * 申请日期
      */
     @ApiModelProperty("申请日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date applyDate;
 
     /**
      * 审批日期
      */
     @ApiModelProperty("审批日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date approvalDate;
 
     /**
@@ -316,8 +316,8 @@ public class TaskDetailInfoDto implements Serializable {
     @ApiModelProperty("页码")
     private Integer pageNo;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**

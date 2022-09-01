@@ -823,18 +823,15 @@ public class TaskInfoServiceImpl implements TaskInfoService {
      */
     @Override
     public ResultHelper<Object> saveLeaveInfo(TaskDetailInfoDto taskDetailInfoDto) {
-        Long uemUserId = taskDetailInfoDto.getUemUserId();
         List<Long> list = new ArrayList<>();
-        list.add(taskDetailInfoDto.getUemUserId());
         list.add(taskDetailInfoDto.getApprover());
-        if (uemUserId == null) {
-            return CommonResult.getFaildResultData("用户id不能为空!");
+        if (list.size() == 0) {
+            return CommonResult.getFaildResultData("审核人id不能为空!");
         }
         UemUserDto uemUserDto = new UemUserDto();
         uemUserDto.setUemUserIdList(list);
         ResultHelper<List<UemUserDto>> listResultHelper = uemUserInterface.queryUemUserListById(uemUserDto);
-        String name = listResultHelper.getData().get(0).getName();
-        String approverName = listResultHelper.getData().get(1).getName();
+        String approverName = listResultHelper.getData().get(0).getName();
         //获取当前登陆用户信息（审核人项目经理）
         ResultHelper<UemUserDto> loginUserInfo = taskInfoInterface.getLoginUserInfo();
         String loginName = loginUserInfo.getData().getName();
