@@ -103,7 +103,7 @@ public class TestControllerTest {
 
         for (int i = 0; i < split.length; i++) {
             System.out.println(split[i]);
-            Long  j = Long.valueOf(split[i]);
+            Long j = Long.valueOf(split[i]);
         }
     }
 
