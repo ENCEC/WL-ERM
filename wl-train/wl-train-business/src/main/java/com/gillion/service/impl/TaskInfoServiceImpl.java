@@ -835,7 +835,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         ResultHelper<List<UemUserDto>> listResultHelper = uemUserInterface.queryUemUserListById(uemUserDto);
         String name = listResultHelper.getData().get(0).getName();
         String approverName = listResultHelper.getData().get(1).getName();
-        // UemUserDto uemUserDto = taskInfoInterface.queryStaffInfo(String.valueOf(uemUserId));
+        //获取当前登陆用户信息（审核人项目经理）
+        ResultHelper<UemUserDto> loginUserInfo = taskInfoInterface.getLoginUserInfo();
+        String loginName = loginUserInfo.getData().getName();
+        Long loginId = loginUserInfo.getData().getUemUserId();
+        if ((loginId == null) || (loginName == null)) {
+            return CommonResult.getFaildResultData("获取用户登陆信息失败!");
+        }
         Long taskInfoId = taskDetailInfoDto.getTaskInfoId();
         Date auditDate = taskDetailInfoDto.getAuditDate();
         String auditResult = taskDetailInfoDto.getAuditResult();
@@ -846,10 +852,10 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         if (Objects.isNull(taskDetailInfo)) {
             return CommonResult.getFaildResultData("查询结果为空!");
         }
-        taskDetailInfo.setAuditId(uemUserId);
         taskDetailInfo.setApprover(approver);
         taskDetailInfo.setApproverName(approverName);
-        taskDetailInfo.setAuditName(name);
+        taskDetailInfo.setAuditId(loginId);
+        taskDetailInfo.setAuditName(loginName);
         taskDetailInfo.setAuditDate(auditDate);
         taskDetailInfo.setAuditRemark(auditRemark);
         taskDetailInfo.setAuditResult(auditResult);

@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -85,4 +87,14 @@ public interface TaskInfoInterface {
 
     @PostMapping("/uemUserManage/queryUemUserListById")
     ResultHelper<List<UemUserDto>> queryUemUserListById(@RequestBody UemUserDto uemUserDto);
+
+    /**
+     * 获取当前登陆用户信息
+     *
+     * @param
+     * @date 2022-09-01
+     */
+    @GetMapping("/user/getLoginUserInfo")
+    @ResponseBody
+    ResultHelper<UemUserDto> getLoginUserInfo();
 }
