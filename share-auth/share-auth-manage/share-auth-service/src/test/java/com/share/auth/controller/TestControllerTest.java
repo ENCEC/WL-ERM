@@ -1,6 +1,7 @@
 package com.share.auth.controller;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.StrUtil;
 import com.gillion.ds.client.api.DaoServiceClient;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
@@ -9,12 +10,11 @@ import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.SysPostDTO;
 import com.share.auth.model.entity.SysApplication;
 import com.share.auth.model.entity.SysPost;
+import com.share.auth.model.entity.SysTechnicalTitle;
 import com.share.auth.model.entity.UemCompany;
-import com.share.auth.model.querymodels.QSysApplication;
-import com.share.auth.model.querymodels.QSysPost;
-import com.share.auth.model.querymodels.QUemCompany;
-import com.share.auth.model.querymodels.QUemUser;
+import com.share.auth.model.querymodels.*;
 import com.share.auth.model.vo.ApplicationVO;
+import com.share.auth.model.vo.SysTechnicalTitleAndPostVO;
 import com.share.support.result.CommonResult;
 import io.swagger.models.auth.In;
 import org.apache.commons.collections.CollectionUtils;
@@ -215,5 +215,108 @@ public class TestControllerTest {
         sysPost.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
         int row = QSysPost.sysPost.save(sysPost);
         assertEquals(1,row,"添加失败");
+    }
+    @DisplayName("分页查询岗位职称测试")
+    @Test
+    void querySysTechnicalTitle() {
+        Integer currentPage = 1;
+        Integer pageSize = 10;
+        String name = "";
+        String status = "0";
+        Long postId = 6964811711813378048L;
+        Page<SysTechnicalTitleAndPostVO> pages = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.technicalTitleId,QSysTechnicalTitle.technicalName,QSysTechnicalTitle.postId,QSysTechnicalTitle.sysPost.chain(QSysPost.postName).as("postName"), QSysTechnicalTitle.seniority, QSysTechnicalTitle.creatorName, QSysTechnicalTitle.createTime, QSysTechnicalTitle.status)
+                .where(
+                        QSysTechnicalTitle.technicalTitleId.goe$(1L).and(QSysTechnicalTitle.technicalName._like$_(name)).and(QSysTechnicalTitle.postId.eq$(postId)).and(QSysTechnicalTitle.status.eq$(status)))
+                .paging(currentPage, pageSize)
+                .sorting(QSysTechnicalTitle.createTime.desc())
+                .mapperTo(SysTechnicalTitleAndPostVO.class)
+                .execute();
+        System.out.println(pages);
+    }
+    @DisplayName("新增岗位职称")
+    @Test
+    void savaSysTechnicalTitle() {
+        String name = "测试";
+        String seniority = "0到3年";
+        Long postId = 6967374353162608648L;
+        assertFalse(StrUtil.isEmpty(name),"职称名称不能为空");
+        assertFalse(StrUtil.isEmpty(seniority),"工作年限不能为空");
+        assertFalse(Objects.isNull(postId),"岗位名称不能为空");
+        List<SysTechnicalTitle> sysTechnicalTitles = QSysTechnicalTitle.sysTechnicalTitle.select(QSysTechnicalTitle.sysTechnicalTitle.fieldContainer())
+                .where(QSysTechnicalTitle.technicalName.eq$(name).and(QSysTechnicalTitle.postId.eq$(postId)))
+                .execute();
+        assertFalse(CollectionUtils.isNotEmpty(sysTechnicalTitles),"该岗位职称已经存在");
+        SysTechnicalTitle sysTechnicalTitle = new SysTechnicalTitle();
+        sysTechnicalTitle.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
+        sysTechnicalTitle.setTechnicalName(name);
+        sysTechnicalTitle.setSeniority(seniority);
+        sysTechnicalTitle.setPostId(postId);
+        sysTechnicalTitle.setStatus("0");
+        int save = QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
+        assertEquals(1,save,"新增失败");
+    }
+
+    @DisplayName("编辑岗位职称")
+    @Test
+    void updateSysTechnicalTitle() {
+        Long technicalTitleId = 6971340543205838848L;
+        String name = "开发工程师";
+        String seniority = "0到3年";
+        Long postId = 6964811711813378048L;
+
+        assertFalse(StrUtil.isEmpty(name),"职称名称不能为空");
+        assertFalse(StrUtil.isEmpty(seniority),"工作年限不能为空");
+        assertFalse(Objects.isNull(postId),"岗位名称不能为空");
+        assertFalse(Objects.isNull(technicalTitleId),"id不存在");
+        SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne(QSysTechnicalTitle.sysTechnicalTitle.fieldContainer())
+                .where(QSysTechnicalTitle.technicalTitleId.eq$(technicalTitleId))
+                .execute();
+        assertFalse(Objects.isNull(sysTechnicalTitle),"岗位职称不存在");
+        if (sysTechnicalTitle.getPostId().equals(postId) == false) {
+            List<SysTechnicalTitle> sysTechnicalTitles = QSysTechnicalTitle.sysTechnicalTitle.select()
+                    .where(QSysTechnicalTitle.technicalName.eq$(name)
+                            .and(QSysTechnicalTitle.postId.eq$(postId)))
+                    .execute();
+            assertFalse(CollectionUtils.isNotEmpty(sysTechnicalTitles),"已存在");
+        }
+        if (sysTechnicalTitle.getTechnicalName().equals(name) == false) {
+            List<SysTechnicalTitle> sysTechnicalTitles = QSysTechnicalTitle.sysTechnicalTitle.select()
+                    .where(QSysTechnicalTitle.technicalName.eq$(name)
+                            .and(QSysTechnicalTitle.postId.eq$(postId)))
+                    .execute();
+            assertFalse(CollectionUtils.isNotEmpty(sysTechnicalTitles),"已存在");
+        }
+
+        sysTechnicalTitle.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        sysTechnicalTitle.setTechnicalName(name);
+        sysTechnicalTitle.setSeniority(seniority);
+        sysTechnicalTitle.setPostId(postId);
+        int save = QSysTechnicalTitle.sysTechnicalTitle.save(sysTechnicalTitle);
+        assertEquals(1,save,"更新失败");
+    }
+
+    @DisplayName("删除岗位职称")
+    @Test
+    void deleteSysTechnicalTitle() {
+        Long technicalTitleId = 6971340543205838848L;
+        assertFalse(Objects.isNull(technicalTitleId),"id不存在");
+        SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne().byId(technicalTitleId);
+        assertFalse(Objects.isNull(sysTechnicalTitle),"岗位职称不存在");
+        int execute = QSysTechnicalTitle.sysTechnicalTitle.delete().where(QSysTechnicalTitle.technicalTitleId.eq$(technicalTitleId)).execute();
+        assertEquals(1,execute,"删除失败");
+    }
+
+    @DisplayName("岗位职称启动禁用")
+    @Test
+    void updateStatus() {
+        Long technicalTitleId = 6971340543205838848L;
+        String status = "1";
+        assertFalse(Objects.isNull(technicalTitleId),"id不存在");
+        SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne().byId(technicalTitleId);
+        assertFalse(Objects.isNull(sysTechnicalTitle),"岗位职称不存在");
+        int execute = QSysTechnicalTitle.sysTechnicalTitle.update(QSysTechnicalTitle.status)
+                .where(QSysTechnicalTitle.technicalTitleId.eq$(technicalTitleId))
+                .execute(ImmutableMap.of("status", status));
+        assertEquals(1,execute,"失败了");
     }
 }

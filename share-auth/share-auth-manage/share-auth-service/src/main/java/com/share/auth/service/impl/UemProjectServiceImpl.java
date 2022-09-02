@@ -17,6 +17,7 @@ import com.share.auth.model.querymodels.QUemUser;
 import com.share.auth.service.UemProjectService;
 import com.share.support.result.CommonResult;
 import com.share.support.result.ResultHelper;
+import io.seata.common.util.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +112,12 @@ public class UemProjectServiceImpl implements UemProjectService {
         }
         if (Objects.isNull(uemProjectDTO.getPlanEndTime())) {
             return CommonResult.getFaildResultData("计划结束时间不能为空");
+        }
+        List<UemProject> uemProjects = QUemProject.uemProject.select(QUemProject.uemProject.fieldContainer())
+                .where(QUemProject.projectName.eq$(uemProjectDTO.getProjectName()))
+                .execute();
+        if (CollectionUtils.isNotEmpty(uemProjects)) {
+            return CommonResult.getFaildResultData("项目已存在");
         }
         UemProject uemProject = new UemProject();
         uemProject.setRowStatus(RowStatusConstants.ROW_STATUS_ADDED);
@@ -215,6 +222,14 @@ public class UemProjectServiceImpl implements UemProjectService {
         UemProject uemProject = this.getUemProjectById(uemProjectDTOId);
         if (Objects.isNull(uemProject)) {
             return CommonResult.getFaildResultData("不存在");
+        }
+        if (uemProject.getProjectName().equals(uemProjectDTO.getProjectName()) == false) {
+            List<UemProject> uemProjects = QUemProject.uemProject.select(QUemProject.uemProject.fieldContainer())
+                    .where(QUemProject.projectName.eq$(uemProjectDTO.getProjectName()))
+                    .execute();
+            if (CollectionUtils.isNotEmpty(uemProjects)) {
+                return CommonResult.getFaildResultData("该项目已存在");
+            }
         }
         //更新信息
         uemProject.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
