@@ -16,6 +16,7 @@ import com.share.support.result.ResultHelper;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理模块
@@ -350,7 +351,7 @@ public interface UemUserManageService {
      *
      * @return
      */
-    ResultHelper<?> queryPostOfDept();
+    ResultHelper<Map<String,Object>> queryPostOfDept();
 
     /**
      * 批量上传文件
@@ -362,5 +363,29 @@ public interface UemUserManageService {
      * @throws JsonProcessingException
      */
     ResultHelper<?> batchUploadFile (Long uemUserId,MultipartFile[] file,String[] fileType,String systemId) throws JsonProcessingException;
+
+    /**
+     * 仪表盘员工工作年限情况
+     * @return
+     */
+    ResultHelper<?> queryUemUserBySeniority();
+
+    /**
+     * 仪表盘员工学历情况
+     * @return
+     */
+    ResultHelper<?> queryUemUserByEducation();
+
+    /**
+     * 仪表盘员工转正情况
+     * @return
+     */
+    ResultHelper<?> queryUemUserByRegularStaff();
+
+    /**
+     * 仪表盘员工类型情况
+     * @return
+     */
+    ResultHelper<Map<String,Object>> queryUemUserByJobStatus();
 
 }

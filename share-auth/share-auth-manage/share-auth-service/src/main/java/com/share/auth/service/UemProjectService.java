@@ -9,6 +9,7 @@ import com.share.auth.model.entity.UemUserProject;
 import com.share.support.result.ResultHelper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tanjp
@@ -89,4 +90,16 @@ public interface UemProjectService {
      * @Return: com.gillion.ds.client.api.queryobject.model.Page<com.share.auth.domain.UemUserProjectDto>
      **/
     Page<UemUserProjectDto> selectUserProject(int pageNo, int pageSize);
+
+    /**
+     * 仪表盘项目人员配置情况
+     * @return
+     */
+    ResultHelper<Map<String,Object>> queryProjectStaff();
+    /**
+     * 仪表盘项目人员详细配置情况
+     * @return
+     */
+    ResultHelper<?> queryProjectDetailedStaff();
+
 }

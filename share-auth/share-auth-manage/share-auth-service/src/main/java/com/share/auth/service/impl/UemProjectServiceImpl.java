@@ -2,8 +2,10 @@ package com.share.auth.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
+import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
+import com.gillion.ds.model.nodes.INode;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.UemProjectDTO;
 import com.share.auth.domain.UemUserDto;
@@ -23,10 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -345,5 +344,114 @@ public class UemProjectServiceImpl implements UemProjectService {
         return uemUserProjects;
     }
 
+    /**
+     * 仪表盘项目人员配置情况
+     * @return
+     */
+    @Override
+    public ResultHelper<Map<String,Object>> queryProjectStaff() {
+        HashMap<String, Object> map = new HashMap<>();
+        //项目总数
+        INode execute = DSContext.customization("WL-ERM_queryUemProjectNumber").selectOne().execute();
+        List<UemProjectDTO> uemProjects = QUemProject.uemProject.select()
+                .where(QUemProject.uemProjectId.goe$(1L).and(QUemProject.status.notIn$(5)))
+                .mapperTo(UemProjectDTO.class)
+                .execute();
+        for (int i = 0; i <uemProjects.size() ; i++) {
+            int count = 0;
+            if (uemProjects.get(i).getDutyId() != null ) {
+                count+=1;
+            }
+            if (uemProjects.get(i).getChiefId() != null) {
+                count+=1;
+            }
+            if (uemProjects.get(i).getDevDirectorId() != null){
+                count+=1;
+            }
+            if (uemProjects.get(i).getDemandId() != null) {
+                count+=1;
+            }
+            if (uemProjects.get(i).getGenDevUsers() != null && uemProjects.get(i).getGenDevUsers() != ""){
+                String[] split = uemProjects.get(i).getGenDevUsers().split(",");
+                //开发组人员人数
+                int length = split.length;
+                count+=length;
+            }
+            if (uemProjects.get(i).getGenDemandUsers() != null && uemProjects.get(i).getGenDemandUsers() != "") {
+                String[] split = uemProjects.get(i).getGenDemandUsers().split(",");
+                //需求组人员人数
+                int length = split.length;
+                count+=length;
+            }
+            uemProjects.get(i).setTotalNum(count);
+        }
+        map.put("data",uemProjects);
+        map.put("totalNumber",execute);
+        return CommonResult.getSuccessResultData(map);
+    }
+
+    /**
+     * 仪表盘项目人员详细配置情况
+     * @return
+     */
+    @Override
+    public ResultHelper<?> queryProjectDetailedStaff() {
+        List<UemProjectDTO> uemProjects = QUemProject.uemProject.select()
+                .where(QUemProject.uemProjectId.goe$(1L).and(QUemProject.status.notIn$(5)))
+                .mapperTo(UemProjectDTO.class)
+                .execute();
+        for (int i = 0; i < uemProjects.size(); i++) {
+            int defaultNumber = 0;
+            if (uemProjects.get(i).getDutyId() != null) {
+                int count = 0;
+                count += 1;
+                uemProjects.get(i).setDutyNumber(count);
+            } else {
+                uemProjects.get(i).setDutyNumber(defaultNumber);
+            }
+            if (uemProjects.get(i).getChiefId() != null) {
+                int count = 0;
+                count += 1;
+                uemProjects.get(i).setChiefNumber(count);
+            } else {
+                uemProjects.get(i).setChiefNumber(defaultNumber);
+            }
+            if (uemProjects.get(i).getDevDirectorId() != null) {
+                int count = 0;
+                count += 1;
+                uemProjects.get(i).setDevDirectorNumber(count);
+            } else {
+                uemProjects.get(i).setDevDirectorNumber(defaultNumber);
+            }
+            if (uemProjects.get(i).getDemandId() != null) {
+                int count = 0;
+                count += 1;
+                uemProjects.get(i).setDemandNumber(count);
+            } else {
+                uemProjects.get(i).setDemandNumber(defaultNumber);
+            }
+            if (uemProjects.get(i).getGenDevUsers() != null && uemProjects.get(i).getGenDevUsers() != "") {
+                int count = 0;
+                String[] split = uemProjects.get(i).getGenDevUsers().split(",");
+                //开发组人员人数
+                int length = split.length;
+                count += length;
+                uemProjects.get(i).setGenDevUsersNumber(count);
+            } else {
+                uemProjects.get(i).setGenDevUsersNumber(defaultNumber);
+            }
+            if (uemProjects.get(i).getGenDemandUsers() != null && uemProjects.get(i).getGenDemandUsers() != "") {
+                int count = 0;
+                String[] split = uemProjects.get(i).getGenDemandUsers().split(",");
+                //需求组人员人数
+                int length = split.length;
+                count += length;
+                uemProjects.get(i).setGenDemandUsersNumber(count);
+            } else {
+                uemProjects.get(i).setGenDemandUsersNumber(defaultNumber);
+            }
+        }
+        return CommonResult.getSuccessResultData(uemProjects);
+    }
 }
 

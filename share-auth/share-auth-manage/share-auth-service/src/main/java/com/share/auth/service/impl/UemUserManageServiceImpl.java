@@ -9,11 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
+import com.gillion.ds.model.nodes.INode;
 import com.share.auth.constants.CodeFinal;
-import com.share.auth.domain.SysRoleDTO;
-import com.share.auth.domain.UemUserDto;
-import com.share.auth.domain.UemUserEditDTO;
-import com.share.auth.domain.UemUserRoleDto;
+import com.share.auth.domain.*;
 import com.share.auth.model.entity.*;
 import com.share.auth.model.querymodels.*;
 import com.share.auth.model.vo.QueryWorkUserVo;
@@ -1132,16 +1130,6 @@ public class UemUserManageServiceImpl implements UemUserManageService {
 
     }
 
-    @Override
-    public ResultHelper<?> queryPostOfDept() {
-        List result = DSContext.customization("WL-ERM_queryPostOfDept").select().execute();
-        if (CollectionUtils.isNotEmpty(result)) {
-            return CommonResult.getSuccessResultData(result);
-        } else {
-            return CommonResult.getFaildResultData("查询失败！");
-        }
-    }
-
     /**
      * 批量上传文件
      * @param uemUserId
@@ -1176,5 +1164,115 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
     }
 
+    /**
+     * 仪表盘部门人员岗位情况
+     * @return
+     */
+    @Override
+    public ResultHelper<Map<String,Object>> queryPostOfDept() {
+        Map<String, Object> map = new HashMap<>();
+        //部门人员总数
+        INode execute = DSContext.customization("WL-ERM_queryUemUserNumber").selectOne().execute();
+        List<INode> result = DSContext.customization("WL-ERM_queryPostOfDept").select().execute();
+        List<SysPostVo> sysPosts = QSysPost.sysPost.select(QSysPost.postName).where(QSysPost.postId.goe$(1L))
+                .mapperTo(SysPostVo.class)
+                .execute();
+        for (int i = 0; i <result.size(); i++) {
+            for (int j = 0; j <sysPosts.size(); j++) {
+                if (result.get(i).path("name").asText().equals(sysPosts.get(j).getPostName())) {
+                    sysPosts.get(j).setNumber(result.get(i).path("number").asInt());
+                }
+            }
+        }
+        map.put("totalNumber",execute);
+        map.put("data",sysPosts);
+        if (CollectionUtils.isNotEmpty(result)) {
+            return CommonResult.getSuccessResultData(map);
+        } else {
+            return CommonResult.getFaildResultData("查询失败");
+        }
+    }
+
+    /**
+     * 仪表盘员工工作年限情况
+     * @return
+     */
+    @Override
+    public ResultHelper<?> queryUemUserBySeniority() {
+        INode result = DSContext.customization("WL-ERM_queryUemUserBySeniority").selectOne().execute();
+        if (Objects.isNull(result)) {
+            return CommonResult.getFaildResultData("查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(result);
+        }
+    }
+
+    /**
+     * 仪表盘员工学历情况
+     * @return
+     */
+    @Override
+    public ResultHelper<?> queryUemUserByEducation() {
+        INode result = DSContext.customization("WL-ERM_queryUemUserByEducation").selectOne().execute();
+        if (Objects.isNull(result)) {
+            return CommonResult.getFaildResultData("查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(result);
+        }
+    }
+
+    /**
+     * 仪表盘员工转正情况
+     * @return
+     */
+    @Override
+    public ResultHelper<?> queryUemUserByRegularStaff() {
+        INode result = DSContext.customization("WL-ERM_queryUemUserByRegularStaff").selectOne().execute();
+        if (Objects.isNull(result)) {
+            return CommonResult.getFaildResultData("查询失败");
+        } else {
+            return CommonResult.getSuccessResultData(result);
+        }
+    }
+
+    /**
+     * 仪表盘员工类型情况
+     * @return
+     */
+    @Override
+    public ResultHelper<Map<String,Object>> queryUemUserByJobStatus() {
+        List<UemUser> uemUserList = QUemUser.uemUser.select()
+                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.notIn$(2L)))
+                .execute();
+        //部门总人数
+        int number = uemUserList.size();
+        List<UemUser> execute = QUemUser.uemUser.select()
+                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.eq$(1L)))
+                .execute();
+        //正式员工人数
+        int formalNumber = execute.size();
+        List<UemUser> uemUsers = QUemUser.uemUser.select()
+                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.eq$(0L)))
+                .execute();
+        //试用人员人数（包括实习生）
+        int size = uemUsers.size();
+        //实习生人数
+        int count = 0;
+        for (int i = 0; i <uemUsers.size() ; i++) {
+            if (uemUsers.get(i).getEntryDate() !=null && uemUsers.get(i).getGraduateDate() !=null) {
+                if (uemUsers.get(i).getEntryDate().before(uemUsers.get(i).getGraduateDate()) && uemUsers.get(i).getGraduateDate().after(new Date())) {
+                    count += 1;
+                }
+            }
+        }
+        //试用员工人数（不包含实习生）
+        int probationaryNumber = size - count;
+        Map<String, Object> map = new HashMap<>();
+        map.put("正式员工",formalNumber);
+        map.put("试用员工",probationaryNumber);
+        map.put("实习生",count);
+        map.put("number",number);
+        return CommonResult.getSuccessResultData(map);
+    }
 
 }

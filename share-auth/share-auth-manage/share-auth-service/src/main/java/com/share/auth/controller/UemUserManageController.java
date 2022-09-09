@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -544,7 +545,7 @@ public class UemUserManageController {
     }
 
     @PostMapping("/queryPostOfDept")
-    public ResultHelper<?> queryPostOfDept() {
+    public ResultHelper<Map<String,Object>> queryPostOfDept() {
         return uemUserManageService.queryPostOfDept();
     }
 
@@ -563,4 +564,39 @@ public class UemUserManageController {
         return uemUserManageService.batchUploadFile(uemUserId, file, fileType, systemId);
     }
 
+    /**
+     * 仪表盘员工工作年限情况
+     * @return
+     */
+    @PostMapping("/queryUemUserBySeniority")
+    public ResultHelper<?> queryUemUserBySeniority() {
+        return uemUserManageService.queryUemUserBySeniority();
+    }
+
+    /**
+     * 仪表盘员工学历情况
+     * @return
+     */
+    @PostMapping("/queryUemUserByEducation")
+    public ResultHelper<?> queryUemUserByEducation() {
+        return uemUserManageService.queryUemUserByEducation();
+    }
+
+    /**
+     * 仪表盘员工转正情况
+     * @return
+     */
+    @PostMapping("/queryUemUserByRegularStaff")
+    public ResultHelper<?> queryUemUserByRegularStaff() {
+        return uemUserManageService.queryUemUserByRegularStaff();
+    }
+
+    /**
+     * 仪表盘员工类型情况
+     * @return
+     */
+    @PostMapping("/queryUemUserByJobStatus")
+    public ResultHelper<Map<String,Object>> queryUemUserByJobStatus() {
+        return uemUserManageService.queryUemUserByJobStatus();
+    }
 }

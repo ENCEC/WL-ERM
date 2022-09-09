@@ -17,6 +17,7 @@ import com.share.auth.model.entity.UemUserProject;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tanjp
@@ -132,6 +133,24 @@ public class UemProjectController {
         int pageNo = uemUserDto.getPageNo();
         Page<UemUserProjectDto> uemUserProjectPage= uemProjectService.selectUserProject(pageNo,pageSize);
         return CommonResult.getSuccessResultData(uemUserProjectPage);
+    }
+
+    /**
+     * 仪表盘项目人员配置情况
+     * @return
+     */
+    @PostMapping("/queryProjectStaff")
+    public ResultHelper<Map<String,Object>> queryProjectStaff() {
+        return uemProjectService.queryProjectStaff();
+    }
+
+    /**
+     * 仪表盘项目人员详细配置情况
+     * @return
+     */
+    @PostMapping("/queryProjectDetailedStaff")
+    public ResultHelper<?> queryProjectDetailedStaff() {
+        return uemProjectService.queryProjectDetailedStaff();
     }
 
 }

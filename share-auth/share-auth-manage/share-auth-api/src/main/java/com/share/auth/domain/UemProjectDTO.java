@@ -179,5 +179,21 @@ private static final long serialVersionUID=1;
     @ApiModelProperty("分页显示条数")
     private Integer pageSize;
 
+    /** 项目总监人数 */
+    private  Integer chiefNumber;
 
+    /** 项目经理人数 */
+    private  Integer dutyNumber;
+
+    /** 开发经理人数 */
+    private Integer devDirectorNumber;
+
+    /** 需求组长人数 */
+    private Integer demandNumber;
+
+    /** 开发组员人数 */
+    private Integer genDevUsersNumber;
+
+    /** 需求组员人数 */
+    private Integer genDemandUsersNumber;
 }
