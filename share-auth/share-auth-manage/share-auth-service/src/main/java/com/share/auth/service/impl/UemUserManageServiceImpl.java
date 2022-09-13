@@ -284,7 +284,21 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         }
         // 更新用户信息
         BeanUtils.copyProperties(uemUserEditDto, uemUser);
+        Long staffDutyId = uemUser.getStaffDutyId();
+        Long projectId = uemUser.getProjectId();
         uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+        SysPost sysPost = QSysPost.sysPost.selectOne()
+                .where(QSysPost.postId.eq$(staffDutyId))
+                .execute();
+        if (!Objects.isNull(sysPost)) {
+            uemUser.setStaffDuty(sysPost.getPostName());
+        }
+        UemProject uemProject = QUemProject.uemProject.selectOne()
+                .where(QUemProject.uemProjectId.eq$(projectId))
+                .execute();
+        if (!Objects.isNull(uemProject)) {
+            uemUser.setProjectName(uemProject.getProjectName());
+        }
         int rowCount = QUemUser.uemUser.save(uemUser);
         // 检查是否更新成功
         if (rowCount == 1) {
@@ -354,10 +368,24 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         // 设置字段
         UemUser uemUser = new UemUser();
         BeanUtils.copyProperties(uemUserEditDTO, uemUser);
+        Long staffDutyId = uemUser.getStaffDutyId();
+        Long projectId = uemUser.getProjectId();
         uemUser.setIsValid(true);
         uemUser.setIsLocked(false);
         uemUser.setJobStatus(0L);
         uemUser.setIsDeleted(false);
+        SysPost sysPost = QSysPost.sysPost.selectOne()
+                .where(QSysPost.postId.eq$(staffDutyId))
+                .execute();
+        if (!Objects.isNull(sysPost)) {
+            uemUser.setStaffDuty(sysPost.getPostName());
+        }
+        UemProject uemProject = QUemProject.uemProject.selectOne()
+                .where(QUemProject.uemProjectId.eq$(projectId))
+                .execute();
+        if (!Objects.isNull(uemProject)) {
+            uemUser.setProjectName(uemProject.getProjectName());
+        }
         // 设置密码
         String passwordText = RandomUtil.randomString(6);
         String password = MD5EnCodeUtils.encryptionPassword(passwordText);

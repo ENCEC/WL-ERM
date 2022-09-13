@@ -891,6 +891,9 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         taskInfo.setStatus(2);
         taskInfo.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
         QTaskInfo.taskInfo.save(taskInfo);
+        if (resultAccess.equals("同意")) {
+            taskInfoInterface.updateJobStatus(taskInfo.getDispatchers());
+        }
         taskDetailInfo.setApprovalDate(approvalDate);
         taskDetailInfo.setResultAccess(resultAccess);
         taskDetailInfo.setOfferRemark(offerRemark);
