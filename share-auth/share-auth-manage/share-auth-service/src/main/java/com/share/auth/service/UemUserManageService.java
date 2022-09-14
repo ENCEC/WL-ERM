@@ -388,4 +388,23 @@ public interface UemUserManageService {
      */
     ResultHelper<Map<String,Object>> queryUemUserByJobStatus();
 
+    /**
+     * 仪表盘员工离职情况
+     * @return
+     */
+    ResultHelper<Map<String,Object>> queryUemUserByLeaveStaff();
+
+    /**
+     * 仪表盘实习及应届生转正情况
+     * @return
+     */
+    ResultHelper<Map<String,Object>> queryUemUserByInternsAndFreshGraduates();
+
+    /**
+     * 仪表盘人员趋势情况
+     * @return
+     */
+    ResultHelper<Map<Object,Object>> queryUemUserTrend();
+
+
 }

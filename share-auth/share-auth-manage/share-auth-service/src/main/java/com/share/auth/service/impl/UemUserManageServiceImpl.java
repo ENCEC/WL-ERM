@@ -41,6 +41,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 /**
@@ -1300,6 +1304,136 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         map.put("试用员工",probationaryNumber);
         map.put("实习生",count);
         map.put("number",number);
+        return CommonResult.getSuccessResultData(map);
+    }
+
+    /**
+     * 仪表盘员工离职情况
+     * @return
+     */
+    @Override
+    public ResultHelper<Map<String, Object>> queryUemUserByLeaveStaff() {
+        //部门总人数（包含离职人数）
+        List<UemUser> execute = QUemUser.uemUser.select()
+                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(0L, 1L, 2L)))
+                .execute();
+        int totalNumber = execute.size();
+        //离职员工(包含辞退员工)
+        List<UemUser> uemUsers = QUemUser.uemUser.select()
+                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.eq$(2L)))
+                .execute();
+        int count = uemUsers.size();
+        //辞退人数
+        int dismissCount = 0;
+        for (int i = 0; i < uemUsers.size() ; i++) {
+            if (!Objects.isNull(uemUsers.get(i).getDismissDate())) {
+                dismissCount+=1;
+            }
+        }
+        //主动离职人数
+        int leaveCount = count - dismissCount;
+        Map<String, Object> map = new HashMap<>();
+        map.put("主动离职",leaveCount);
+        map.put("被动离职",dismissCount);
+        map.put("number",totalNumber);
+        return CommonResult.getSuccessResultData(map);
+    }
+
+    /**
+     * 仪表盘实习及应届生转正情况
+     * @return
+     */
+    @Override
+    public ResultHelper<Map<String, Object>> queryUemUserByInternsAndFreshGraduates() {
+        //部门人数
+        List<UemUser> uemUsers = QUemUser.uemUser.select()
+                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.notIn$(2L)))
+                .execute();
+        //以实习生及应届生身份进入部门人数
+        int number = 0;
+        for (int i = 0; i < uemUsers.size() ; i++) {
+            if (uemUsers.get(i).getEntryDate() !=null && uemUsers.get(i).getGraduateDate() !=null) {
+                String graduateDate = new SimpleDateFormat("yyyy-MM-dd").format( uemUsers.get(i).getGraduateDate());
+                String entryDate = new SimpleDateFormat("yyyy-MM-dd").format( uemUsers.get(i).getEntryDate());
+                LocalDate graduate = LocalDate.parse(graduateDate);
+                LocalDate entry = LocalDate.parse(entryDate);
+                Period between = Period.between(graduate,entry);
+                if (uemUsers.get(i).getEntryDate().before(uemUsers.get(i).getGraduateDate()) || Math.abs(between.getYears()) <1) {
+                    number+=1;
+                }
+            }
+        }
+        //转正人数
+        List<UemUser> execute = QUemUser.uemUser.select()
+                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(1L)))
+                .execute();
+        //实习生及应届生身份转正人数
+        int count = 0;
+        for (int i = 0; i < execute.size(); i++) {
+            if ( execute.get(i).getEntryDate() !=null &&  execute.get(i).getGraduateDate() !=null) {
+                String graduateDate = new SimpleDateFormat("yyyy-MM-dd").format( execute.get(i).getGraduateDate());
+                String entryDate = new SimpleDateFormat("yyyy-MM-dd").format( execute.get(i).getEntryDate());
+                LocalDate graduate = LocalDate.parse(graduateDate);
+                LocalDate entry = LocalDate.parse(entryDate);
+                Period between = Period.between(graduate,entry);
+                if ( execute.get(i).getEntryDate().before( execute.get(i).getGraduateDate()) || Math.abs(between.getYears()) <1) {
+                    count+=1;
+                }
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("实习及应届生",count);
+        map.put("number",number);
+        return CommonResult.getSuccessResultData(map);
+    }
+
+    /**
+     * 仪表盘人员趋势情况
+     * @return
+     */
+    @Override
+    public ResultHelper<Map<Object, Object>> queryUemUserTrend() {
+        Map<Object, Object> map = new HashMap<>();
+        //使用日历类
+        Calendar cal=Calendar.getInstance();
+        //当前月份
+        int month=cal.get(Calendar.MONTH)+1;
+        //当前年份
+        int year = cal.get(Calendar.YEAR);
+        for (int i = 1; i <= month ; i++) {
+            String nextMonth = null;
+            if (i==12) {
+                nextMonth = (year+1)+"-"+1;
+            } else {
+                nextMonth = year + "-" + (i + 1);
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+            try {
+                //下个月的月初
+                Date date=simpleDateFormat.parse(nextMonth);
+                //某个月之前进部门的人数(包含离职员工)
+                List<UemUser> uemUsers = QUemUser.uemUser.select()
+                        .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(0L,1L,2L)).and(QUemUser.entryDate.lt$(date)))
+                        .execute();
+                int totalNumber = uemUsers.size();
+                //某个月之前主动离职的人数
+                List<UemUser> leaveUemUser = QUemUser.uemUser.select()
+                        .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(2L)).and(QUemUser.leaveDate.lt$(date)))
+                        .execute();
+                int leaveNumber = leaveUemUser.size();
+                //某个月之前辞退人数
+                List<UemUser> dismissUemUser = QUemUser.uemUser.select()
+                        .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(2L)).and(QUemUser.dismissDate.lt$(date)))
+                        .execute();
+                int dismissNumber = dismissUemUser.size();
+                //某个月在职人数
+                int number = totalNumber-leaveNumber-dismissNumber;
+                map.put(i,number);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
         return CommonResult.getSuccessResultData(map);
     }
 

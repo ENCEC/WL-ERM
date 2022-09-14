@@ -599,4 +599,31 @@ public class UemUserManageController {
     public ResultHelper<Map<String,Object>> queryUemUserByJobStatus() {
         return uemUserManageService.queryUemUserByJobStatus();
     }
+
+    /**
+     * 仪表盘员工离职情况
+     * @return
+     */
+    @PostMapping("/queryUemUserByLeaveStaff")
+    public ResultHelper<Map<String, Object>> queryUemUserByLeaveStaff() {
+        return uemUserManageService.queryUemUserByLeaveStaff();
+    }
+
+    /**
+     * 仪表盘实习及应届生转正情况
+     * @return
+     */
+    @PostMapping("/queryUemUserByInternsAndFreshGraduates")
+    public ResultHelper<Map<String, Object>> queryUemUserByInternsAndFreshGraduates() {
+        return uemUserManageService.queryUemUserByInternsAndFreshGraduates();
+    }
+
+    /**
+     * 仪表盘人员趋势情况
+     * @return
+     */
+    @PostMapping("/queryUemUserTrend")
+    public ResultHelper<Map<Object, Object>> queryUemUserTrend() {
+      return uemUserManageService.queryUemUserTrend();
+    }
 }
