@@ -1274,35 +1274,39 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     @Override
     public ResultHelper<Map<String,Object>> queryUemUserByJobStatus() {
         List<UemUser> uemUserList = QUemUser.uemUser.select()
-                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.notIn$(2L)))
+                .where(QUemUser.jobStatus.notIn$(2L))
                 .execute();
         //部门总人数
         int number = uemUserList.size();
-        List<UemUser> execute = QUemUser.uemUser.select()
-                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.eq$(1L)))
-                .execute();
         //正式员工人数
-        int formalNumber = execute.size();
-        List<UemUser> uemUsers = QUemUser.uemUser.select()
-                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.eq$(0L)))
-                .execute();
+        int formalNumber = 0;
         //试用人员人数（包括实习生）
-        int size = uemUsers.size();
+        int probationaryTotalNumber = 0;
+        for (int i = 0; i < uemUserList.size() ; i++) {
+            if (uemUserList.get(i).getJobStatus().equals(1L)) {
+                formalNumber+=1;
+            }
+            if (uemUserList.get(i).getJobStatus().equals(0L)) {
+                probationaryTotalNumber+=1;
+            }
+        }
         //实习生人数
-        int count = 0;
-        for (int i = 0; i <uemUsers.size() ; i++) {
-            if (uemUsers.get(i).getEntryDate() !=null && uemUsers.get(i).getGraduateDate() !=null) {
-                if (uemUsers.get(i).getEntryDate().before(uemUsers.get(i).getGraduateDate()) && uemUsers.get(i).getGraduateDate().after(new Date())) {
-                    count += 1;
+        int traineeNumber = 0;
+        for (int j = 0; j < uemUserList.size() ; j++) {
+            if (uemUserList.get(j).getJobStatus().equals(0L)) {
+                if (uemUserList.get(j).getEntryDate() !=null && uemUserList.get(j).getGraduateDate() !=null) {
+                    if (uemUserList.get(j).getEntryDate().before(uemUserList.get(j).getGraduateDate()) && uemUserList.get(j).getGraduateDate().after(new Date())) {
+                        traineeNumber+= 1;
+                    }
                 }
             }
         }
         //试用员工人数（不包含实习生）
-        int probationaryNumber = size - count;
+        int probationaryNumber = probationaryTotalNumber - traineeNumber;
         Map<String, Object> map = new HashMap<>();
         map.put("正式员工",formalNumber);
         map.put("试用员工",probationaryNumber);
-        map.put("实习生",count);
+        map.put("实习生",traineeNumber);
         map.put("number",number);
         return CommonResult.getSuccessResultData(map);
     }
@@ -1315,19 +1319,19 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     public ResultHelper<Map<String, Object>> queryUemUserByLeaveStaff() {
         //部门总人数（包含离职人数）
         List<UemUser> execute = QUemUser.uemUser.select()
-                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(0L, 1L, 2L)))
+                .where(QUemUser.jobStatus.in$(0L, 1L, 2L))
                 .execute();
         int totalNumber = execute.size();
         //离职员工(包含辞退员工)
-        List<UemUser> uemUsers = QUemUser.uemUser.select()
-                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.eq$(2L)))
-                .execute();
-        int count = uemUsers.size();
+        int count = 0;
         //辞退人数
         int dismissCount = 0;
-        for (int i = 0; i < uemUsers.size() ; i++) {
-            if (!Objects.isNull(uemUsers.get(i).getDismissDate())) {
-                dismissCount+=1;
+        for (int i = 0; i < execute.size() ; i++) {
+            if (execute.get(i).getJobStatus().equals(2L)) {
+                count+=1;
+                if (!Objects.isNull(execute.get(i).getDismissDate())) {
+                    dismissCount+=1;
+                }
             }
         }
         //主动离职人数
@@ -1347,7 +1351,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     public ResultHelper<Map<String, Object>> queryUemUserByInternsAndFreshGraduates() {
         //部门人数
         List<UemUser> uemUsers = QUemUser.uemUser.select()
-                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.notIn$(2L)))
+                .where(QUemUser.jobStatus.notIn$(2L))
                 .execute();
         //以实习生及应届生身份进入部门人数
         int number = 0;
@@ -1363,21 +1367,19 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 }
             }
         }
-        //转正人数
-        List<UemUser> execute = QUemUser.uemUser.select()
-                .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(1L)))
-                .execute();
         //实习生及应届生身份转正人数
         int count = 0;
-        for (int i = 0; i < execute.size(); i++) {
-            if ( execute.get(i).getEntryDate() !=null &&  execute.get(i).getGraduateDate() !=null) {
-                String graduateDate = new SimpleDateFormat("yyyy-MM-dd").format( execute.get(i).getGraduateDate());
-                String entryDate = new SimpleDateFormat("yyyy-MM-dd").format( execute.get(i).getEntryDate());
-                LocalDate graduate = LocalDate.parse(graduateDate);
-                LocalDate entry = LocalDate.parse(entryDate);
-                Period between = Period.between(graduate,entry);
-                if ( execute.get(i).getEntryDate().before( execute.get(i).getGraduateDate()) || Math.abs(between.getYears()) <1) {
-                    count+=1;
+        for (int j = 0; j < uemUsers.size(); j++) {
+            if (uemUsers.get(j).getJobStatus().equals(1L)) {
+                if (uemUsers.get(j).getEntryDate() != null && uemUsers.get(j).getGraduateDate() != null) {
+                    String graduateDate = new SimpleDateFormat("yyyy-MM-dd").format(uemUsers.get(j).getGraduateDate());
+                    String entryDate = new SimpleDateFormat("yyyy-MM-dd").format(uemUsers.get(j).getEntryDate());
+                    LocalDate graduate = LocalDate.parse(graduateDate);
+                    LocalDate entry = LocalDate.parse(entryDate);
+                    Period between = Period.between(graduate, entry);
+                    if (uemUsers.get(j).getEntryDate().before(uemUsers.get(j).getGraduateDate()) || Math.abs(between.getYears()) < 1) {
+                        count += 1;
+                    }
                 }
             }
         }
@@ -1393,6 +1395,9 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     public ResultHelper<Map<Object, Object>> queryUemUserTrend() {
+        List<UemUser> uemUsers = QUemUser.uemUser.select()
+                .where(QUemUser.jobStatus.in$(0L,1L,2L))
+                .execute();
         Map<Object, Object> map = new HashMap<>();
         //使用日历类
         Calendar cal=Calendar.getInstance();
@@ -1401,7 +1406,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         //当前年份
         int year = cal.get(Calendar.YEAR);
         for (int i = 1; i <= month ; i++) {
-            String nextMonth = null;
+            String nextMonth;
             if (i==12) {
                 nextMonth = (year+1)+"-"+1;
             } else {
@@ -1411,28 +1416,31 @@ public class UemUserManageServiceImpl implements UemUserManageService {
             try {
                 //下个月的月初
                 Date date=simpleDateFormat.parse(nextMonth);
-                //某个月之前进部门的人数(包含离职员工)
-                List<UemUser> uemUsers = QUemUser.uemUser.select()
-                        .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(0L,1L,2L)).and(QUemUser.entryDate.lt$(date)))
-                        .execute();
-                int totalNumber = uemUsers.size();
-                //某个月之前主动离职的人数
-                List<UemUser> leaveUemUser = QUemUser.uemUser.select()
-                        .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(2L)).and(QUemUser.leaveDate.lt$(date)))
-                        .execute();
-                int leaveNumber = leaveUemUser.size();
-                //某个月之前辞退人数
-                List<UemUser> dismissUemUser = QUemUser.uemUser.select()
-                        .where(QUemUser.isDeleted.eq$(false).and(QUemUser.jobStatus.in$(2L)).and(QUemUser.dismissDate.lt$(date)))
-                        .execute();
-                int dismissNumber = dismissUemUser.size();
-                //某个月在职人数
-                int number = totalNumber-leaveNumber-dismissNumber;
+                //下个月的月初之前进入部门的人数
+                int entryNumber = 0;
+                //下个月的月初之前离开部门的人数
+                int leaveNumber = 0;
+                for (int j = 0; j < uemUsers.size() ; j++) {
+                    if (uemUsers.get(j).getEntryDate() != null) {
+                        if (uemUsers.get(j).getEntryDate().before(date)) {
+                            entryNumber += 1;
+                        }
+                    }
+                    if (uemUsers.get(j).getJobStatus().equals(2L)) {
+                        if (uemUsers.get(j).getLeaveDate() != null && uemUsers.get(j).getLeaveDate().before(date)) {
+                            leaveNumber += 1;
+                        }
+                        if (uemUsers.get(j).getDismissDate() != null && uemUsers.get(j).getDismissDate().before(date)) {
+                            leaveNumber += 1;
+                        }
+                    }
+                }
+                //当月部门在职的人数
+                int number = entryNumber - leaveNumber;
                 map.put(i,number);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
         }
         return CommonResult.getSuccessResultData(map);
     }
