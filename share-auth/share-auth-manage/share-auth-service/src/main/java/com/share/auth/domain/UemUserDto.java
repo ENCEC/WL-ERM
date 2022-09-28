@@ -541,4 +541,12 @@ public class UemUserDto extends BaseModel implements Serializable {
     @ApiModelProperty("政治面貌")
     private String politicalStatus;
 
+    @ApiModelProperty("标签ID")
+    private String tagIds;
+
+    @ApiModelProperty("归属地（数据字典）")
+    private String attributionLand;
+
+    @ApiModelProperty("标签名称")
+    private String tagNames;
 }

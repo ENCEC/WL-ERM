@@ -496,4 +496,16 @@ public class UemUser extends BaseModel implements Serializable {
     @Column(name = "wx_id")
     private String wxId;
 
+    /**
+     * 标签ID
+     */
+    @Column(name = "tag_ids")
+    private String tagIds;
+
+    /**
+     * 归属地（数据字典）
+     */
+    @Column(name = "attribution_land")
+    private String attributionLand;
+
 }

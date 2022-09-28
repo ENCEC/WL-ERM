@@ -125,4 +125,16 @@ public class UemUserEditDTO {
      */
     @ApiModelProperty("所属项目名称")
     private String projectName;
+
+    /**
+     * 标签ID
+     */
+    @ApiModelProperty("标签ID")
+    private String tagIds;
+
+    /**
+     * 归属地（数据字典）
+     */
+    @ApiModelProperty("归属地（数据字典）")
+    private String attributionLand;
 }

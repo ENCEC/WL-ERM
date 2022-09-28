@@ -1,5 +1,7 @@
 package com.share.auth.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -10,6 +12,7 @@ import com.gillion.ds.client.DSContext;
 import com.gillion.ds.client.api.queryobject.model.Page;
 import com.gillion.ds.entity.base.RowStatusConstants;
 import com.gillion.ds.model.nodes.INode;
+import com.google.common.collect.ImmutableMap;
 import com.share.auth.constants.CodeFinal;
 import com.share.auth.domain.*;
 import com.share.auth.model.entity.*;
@@ -33,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户信息管理
@@ -70,7 +74,7 @@ public class UemUserManageServiceImpl implements UemUserManageService {
     private ShareFileInterface shareFileInterface;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     /**
      * 查询用户信息
@@ -121,16 +125,14 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         if (uemUserIdList.isEmpty()) {
             return CommonResult.getSuccessResultData(new ArrayList<>());
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('(');
-        for (Long uemUserId : uemUserIdList) {
-            stringBuilder.append(uemUserId);
-            stringBuilder.append(',');
-        }
-        stringBuilder.setCharAt(stringBuilder.length() - 1, ')');
+        // 为绕过数据服务的权限控制，改用jdbc
+        BeanPropertyRowMapper<UemUserDto> rowMapper = new BeanPropertyRowMapper<UemUserDto>
+                (UemUserDto.class);
+        Map<String,Object> paramMap = new HashMap<>();
+        paramMap.put("ids", uemUserIdList);
+        String sql = "SELECT * FROM uem_user WHERE `uem_user_id` IN (:ids) AND `is_deleted`=0";
         List<UemUserDto> uemUserDtoList = jdbcTemplate.query(
-                "SELECT * FROM uem_user WHERE `uem_user_id` IN " + stringBuilder.toString() + " AND `is_deleted`=0",
-                BeanPropertyRowMapper.newInstance(UemUserDto.class));
+                sql, paramMap, rowMapper);
 //        List<UemUserDto> uemUserDtoList = QUemUser.uemUser
 //                .select(QUemUser.uemUser.fieldContainer())
 //                .where(QUemUser.uemUserId.in$(uemUserIdList).and(QUemUser.isDeleted.eq$(false)))
@@ -158,12 +160,12 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         Page<QueryWorkUserVo> page = new Page<>();
         int count = jdbcTemplate.queryForList(
                 "SELECT COUNT(`uem_user_id`) FROM uem_user " +
-                        "WHERE `name` LIKE ? AND `is_deleted`=0 AND `job_status`<>2;", Integer.class, name)
+                        "WHERE `name` LIKE :name AND `is_deleted`=0 AND `job_status`<>2;", ImmutableMap.of("name",name),Integer.class)
                 .get(0);
         List<QueryWorkUserVo> uemUserDtoList = jdbcTemplate.query(
                 "SELECT `uem_user_id`, `account`, `name`, `email`, `mobile` FROM uem_user " +
-                        "WHERE `name` LIKE ? AND `is_deleted`=0 AND `job_status`<>2 LIMIT ?,?;",
-                BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class), name, offset, pageSize);
+                        "WHERE `name` LIKE :name AND `is_deleted`=0 AND `job_status`<>2 LIMIT :offset,:pageSize;",
+                ImmutableMap.of("name",name,"offset",offset,"pageSize",pageSize),BeanPropertyRowMapper.newInstance(QueryWorkUserVo.class));
         page.setRecords(uemUserDtoList);
         page.setTotalRecord(count);
         page.setPageSize(pageSize);
@@ -587,18 +589,8 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 loginUser.getData().getRoleList().isEmpty()) {
             return null;
         }
-        return QUemUser.uemUser.select(
-                        QUemUser.uemUserId,
-                        QUemUser.name,
-                        QUemUser.sex,
-                        QUemUser.mobile,
-                        QUemUser.deptName,
-                        QUemUser.uemDeptId,
-                        QUemUser.staffDutyId,
-                        QUemUser.staffDuty,
-                        QUemUser.technicalTitleId,
-                        QUemUser.technicalName,
-                        QUemUser.jobStatus).
+        Page<UemUserDto> uemUserDtoPage = QUemUser.uemUser.select(
+                        QUemUser.uemUser.fieldContainer()).
                 where(QUemUser.name._like$_(uemUserDto.getName())
                         .and(QUemUser.uemDeptId.eq$(uemUserDto.getUemDeptId()))
                         .and(QUemUser.technicalTitleId.eq$(uemUserDto.getTechnicalTitleId()))
@@ -608,6 +600,38 @@ public class UemUserManageServiceImpl implements UemUserManageService {
                 .paging((currentPage == null) ? CodeFinal.CURRENT_PAGE_DEFAULT : currentPage, (pageSize == null)
                         ? CodeFinal.PAGE_SIZE_DEFAULT : pageSize).sorting(QUemUser.createTime.desc()).mapperTo(UemUserDto.class)
                 .execute();
+        List<SysTag> sysTags = QSysTag.sysTag
+                .select(QSysTag.sysTagId,QSysTag.tagName)
+                .where(QSysTag.isDeleted.eq$(false)
+                        .and(QSysTag.status.eq$(true)))
+                .execute();
+        Map<Long,String> tagMap = sysTags.stream().collect(Collectors.toMap(SysTag::getSysTagId, SysTag::getTagName));
+//        uemUserDtoPage.getRecords().stream()
+//                .filter(m->{return Objects.nonNull(m.getTagIds());})
+//                .forEach(record ->{
+//                    StringBuffer tagNames = new StringBuffer();
+//                    Arrays.stream(record.getTagIds().split(",")).forEach(tagId ->{
+//                        tagNames.append(tagMap.get(tagId)).append(",");
+//                    });
+//                record.setTagNames(tagNames.deleteCharAt(tagNames.length()-1).toString());
+//                });
+        for(int i =0; i < uemUserDtoPage.getRecords().size(); i++){
+            UemUserDto userDto = uemUserDtoPage.getRecords().get(i);
+            String tagIds = userDto.getTagIds();
+            if(StringUtils.isBlank(tagIds)){
+                continue;
+            }
+            String[] tagIdArray = tagIds.split(",");
+            StringBuffer tagNames = new StringBuffer();
+            for (int j = 0; j < tagIdArray.length; j++){
+                tagNames.append(tagMap.get(Long.valueOf(tagIdArray[j])));
+                if(j < tagIdArray.length -1){
+                    tagNames.append(",");
+                }
+            }
+            userDto.setTagNames(tagNames.toString());
+        }
+        return uemUserDtoPage;
     }
 
 
@@ -619,7 +643,21 @@ public class UemUserManageServiceImpl implements UemUserManageService {
      */
     @Override
     public UemUserDto queryStaffById(Long uemUserId) {
-        return QUemUser.uemUser.selectOne().mapperTo(UemUserDto.class).byId(uemUserId);
+        UemUserDto uemUserDto = QUemUser.uemUser.selectOne().mapperTo(UemUserDto.class).byId(uemUserId);
+        if(Objects.nonNull(uemUserDto) && StringUtils.isNotBlank(uemUserDto.getTagIds())){
+            List<SysTag> sysTags = QSysTag.sysTag
+                    .select(QSysTag.sysTagId,QSysTag.tagName)
+                    .where(QSysTag.isDeleted.eq$(false)
+                            .and(QSysTag.status.eq$(true)))
+                    .execute();
+            Map<Long,String> tagMap = sysTags.stream().collect(Collectors.toMap(SysTag::getSysTagId, SysTag::getTagName));
+            StringBuffer tagNames = new StringBuffer();
+            Arrays.stream(uemUserDto.getTagIds().split(","))
+                    .filter(s->{return !StringUtils.isBlank(s);})
+                    .forEach(s ->{tagNames.append(tagMap.get(Long.valueOf(s))).append(",");});
+            uemUserDto.setTagNames(tagNames.deleteCharAt(tagNames.length()-1).toString());
+        }
+        return uemUserDto;
     }
 
     /**
@@ -634,64 +672,24 @@ public class UemUserManageServiceImpl implements UemUserManageService {
         if (Objects.isNull(uemUserId)) {
             return CommonResult.getFaildResultData("用户id不能为空");
         }
-        String name = uemUserDto.getName();
-        Boolean sex = uemUserDto.getSex();
-        String birthday = uemUserDto.getBirthday();
-        Long jobStatus = uemUserDto.getJobStatus();
-        String idCard = uemUserDto.getIdCard();
-        String mobile = uemUserDto.getMobile();
-        String address = uemUserDto.getAddress();
-        String sourceAddress = uemUserDto.getSourceAddress();
-        Long maritalStatus = uemUserDto.getMaritalStatus();
-        //政治面貌---来源数据字典
-        String politicalStatus = uemUserDto.getPoliticalStatus();
-        Long education = uemUserDto.getEducation();
-        Date graduateDate = uemUserDto.getGraduateDate();
-        String graduateSchool = uemUserDto.getGraduateSchool();
-        String speciality = uemUserDto.getSpeciality();
-        Date entryDate = uemUserDto.getEntryDate();
-        Long uemDeptId = uemUserDto.getUemDeptId();
-        Long technicalTitleId = uemUserDto.getTechnicalTitleId();
-        String email = uemUserDto.getEmail();
-        BigDecimal seniority = uemUserDto.getSeniority();
-        Long projectId = uemUserDto.getProjectId();
-        Long staffDutyId = uemUserDto.getStaffDutyId();
         //根据id查询出对应的员工信息，避免空字段
         UemUser uemUser = QUemUser.uemUser.selectOne(QUemUser.uemUser.fieldContainer()).byId(uemUserId);
         if (uemUser == null) {
             return CommonResult.getFaildResultData("查询结果为空!");
         }
-        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
-        uemUser.setUemUserId(uemUserId);
-        uemUser.setPoliticalStatus(politicalStatus);
-        uemUser.setSex(sex);
-        uemUser.setBirthday(birthday);
-        uemUser.setJobStatus(jobStatus);
-        uemUser.setIdCard(idCard);
-        uemUser.setName(name);
-        uemUser.setMobile(mobile);
-        uemUser.setAddress(address);
-        uemUser.setSourceAddress(sourceAddress);
-        uemUser.setMaritalStatus(maritalStatus);
-        uemUser.setEducation(education);
-        uemUser.setGraduateDate(graduateDate);
-        uemUser.setGraduateSchool(graduateSchool);
-        uemUser.setSpeciality(speciality);
-        uemUser.setEntryDate(entryDate);
-        uemUser.setEmail(email);
-        uemUser.setSeniority(seniority);
-        SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne(QSysTechnicalTitle.technicalName).byId(technicalTitleId);
-        uemUser.setTechnicalName(sysTechnicalTitle.getTechnicalName());
-        uemUser.setTechnicalTitleId(technicalTitleId);
-        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postName).where(QSysPost.postId.eq$(staffDutyId)).execute();
-        uemUser.setStaffDuty(sysPost.getPostName());
-        uemUser.setStaffDutyId(staffDutyId);
-        UemProject uemProject = QUemProject.uemProject.selectOne(QUemProject.projectName).byId(projectId);
-        uemUser.setProjectName(uemProject.getProjectName());
-        uemUser.setProjectId(projectId);
-        UemDept uemDept = QUemDept.uemDept.selectOne(QUemDept.deptName, QUemDept.uemDeptId).byId(uemDeptId);
+        BeanUtil.copyProperties(uemUserDto,uemUser,CopyOptions.create().setIgnoreNullValue(true));
+        uemUser.setTagIds(uemUserDto.getTagIds());
+        UemDept uemDept = QUemDept.uemDept.selectOne(QUemDept.deptName, QUemDept.uemDeptId).byId(uemUserDto.getUemDeptId());
+        UemProject uemProject= QUemProject.uemProject.selectOne(QUemProject.projectName).byId(uemUserDto.getProjectId());
+        SysTechnicalTitle sysTechnicalTitle = QSysTechnicalTitle.sysTechnicalTitle.selectOne(QSysTechnicalTitle.technicalName).byId(uemUserDto.getTechnicalTitleId());
+        SysPost sysPost = QSysPost.sysPost.selectOne(QSysPost.postName).where(QSysPost.postId.eq$(uemUserDto.getStaffDutyId())).execute();
+
         uemUser.setDeptName(uemDept.getDeptName());
-        uemUser.setUemDeptId(uemDept.getUemDeptId());
+        uemUser.setProjectName(uemProject.getProjectName());
+        uemUser.setTechnicalName(sysTechnicalTitle.getTechnicalName());
+        uemUser.setStaffDuty(sysPost.getPostName());
+        uemUser.setRowStatus(RowStatusConstants.ROW_STATUS_MODIFIED);
+
         QUemUser.uemUser.save(uemUser);
         return CommonResult.getSuccessResultData("修改成功!");
     }

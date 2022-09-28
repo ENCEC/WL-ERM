@@ -93,7 +93,8 @@ public class QUemUser extends BaseModelExpression<UemUser, Long> {
     public static final FieldExpression<Long> uemUserId = uemUser.fieldOf("uemUserId", Long.class);
     public static final FieldExpression<String> userType = uemUser.fieldOf("userType", String.class);
     public static final FieldExpression<String> wxId = uemUser.fieldOf("wxId", String.class);
-
+    public static final FieldExpression<String> tagIds = uemUser.fieldOf("tagIds", String.class);
+    public static final FieldExpression<String> attributionLand = uemUser.fieldOf("attributionLand", String.class);
 
     public QUemUser() {
         super("UemUser", UemUser.class);
